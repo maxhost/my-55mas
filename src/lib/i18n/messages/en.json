@@ -1,0 +1,25 @@
+{
+  "Metadata": {
+    "title": "55mas - Experienced professionals",
+    "description": "Professional services marketplace for people over 55"
+  },
+  "Common": {
+    "loading": "Loading...",
+    "error": "An error has occurred",
+    "back": "Back",
+    "logout": "Sign out",
+    "profile": "Profile",
+    "notFound": "Page not found",
+    "notFoundDescription": "The page you are looking for does not exist",
+    "unexpectedError": "Something went wrong",
+    "retry": "Try again"
+  },
+  "Placeholder": {
+    "comingSoon": "Coming soon",
+    "publicArea": "Public area",
+    "authArea": "Access",
+    "clientArea": "Client area",
+    "talentArea": "Talent portal",
+    "adminArea": "Admin panel"
+  }
+}

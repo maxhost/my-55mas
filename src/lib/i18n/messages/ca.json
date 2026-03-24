@@ -1,0 +1,25 @@
+{
+  "Metadata": {
+    "title": "55mas - Professionals amb experiència",
+    "description": "Marketplace de serveis professionals per a majors de 55"
+  },
+  "Common": {
+    "loading": "Carregant...",
+    "error": "S'ha produït un error",
+    "back": "Tornar",
+    "logout": "Sortir",
+    "profile": "Perfil",
+    "notFound": "Pàgina no trobada",
+    "notFoundDescription": "La pàgina que cerques no existeix",
+    "unexpectedError": "Alguna cosa ha anat malament",
+    "retry": "Tornar a provar"
+  },
+  "Placeholder": {
+    "comingSoon": "Properament",
+    "publicArea": "Àrea pública",
+    "authArea": "Accés",
+    "clientArea": "Zona de client",
+    "talentArea": "Portal del talent",
+    "adminArea": "Panell d'administració"
+  }
+}

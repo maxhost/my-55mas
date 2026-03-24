@@ -1,0 +1,25 @@
+{
+  "Metadata": {
+    "title": "55mas - Profesionales con experiencia",
+    "description": "Marketplace de servicios profesionales para mayores de 55"
+  },
+  "Common": {
+    "loading": "Cargando...",
+    "error": "Ha ocurrido un error",
+    "back": "Volver",
+    "logout": "Salir",
+    "profile": "Perfil",
+    "notFound": "Página no encontrada",
+    "notFoundDescription": "La página que buscas no existe",
+    "unexpectedError": "Algo salió mal",
+    "retry": "Reintentar"
+  },
+  "Placeholder": {
+    "comingSoon": "Próximamente",
+    "publicArea": "Área pública",
+    "authArea": "Acceso",
+    "clientArea": "Zona de cliente",
+    "talentArea": "Portal del talento",
+    "adminArea": "Panel de administración"
+  }
+}
