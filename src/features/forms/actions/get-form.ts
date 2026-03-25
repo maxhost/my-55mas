@@ -9,7 +9,8 @@ import {
 
 export async function getForm(
   serviceId: string,
-  countryId: string | null = null
+  countryId: string | null = null,
+  fallback = true
 ): Promise<FormWithTranslations | null> {
   const supabase = createClient();
 
@@ -33,8 +34,8 @@ export async function getForm(
   if (error) throw error;
 
   // Fallback to default if country-specific not found
-  if ((!forms || forms.length === 0) && countryId) {
-    return getForm(serviceId, null);
+  if ((!forms || forms.length === 0) && countryId && fallback) {
+    return getForm(serviceId, null, true);
   }
 
   if (!forms || forms.length === 0) return null;

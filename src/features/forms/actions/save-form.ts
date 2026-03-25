@@ -6,6 +6,8 @@ import {
   type SaveFormInput,
   saveFormTranslationsSchema,
   type SaveFormTranslationsInput,
+  saveFormWithTranslationsSchema,
+  type SaveFormWithTranslationsInput,
 } from '../schemas';
 
 export async function saveForm(input: SaveFormInput) {
@@ -82,4 +84,34 @@ export async function saveFormTranslations(input: SaveFormTranslationsInput) {
 
   if (error) throw error;
   return { data: { form_id, locale } };
+}
+
+export async function saveFormWithTranslations(
+  input: SaveFormWithTranslationsInput
+) {
+  const parsed = saveFormWithTranslationsSchema.safeParse(input);
+  if (!parsed.success) {
+    return { error: parsed.error.flatten().fieldErrors };
+  }
+
+  const { service_id, country_id, schema, locale, labels, placeholders, option_labels } =
+    parsed.data;
+
+  // Save schema (reuses existing saveForm logic)
+  const formResult = await saveForm({ service_id, country_id, schema });
+  if ('error' in formResult && formResult.error) return formResult;
+
+  const formId = formResult.data!.id;
+
+  // Save translations for the active locale
+  const transResult = await saveFormTranslations({
+    form_id: formId,
+    locale,
+    labels,
+    placeholders,
+    option_labels,
+  });
+  if ('error' in transResult && transResult.error) return transResult;
+
+  return { data: { id: formId } };
 }

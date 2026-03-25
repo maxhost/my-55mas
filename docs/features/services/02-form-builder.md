@@ -53,13 +53,24 @@ Inspirado en Tally.so y Typeform. Cards apiladas verticalmente, una por paso.
 | Selección múltiple | `multiselect` | Sí — lista de option keys |
 | Archivo | `file` | No (tipos permitidos en v2) |
 
-### Formulario por país
+### Variantes por país
 
-Un servicio puede tener formularios diferentes por país (regulaciones). La DB soporta esto via `service_forms.country_id`:
-- `country_id = NULL` → formulario default (todos los países)
-- `country_id = uuid` → formulario específico para ese país
+Un servicio puede tener formularios diferentes por país (regulaciones, preguntas locales). Soportado via `service_forms.country_id`:
+- `country_id = NULL` → formulario general (aplica a todos los países sin variante propia)
+- `country_id = uuid` → variante específica para ese país
 
-**v1:** Solo formulario default (country_id = NULL). Formularios por país en v2.
+**Flujo:**
+1. El admin crea el formulario general (se muestra por defecto)
+2. Opcionalmente, desde un dropdown "Variante", clona el general a un país específico
+3. La variante clonada es 100% independiente: puede añadir/quitar pasos y campos
+4. Todas las traducciones se clonan junto con la estructura
+
+### Traducciones integradas
+
+Las traducciones de labels, placeholders y opciones se editan **dentro del mismo builder**, no en una sección separada. El patrón es idéntico a la tab Contenido:
+- Tabs de idioma (ES, EN, PT, FR, CA) arriba del builder
+- Al cambiar de idioma, la estructura del formulario se mantiene pero los campos de etiqueta/placeholder cambian al idioma seleccionado
+- Guardar persiste estructura + traducciones del idioma activo en una sola llamada
 
 ---
 
@@ -135,5 +146,9 @@ Ver spec detallada en [04-translations.md](./04-translations.md).
 - [ ] El schema se guarda como JSONB en `service_forms`
 - [ ] Keys son validados (únicos, snake_case)
 - [ ] Al guardar, se incrementa version si el schema cambió
-- [ ] Formulario default (country_id = NULL) funciona correctamente
+- [ ] Formulario general (country_id = NULL) funciona correctamente
+- [ ] Tabs de idioma muestran traducciones integradas en el builder
+- [ ] Crear variante para un país clona estructura + traducciones
+- [ ] Variantes son independientes (cambios no afectan al general ni a otras variantes)
+- [ ] Cambiar entre variantes recarga el formulario correcto
 - [ ] Build pasa sin errores

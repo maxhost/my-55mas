@@ -64,3 +64,27 @@ export const saveFormTranslationsSchema = z.object({
 export type SaveFormTranslationsInput = z.input<
   typeof saveFormTranslationsSchema
 >;
+
+// ── Save Form + Translations (combined) ──────────────
+
+export const saveFormWithTranslationsSchema = z.object({
+  service_id: z.string().uuid(),
+  country_id: z.string().uuid().nullable().default(null),
+  schema: formSchemaSchema,
+  locale: z.string().min(2).max(5),
+  labels: z.record(z.string()),
+  placeholders: z.record(z.string()),
+  option_labels: z.record(z.string()),
+});
+
+export type SaveFormWithTranslationsInput = z.input<
+  typeof saveFormWithTranslationsSchema
+>;
+
+// ── Clone Form Variant ───────────────────────────────
+
+export const cloneFormVariantSchema = z.object({
+  service_id: z.string().uuid(),
+  source_country_id: z.string().uuid().nullable(),
+  target_country_id: z.string().uuid(),
+});

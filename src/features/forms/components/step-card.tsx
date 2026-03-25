@@ -2,20 +2,25 @@
 
 import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ArrowUp, ArrowDown, X, Plus } from 'lucide-react';
-import type { FormStep, FormField } from '../types';
+import type { FormStep, FormField, FormTranslationData } from '../types';
 import { FieldEditor } from './field-editor';
 
 type Props = {
   step: FormStep;
   stepIndex: number;
   totalSteps: number;
+  translations: FormTranslationData;
   onChange: (step: FormStep) => void;
   onRemove: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
+  onLabelChange: (key: string, value: string) => void;
+  onPlaceholderChange: (key: string, value: string) => void;
+  onOptionLabelChange: (compositeKey: string, value: string) => void;
 };
 
 function swap<T>(arr: T[], i: number, j: number): T[] {
@@ -28,25 +33,24 @@ export function StepCard({
   step,
   stepIndex,
   totalSteps,
+  translations,
   onChange,
   onRemove,
   onMoveUp,
   onMoveDown,
+  onLabelChange,
+  onPlaceholderChange,
+  onOptionLabelChange,
 }: Props) {
   const t = useTranslations('AdminFormBuilder');
 
   const addField = () => {
-    const newField: FormField = {
-      key: '',
-      type: 'text',
-      required: false,
-    };
+    const newField: FormField = { key: '', type: 'text', required: false };
     onChange({ ...step, fields: [...step.fields, newField] });
   };
 
   const updateField = (fieldIndex: number, field: FormField) => {
-    const fields = step.fields.map((f, i) => (i === fieldIndex ? field : f));
-    onChange({ ...step, fields });
+    onChange({ ...step, fields: step.fields.map((f, i) => (i === fieldIndex ? field : f)) });
   };
 
   const removeField = (fieldIndex: number) => {
@@ -66,60 +70,54 @@ export function StepCard({
           className="h-8 w-40 text-sm"
         />
         <div className="ml-auto flex gap-0.5">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-xs"
-            onClick={onMoveUp}
-            disabled={stepIndex === 0}
-          >
+          <Button type="button" variant="ghost" size="icon-xs" onClick={onMoveUp} disabled={stepIndex === 0}>
             <ArrowUp />
           </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-xs"
-            onClick={onMoveDown}
-            disabled={stepIndex === totalSteps - 1}
-          >
+          <Button type="button" variant="ghost" size="icon-xs" onClick={onMoveDown} disabled={stepIndex === totalSteps - 1}>
             <ArrowDown />
           </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-xs"
-            onClick={onRemove}
-          >
+          <Button type="button" variant="ghost" size="icon-xs" onClick={onRemove}>
             <X />
           </Button>
         </div>
       </CardHeader>
+
       <CardContent className="space-y-3">
+        {/* Step label translation */}
+        <div className="space-y-1">
+          <Label className="text-xs">{t('stepLabel')}</Label>
+          <Input
+            value={translations.labels[step.key] ?? ''}
+            onChange={(e) => onLabelChange(step.key, e.target.value)}
+            placeholder={t('stepLabel')}
+            className="h-8 text-sm"
+          />
+        </div>
+
         {step.fields.length === 0 && (
           <p className="text-muted-foreground text-sm">{t('noFields')}</p>
         )}
+
         {step.fields.map((field, fieldIndex) => (
           <FieldEditor
             key={fieldIndex}
             field={field}
             index={fieldIndex}
             total={step.fields.length}
+            label={translations.labels[field.key] ?? ''}
+            placeholder={translations.placeholders[field.key] ?? ''}
+            optionLabels={translations.option_labels}
             onChange={(f) => updateField(fieldIndex, f)}
             onRemove={() => removeField(fieldIndex)}
-            onMoveUp={() =>
-              onChange({ ...step, fields: swap(step.fields, fieldIndex, fieldIndex - 1) })
-            }
-            onMoveDown={() =>
-              onChange({ ...step, fields: swap(step.fields, fieldIndex, fieldIndex + 1) })
-            }
+            onMoveUp={() => onChange({ ...step, fields: swap(step.fields, fieldIndex, fieldIndex - 1) })}
+            onMoveDown={() => onChange({ ...step, fields: swap(step.fields, fieldIndex, fieldIndex + 1) })}
+            onLabelChange={onLabelChange}
+            onPlaceholderChange={onPlaceholderChange}
+            onOptionLabelChange={onOptionLabelChange}
           />
         ))}
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={addField}
-        >
+
+        <Button type="button" variant="outline" size="sm" onClick={addField}>
           <Plus className="mr-1 h-3 w-3" />
           {t('addField')}
         </Button>

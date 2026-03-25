@@ -90,7 +90,15 @@
     "multiselect": "Selección múltiple",
     "file": "Archivo",
     "noSteps": "No hay pasos definidos",
-    "noFields": "No hay campos en este paso"
+    "noFields": "No hay campos en este paso",
+    "variant": "Variante",
+    "general": "General",
+    "createVariantFor": "+ {country}",
+    "cloning": "Clonando...",
+    "stepLabel": "Etiqueta del paso",
+    "fieldLabel": "Etiqueta",
+    "fieldPlaceholder": "Placeholder",
+    "optionLabel": "Etiqueta de opción"
   },
   "Placeholder": {
     "comingSoon": "Próximamente",

@@ -90,7 +90,15 @@
     "multiselect": "Multi select",
     "file": "File",
     "noSteps": "No steps defined",
-    "noFields": "No fields in this step"
+    "noFields": "No fields in this step",
+    "variant": "Variant",
+    "general": "General",
+    "createVariantFor": "+ {country}",
+    "cloning": "Cloning...",
+    "stepLabel": "Step label",
+    "fieldLabel": "Label",
+    "fieldPlaceholder": "Placeholder",
+    "optionLabel": "Option label"
   },
   "Placeholder": {
     "comingSoon": "Coming soon",

@@ -90,7 +90,15 @@
     "multiselect": "Sélection multiple",
     "file": "Fichier",
     "noSteps": "Aucune étape définie",
-    "noFields": "Aucun champ dans cette étape"
+    "noFields": "Aucun champ dans cette étape",
+    "variant": "Variante",
+    "general": "Général",
+    "createVariantFor": "+ {country}",
+    "cloning": "Clonage...",
+    "stepLabel": "Libellé de l'étape",
+    "fieldLabel": "Libellé",
+    "fieldPlaceholder": "Placeholder",
+    "optionLabel": "Libellé de l'option"
   },
   "Placeholder": {
     "comingSoon": "Prochainement",

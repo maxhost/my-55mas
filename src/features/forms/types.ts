@@ -58,6 +58,22 @@ export type FormWithTranslations = FormDetail & {
   translations: Record<string, FormTranslationData>;
 };
 
+// ── Variant summary (for variant selector) ───────────
+
+export type FormVariantSummary = {
+  id: string;
+  country_id: string | null;
+  country_name: string | null;
+  version: number;
+};
+
+// ── Country option (forms-local, avoids cross-feature import) ──
+
+export type FormCountryOption = {
+  id: string;
+  name: string;
+};
+
 // ── Helpers ───────────────────────────────────────────
 
 /**

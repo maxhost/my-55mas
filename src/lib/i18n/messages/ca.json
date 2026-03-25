@@ -90,7 +90,15 @@
     "multiselect": "Selecció múltiple",
     "file": "Fitxer",
     "noSteps": "No hi ha passos definits",
-    "noFields": "No hi ha camps en aquest pas"
+    "noFields": "No hi ha camps en aquest pas",
+    "variant": "Variant",
+    "general": "General",
+    "createVariantFor": "+ {country}",
+    "cloning": "Clonant...",
+    "stepLabel": "Etiqueta del pas",
+    "fieldLabel": "Etiqueta",
+    "fieldPlaceholder": "Placeholder",
+    "optionLabel": "Etiqueta de l'opció"
   },
   "Placeholder": {
     "comingSoon": "Properament",
