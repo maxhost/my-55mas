@@ -2,7 +2,9 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
+import { Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -15,6 +17,7 @@ import type { ServiceListItem, ServiceStatus } from '../types';
 
 type Props = {
   services: ServiceListItem[];
+  onDelete: (id: string) => void;
 };
 
 const statusVariant: Record<ServiceStatus, 'default' | 'secondary' | 'outline'> = {
@@ -23,7 +26,7 @@ const statusVariant: Record<ServiceStatus, 'default' | 'secondary' | 'outline'> 
   archived: 'outline',
 };
 
-export function ServicesTable({ services }: Props) {
+export function ServicesTable({ services, onDelete }: Props) {
   const t = useTranslations('AdminServices');
 
   if (services.length === 0) {
@@ -41,6 +44,7 @@ export function ServicesTable({ services }: Props) {
           <TableHead>{t('name')}</TableHead>
           <TableHead>{t('status')}</TableHead>
           <TableHead>{t('createdAt')}</TableHead>
+          <TableHead />
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -63,6 +67,18 @@ export function ServicesTable({ services }: Props) {
               {service.created_at
                 ? new Date(service.created_at).toLocaleDateString()
                 : '—'}
+            </TableCell>
+            <TableCell>
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(service.id);
+                }}
+              >
+                <Trash2 className="size-3" />
+              </Button>
             </TableCell>
           </TableRow>
         ))}

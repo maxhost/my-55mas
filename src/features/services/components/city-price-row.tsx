@@ -1,25 +1,28 @@
 'use client';
 
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { TableCell, TableRow } from '@/components/ui/table';
-import type { CountryOption } from '../types';
+import { X } from 'lucide-react';
 
-type CountryPriceData = {
+export type CityPriceData = {
+  city_id: string;
   country_id: string;
   base_price: number;
   is_active: boolean;
 };
 
 type Props = {
-  country: CountryOption;
-  data: CountryPriceData;
-  onChange: (data: CountryPriceData) => void;
+  cityName: string;
+  data: CityPriceData;
+  onChange: (data: CityPriceData) => void;
+  onRemove: () => void;
 };
 
-export function CountryPriceRow({ country, data, onChange }: Props) {
+export function CityPriceRow({ cityName, data, onChange, onRemove }: Props) {
   return (
     <TableRow>
-      <TableCell className="font-medium">{country.name}</TableCell>
+      <TableCell className="font-medium">{cityName}</TableCell>
       <TableCell>
         <Input
           type="number"
@@ -32,7 +35,6 @@ export function CountryPriceRow({ country, data, onChange }: Props) {
           className="w-32"
         />
       </TableCell>
-      <TableCell className="text-muted-foreground">{country.currency}</TableCell>
       <TableCell>
         <input
           type="checkbox"
@@ -40,6 +42,11 @@ export function CountryPriceRow({ country, data, onChange }: Props) {
           onChange={(e) => onChange({ ...data, is_active: e.target.checked })}
           className="h-4 w-4 rounded"
         />
+      </TableCell>
+      <TableCell>
+        <Button type="button" variant="ghost" size="icon-xs" onClick={onRemove}>
+          <X />
+        </Button>
       </TableCell>
     </TableRow>
   );

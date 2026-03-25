@@ -5,6 +5,7 @@ import type {
   ServiceDetail,
   ServiceTranslationDetail,
   ServiceCountryDetail,
+  ServiceCityDetail,
   FaqItem,
 } from '../types';
 
@@ -89,5 +90,38 @@ export async function getService(id: string): Promise<ServiceDetail | null> {
     };
   });
 
-  return { ...service, translations, countries };
+  // Fetch city pricing with city details
+  const { data: rawCities } = await supabase
+    .from('service_cities')
+    .select('service_id, city_id, base_price, is_active, cities (country_id)')
+    .eq('service_id', id);
+
+  const cityIds = (rawCities ?? []).map((c) => c.city_id);
+  let cityNameMap: Record<string, string> = {};
+
+  if (cityIds.length > 0) {
+    const { data: cityNames } = await supabase
+      .from('city_translations')
+      .select('city_id, name')
+      .eq('locale', 'es')
+      .in('city_id', cityIds);
+
+    cityNameMap = Object.fromEntries(
+      (cityNames ?? []).map((c) => [c.city_id, c.name])
+    );
+  }
+
+  const cities: ServiceCityDetail[] = (rawCities ?? []).map((c) => {
+    const city = c.cities as unknown as { country_id: string };
+    return {
+      service_id: c.service_id,
+      city_id: c.city_id,
+      base_price: c.base_price,
+      is_active: c.is_active,
+      city_name: cityNameMap[c.city_id] ?? c.city_id,
+      country_id: city.country_id,
+    };
+  });
+
+  return { ...service, translations, countries, cities };
 }

@@ -12,7 +12,10 @@
     "notFound": "Page not found",
     "notFoundDescription": "The page you are looking for does not exist",
     "unexpectedError": "Something went wrong",
-    "retry": "Try again"
+    "retry": "Try again",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "deleting": "Deleting..."
   },
   "AdminNav": {
     "orders": "Orders",
@@ -61,7 +64,21 @@
     "currency": "Currency",
     "active": "Active",
     "allowsRecurrence": "Allows recurrence",
-    "confirmArchive": "Archive this service?"
+    "confirmArchive": "Archive this service?",
+    "addCountry": "Add",
+    "removeCountry": "Remove country",
+    "noCountries": "No countries configured",
+    "selectCountry": "Select country",
+    "city": "City",
+    "selectCity": "Select city",
+    "addCity": "Add",
+    "noCities": "No cities configured",
+    "templatePrice": "Template price",
+    "applyToCities": "Apply to cities",
+    "deleteServiceTitle": "Delete service",
+    "deleteServiceDescription": "This will permanently delete \"{name}\" and all its data: translations, country/city configuration, forms, and required documents. This action cannot be undone.",
+    "deleteConfirm": "Delete permanently",
+    "deleteError": "Error deleting service."
   },
   "AdminFormBuilder": {
     "title": "Form designer",
@@ -98,7 +115,10 @@
     "stepLabel": "Step label",
     "fieldLabel": "Label",
     "fieldPlaceholder": "Placeholder",
-    "optionLabel": "Option label"
+    "optionLabel": "Option label",
+    "cascadeInfo": "Changes to the general form are propagated to all countries",
+    "noCountriesConfigured": "Configure countries in the Settings tab first",
+    "saveError": "Error saving. Check field keys."
   },
   "Placeholder": {
     "comingSoon": "Coming soon",

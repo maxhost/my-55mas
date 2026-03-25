@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ArrowUp, ArrowDown, X, Plus } from 'lucide-react';
 import type { FormStep, FormField, FormTranslationData } from '../types';
+import { sanitizeKey } from '../utils';
 import { FieldEditor } from './field-editor';
 
 type Props = {
@@ -45,7 +46,10 @@ export function StepCard({
   const t = useTranslations('AdminFormBuilder');
 
   const addField = () => {
-    const newField: FormField = { key: '', type: 'text', required: false };
+    const existingKeys = new Set(step.fields.map((f) => f.key));
+    let idx = step.fields.length + 1;
+    while (existingKeys.has(`field_${idx}`)) idx++;
+    const newField: FormField = { key: `field_${idx}`, type: 'text', required: false };
     onChange({ ...step, fields: [...step.fields, newField] });
   };
 
@@ -65,7 +69,7 @@ export function StepCard({
         </span>
         <Input
           value={step.key}
-          onChange={(e) => onChange({ ...step, key: e.target.value })}
+          onChange={(e) => onChange({ ...step, key: sanitizeKey(e.target.value) })}
           placeholder={t('stepKey')}
           className="h-8 w-40 text-sm"
         />

@@ -4,101 +4,129 @@ import { useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Plus } from 'lucide-react';
 import { saveConfig } from '../actions/update-service';
-import type { ServiceDetail, CountryOption, ServiceStatus } from '../types';
+import { canPublish } from '../actions/config-helpers';
+import type { ServiceDetail, CountryOption, CityOption, ServiceStatus, ServiceCountryDetail } from '../types';
 import { SERVICE_STATUSES } from '../types';
-import { CountryPriceRow } from './country-price-row';
-
-type CountryPriceData = {
-  country_id: string;
-  base_price: number;
-  is_active: boolean;
-};
+import { useConfigState } from '../hooks/use-config-state';
+import { CountryConfigCard } from './country-config-card';
 
 type Props = {
   service: ServiceDetail;
   countries: CountryOption[];
+  allCities: CityOption[];
+  onCountriesChange?: (countries: ServiceCountryDetail[]) => void;
 };
 
-export function ServiceConfig({ service, countries }: Props) {
+export function ServiceConfig({ service, countries, allCities, onCountriesChange }: Props) {
   const t = useTranslations('AdminServices');
   const [isPending, startTransition] = useTransition();
+  const [status, setStatus] = useState<ServiceStatus>(service.status as ServiceStatus);
+  const [allowsRecurrence, setAllowsRecurrence] = useState(service.allows_recurrence);
+  const [selectedCountry, setSelectedCountry] = useState('');
 
-  const [status, setStatus] = useState<ServiceStatus>(
-    service.status as ServiceStatus
-  );
-  const [allowsRecurrence, setAllowsRecurrence] = useState(
-    service.allows_recurrence
-  );
+  const state = useConfigState(service);
+  const availableCountries = countries.filter((c) => !state.configuredCountryIds.includes(c.id));
+  const configuredCountries = state.configuredCountryIds
+    .map((id) => countries.find((c) => c.id === id))
+    .filter((c): c is CountryOption => c !== undefined);
 
-  // Initialize country prices from existing data
-  const initialPrices: Record<string, CountryPriceData> = {};
-  for (const c of countries) {
-    const existing = service.countries.find((sc) => sc.country_id === c.id);
-    initialPrices[c.id] = existing
-      ? {
-          country_id: c.id,
-          base_price: existing.base_price,
-          is_active: existing.is_active,
-        }
-      : { country_id: c.id, base_price: 0, is_active: false };
-  }
-  const [prices, setPrices] =
-    useState<Record<string, CountryPriceData>>(initialPrices);
-
-  const updatePrice = (countryId: string, data: CountryPriceData) => {
-    setPrices((prev) => ({ ...prev, [countryId]: data }));
+  const handleAddCountry = () => {
+    if (!selectedCountry) return;
+    state.addCountry(selectedCountry);
+    setSelectedCountry('');
   };
 
   const handleSave = () => {
-    const countryRows = Object.values(prices).filter(
-      (p) => p.base_price > 0 || p.is_active
-    );
+    const { countries: countryRows, cities: cityRows } = state.buildSavePayload();
+
     startTransition(async () => {
-      await saveConfig({
+      const result = await saveConfig({
         service_id: service.id,
         status,
         allows_recurrence: allowsRecurrence,
         countries: countryRows,
+        cities: cityRows,
       });
+
+      if (result && 'error' in result) return;
+
+      if (onCountriesChange) {
+        const updated: ServiceCountryDetail[] = countryRows.map((row) => {
+          const c = countries.find((co) => co.id === row.country_id)!;
+          return {
+            service_id: service.id,
+            country_id: row.country_id,
+            base_price: row.base_price,
+            is_active: row.is_active,
+            country_name: c.name,
+            currency: c.currency,
+            country_code: c.code,
+          };
+        });
+        onCountriesChange(updated);
+      }
     });
   };
 
+  const allCityData = Object.values(state.cityData);
+  const publishBlocked = status === 'published' && !canPublish(allCityData);
+
   return (
-    <div className="space-y-8">
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">
-          {t('country')} & {t('pricePerHour')}
-        </h3>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t('country')}</TableHead>
-              <TableHead>{t('pricePerHour')}</TableHead>
-              <TableHead>{t('currency')}</TableHead>
-              <TableHead>{t('active')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {countries.map((country) => (
-              <CountryPriceRow
+    <div className="space-y-6">
+      {/* Country selector */}
+      {availableCountries.length > 0 && (
+        <div className="flex items-center gap-2">
+          <select
+            value={selectedCountry}
+            onChange={(e) => setSelectedCountry(e.target.value)}
+            className="border-border bg-background h-9 rounded-md border px-3 text-sm"
+          >
+            <option value="">{t('selectCountry')}</option>
+            {availableCountries.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+          <Button type="button" variant="outline" size="sm" onClick={handleAddCountry} disabled={!selectedCountry}>
+            <Plus className="mr-1 h-3 w-3" />
+            {t('addCountry')}
+          </Button>
+        </div>
+      )}
+
+      {/* Country cards */}
+      {configuredCountries.length === 0 ? (
+        <p className="text-muted-foreground py-4 text-sm">{t('noCountries')}</p>
+      ) : (
+        <div className="space-y-4">
+          {configuredCountries.map((country) => {
+            const citiesForCountry = allCities.filter((c) => c.country_id === country.id);
+            const configuredIds = state.configuredCityIds[country.id] ?? [];
+            const cityList = configuredIds
+              .map((id) => state.cityData[id])
+              .filter(Boolean);
+
+            return (
+              <CountryConfigCard
                 key={country.id}
                 country={country}
-                data={prices[country.id]}
-                onChange={(data) => updatePrice(country.id, data)}
+                templatePrice={state.templatePrices[country.id] ?? 0}
+                cities={cityList}
+                allCitiesForCountry={citiesForCountry}
+                onTemplateChange={(p) => state.updateTemplatePrice(country.id, p)}
+                onApplyToCities={() => state.applyToCities(country.id)}
+                onCityAdd={(cityId) => state.addCity(country.id, cityId)}
+                onCityRemove={(cityId) => state.removeCity(country.id, cityId)}
+                onCityChange={(cityId, d) => state.updateCity(cityId, d)}
+                onCountryRemove={() => state.removeCountry(country.id)}
               />
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+            );
+          })}
+        </div>
+      )}
 
+      {/* Status */}
       <div className="max-w-md space-y-2">
         <Label>{t('status')}</Label>
         <select
@@ -107,13 +135,17 @@ export function ServiceConfig({ service, countries }: Props) {
           className="border-border bg-background flex h-9 w-full rounded-md border px-3 py-1 text-sm"
         >
           {SERVICE_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {t(s)}
-            </option>
+            <option key={s} value={s}>{t(s)}</option>
           ))}
         </select>
+        {publishBlocked && (
+          <p className="text-destructive text-xs">
+            {t('noCities')}
+          </p>
+        )}
       </div>
 
+      {/* Recurrence */}
       <div className="flex items-center gap-2">
         <input
           type="checkbox"
@@ -125,7 +157,7 @@ export function ServiceConfig({ service, countries }: Props) {
         <Label htmlFor="recurrence">{t('allowsRecurrence')}</Label>
       </div>
 
-      <Button onClick={handleSave} disabled={isPending}>
+      <Button onClick={handleSave} disabled={isPending || publishBlocked}>
         {isPending ? t('saving') : t('save')}
       </Button>
     </div>

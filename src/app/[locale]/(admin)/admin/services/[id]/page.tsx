@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { getService } from '@/features/services/actions/get-service';
 import { getCountries } from '@/features/services/actions/get-countries';
+import { getCities } from '@/features/services/actions/get-cities';
 import { getForm } from '@/features/forms/actions/get-form';
 import { listFormVariants } from '@/features/forms/actions/list-form-variants';
 import { ServiceEditTabs } from './service-edit-tabs';
@@ -12,9 +13,10 @@ export default async function EditServicePage({ params: { locale, id } }: Props)
   unstable_setRequestLocale(locale);
   const t = await getTranslations('AdminServices');
 
-  const [service, countries, form, formVariants] = await Promise.all([
+  const [service, countries, allCities, form, formVariants] = await Promise.all([
     getService(id),
     getCountries(locale),
+    getCities(locale),
     getForm(id),
     listFormVariants(id),
   ]);
@@ -34,6 +36,7 @@ export default async function EditServicePage({ params: { locale, id } }: Props)
       <ServiceEditTabs
         service={service}
         countries={countries}
+        allCities={allCities}
         form={form}
         formVariants={formVariants}
       />

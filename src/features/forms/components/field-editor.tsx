@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { ArrowUp, ArrowDown, X } from 'lucide-react';
 import { FIELD_TYPES_WITH_OPTIONS, type FormField } from '../types';
+import { sanitizeKey } from '../utils';
 import { FieldTypePicker } from './field-type-picker';
 import { FieldOptionsEditor } from './field-options-editor';
 
@@ -48,7 +49,7 @@ export function FieldEditor({
       <div className="flex items-center gap-2">
         <Input
           value={field.key}
-          onChange={(e) => onChange({ ...field, key: e.target.value })}
+          onChange={(e) => onChange({ ...field, key: sanitizeKey(e.target.value) })}
           placeholder={t('fieldKey')}
           className="h-8 w-40 text-sm"
         />

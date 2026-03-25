@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import type { Json } from '@/lib/supabase/database.types';
 import {
   updateServiceSchema,
   type UpdateServiceInput,
@@ -9,6 +10,7 @@ import {
   saveConfigSchema,
   type SaveConfigInput,
 } from '../schemas';
+import { canPublish } from './config-helpers';
 
 export async function updateService(input: UpdateServiceInput) {
   const parsed = updateServiceSchema.safeParse(input);
@@ -71,46 +73,29 @@ export async function saveConfig(input: SaveConfigInput) {
     return { error: parsed.error.flatten().fieldErrors };
   }
 
-  const { service_id, status, allows_recurrence, countries } = parsed.data;
+  const { service_id, status, allows_recurrence, countries, cities } = parsed.data;
+
+  // Validate publish requirements
+  if (status === 'published' && !canPublish(cities)) {
+    return { error: { status: ['Requires at least 1 active city with price > 0'] } };
+  }
+
   const supabase = createClient();
 
-  // Update service fields if provided
-  const serviceUpdate: Record<string, unknown> = {
-    updated_at: new Date().toISOString(),
-  };
-  if (status !== undefined) serviceUpdate.status = status;
-  if (allows_recurrence !== undefined)
-    serviceUpdate.allows_recurrence = allows_recurrence;
-
-  const { error: serviceError } = await supabase
-    .from('services')
-    .update(serviceUpdate)
-    .eq('id', service_id);
-
-  if (serviceError) throw serviceError;
-
-  // Delete existing country prices, then insert new ones
-  const { error: deleteError } = await supabase
-    .from('service_countries')
-    .delete()
-    .eq('service_id', service_id);
-
-  if (deleteError) throw deleteError;
-
-  if (countries.length > 0) {
-    const rows = countries.map((c) => ({
-      service_id,
-      country_id: c.country_id,
+  // Atomic save via RPC (transactional: countries + cities together)
+  const { error } = await supabase.rpc('save_service_config', {
+    p_service_id: service_id,
+    p_status: status ?? undefined,
+    p_allows_recurrence: allows_recurrence ?? undefined,
+    p_countries: countries as unknown as Json,
+    p_cities: cities.map((c) => ({
+      city_id: c.city_id,
       base_price: c.base_price,
       is_active: c.is_active,
-    }));
+    })) as unknown as Json,
+  });
 
-    const { error: insertError } = await supabase
-      .from('service_countries')
-      .insert(rows);
-
-    if (insertError) throw insertError;
-  }
+  if (error) return { error: { _rpc: [error.message] } };
 
   return { data: { service_id } };
 }

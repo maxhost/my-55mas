@@ -313,7 +313,9 @@ CREATE TABLE service_translations (
   PRIMARY KEY (service_id, locale)
 );
 
--- Disponibilidad y precio por país
+-- Disponibilidad y precio plantilla por país
+-- base_price es un "template price" que se copia a ciudades como acelerador UX
+-- is_active se auto-calcula al guardar: true si ≥1 ciudad activa en el país
 -- currency se obtiene via JOIN con countries; no se duplica aquí
 CREATE TABLE service_countries (
   service_id  uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
@@ -321,6 +323,19 @@ CREATE TABLE service_countries (
   base_price  numeric(10,2) NOT NULL CHECK (base_price >= 0),
   is_active   boolean NOT NULL DEFAULT true,
   PRIMARY KEY (service_id, country_id)
+);
+
+-- Disponibilidad y precio real por ciudad
+-- base_price es el precio/hora real del servicio en esta ciudad
+-- country_id se deriva de cities.country_id (sin denormalización)
+CREATE TABLE service_cities (
+  service_id  uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
+  city_id     uuid NOT NULL REFERENCES cities(id),
+  base_price  numeric(10,2) NOT NULL CHECK (base_price >= 0),
+  is_active   boolean NOT NULL DEFAULT true,
+  created_at  timestamptz DEFAULT now(),
+  updated_at  timestamptz DEFAULT now(),
+  PRIMARY KEY (service_id, city_id)
 );
 ```
 

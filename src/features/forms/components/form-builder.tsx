@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { locales } from '@/lib/i18n/config';
 import { saveFormWithTranslations } from '../actions/save-form';
+import { cascadeGeneralSave } from '../actions/cascade-general-save';
+import { getForm } from '../actions/get-form';
 import type {
   FormSchema,
   FormStep,
@@ -19,6 +21,7 @@ type Props = {
   countryId: string | null;
   form: FormWithTranslations | null;
   activeLocale: string;
+  onSaved?: (form: FormWithTranslations) => void;
 };
 
 function swap<T>(arr: T[], i: number, j: number): T[] {
@@ -41,17 +44,12 @@ function initTranslations(
   return init;
 }
 
-export function FormBuilder({ serviceId, countryId, form, activeLocale }: Props) {
+export function FormBuilder({ serviceId, countryId, form, activeLocale, onSaved }: Props) {
   const t = useTranslations('AdminFormBuilder');
   const [isPending, startTransition] = useTransition();
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [schema, setSchema] = useState<FormSchema>(form?.schema ?? { steps: [] });
   const [translations, setTranslations] = useState(() => initTranslations(form));
-
-  // Reset state when form prop changes (variant switch)
-  useEffect(() => {
-    setSchema(form?.schema ?? { steps: [] });
-    setTranslations(initTranslations(form));
-  }, [form]);
 
   const current = translations[activeLocale] ?? emptyTranslation();
 
@@ -102,14 +100,32 @@ export function FormBuilder({ serviceId, countryId, form, activeLocale }: Props)
   };
 
   const handleSave = () => {
+    const payload = {
+      service_id: serviceId,
+      country_id: countryId,
+      schema,
+      locale: activeLocale,
+      ...current,
+    };
+    setSaveError(null);
     startTransition(async () => {
-      await saveFormWithTranslations({
-        service_id: serviceId,
-        country_id: countryId,
-        schema,
-        locale: activeLocale,
-        ...current,
-      });
+      const result = countryId === null
+        ? await cascadeGeneralSave(payload)
+        : await saveFormWithTranslations(payload);
+
+      if (result && 'error' in result) {
+        const errors = result.error as Record<string, string[]>;
+        const firstMsg = Object.values(errors).flat()[0];
+        setSaveError(firstMsg ?? t('saveError'));
+        return;
+      }
+      setSaveError(null);
+
+      // Sincronizar parent con datos guardados
+      if (onSaved) {
+        const saved = await getForm(serviceId, countryId, false);
+        if (saved) onSaved(saved);
+      }
     });
   };
 
@@ -136,14 +152,19 @@ export function FormBuilder({ serviceId, countryId, form, activeLocale }: Props)
         />
       ))}
 
-      <div className="flex gap-3">
-        <Button type="button" variant="outline" onClick={addStep}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('addStep')}
-        </Button>
-        <Button onClick={handleSave} disabled={isPending}>
-          {isPending ? t('saving') : t('save')}
-        </Button>
+      <div className="space-y-2">
+        <div className="flex gap-3">
+          <Button type="button" variant="outline" onClick={addStep}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('addStep')}
+          </Button>
+          <Button onClick={handleSave} disabled={isPending}>
+            {isPending ? t('saving') : t('save')}
+          </Button>
+        </div>
+        {saveError && (
+          <p className="text-destructive text-sm">{saveError}</p>
+        )}
       </div>
     </div>
   );

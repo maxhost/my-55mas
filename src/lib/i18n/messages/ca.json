@@ -12,7 +12,10 @@
     "notFound": "Pàgina no trobada",
     "notFoundDescription": "La pàgina que cerques no existeix",
     "unexpectedError": "Alguna cosa ha anat malament",
-    "retry": "Tornar a provar"
+    "retry": "Tornar a provar",
+    "cancel": "Cancel·lar",
+    "confirm": "Confirmar",
+    "deleting": "Eliminant..."
   },
   "AdminNav": {
     "orders": "Comandes",
@@ -61,7 +64,21 @@
     "currency": "Moneda",
     "active": "Actiu",
     "allowsRecurrence": "Permet recurrència",
-    "confirmArchive": "Arxivar aquest servei?"
+    "confirmArchive": "Arxivar aquest servei?",
+    "addCountry": "Afegir",
+    "removeCountry": "Treure país",
+    "noCountries": "No hi ha països configurats",
+    "selectCountry": "Seleccionar país",
+    "city": "Ciutat",
+    "selectCity": "Seleccionar ciutat",
+    "addCity": "Afegir",
+    "noCities": "No hi ha ciutats configurades",
+    "templatePrice": "Preu plantilla",
+    "applyToCities": "Aplicar a ciutats",
+    "deleteServiceTitle": "Eliminar servei",
+    "deleteServiceDescription": "Això eliminarà permanentment \"{name}\" i totes les seves dades: traduccions, configuració de països/ciutats, formularis i documents requerits. Aquesta acció no es pot desfer.",
+    "deleteConfirm": "Eliminar permanentment",
+    "deleteError": "Error en eliminar el servei."
   },
   "AdminFormBuilder": {
     "title": "Dissenyador de formulari",
@@ -98,7 +115,10 @@
     "stepLabel": "Etiqueta del pas",
     "fieldLabel": "Etiqueta",
     "fieldPlaceholder": "Placeholder",
-    "optionLabel": "Etiqueta de l'opció"
+    "optionLabel": "Etiqueta de l'opció",
+    "cascadeInfo": "Els canvis al formulari general es propaguen a tots els països",
+    "noCountriesConfigured": "Configureu els països a la pestanya Configuració primer",
+    "saveError": "Error en desar. Verifiqueu les claus dels camps."
   },
   "Placeholder": {
     "comingSoon": "Properament",

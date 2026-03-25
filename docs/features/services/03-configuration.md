@@ -4,48 +4,63 @@
 
 Tab "Configuración" en la edición del servicio. Aquí el admin gestiona:
 
-1. **Disponibilidad por país** — en qué países se ofrece el servicio
-2. **Precio por país** — precio/hora en la moneda local del país
-3. **Datos generales** — recurrencia, estado
+1. **Disponibilidad por país y ciudad** — en qué ciudades se ofrece el servicio
+2. **Precio por ciudad** — precio/hora en la moneda local del país, configurable por ciudad
+3. **Precio plantilla por país** — precio base que se copia a todas las ciudades (UX accelerator)
+4. **Datos generales** — recurrencia, estado
 
 ### Wireframe
 
 ```
-┌──────────────────────────────────────────────────────┐
-│  Configuración                                        │
-│                                                       │
-│  ┌─ Países y precios ─────────────────────────────┐  │
-│  │                                                 │  │
-│  │  País        │ Precio/hora │ Moneda │ Activo   │  │
-│  │  ─────────────────────────────────────────────  │  │
-│  │  España      │  25.00      │ EUR    │ [✓]      │  │
-│  │  Portugal    │  22.00      │ EUR    │ [✓]      │  │
-│  │  Francia     │  30.00      │ EUR    │ [ ]      │  │
-│  │  Argentina   │  15000.00   │ ARS    │ [✓]      │  │
-│  │  México      │  450.00     │ MXN    │ [ ]      │  │
-│  │  Colombia    │  80000.00   │ COP    │ [ ]      │  │
-│  │                                                 │  │
-│  └─────────────────────────────────────────────────┘  │
-│                                                       │
-│  Estado: [Borrador ▾]                                 │
-│  Permite recurrencia: [Toggle]                        │
-│                                                       │
-│                                        [Guardar]      │
-└──────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────┐
+│  Configuración                                              │
+│                                                             │
+│  [Seleccionar país ▾] [+ Agregar]                          │
+│                                                             │
+│  ▼ España  — Plantilla: [25.00] EUR [Aplicar a ciudades] [✕]│
+│    ┌────────────────────────────────────────────────────┐   │
+│    │ [Seleccionar ciudad ▾] [+ Agregar]                 │   │
+│    │                                                     │   │
+│    │  Ciudad    │ Precio/hora │ Activo │                 │   │
+│    │  ──────────────────────────────────                 │   │
+│    │  Madrid    │  25.00      │  [✓]   │ [✕]            │   │
+│    │  Barcelona │  28.00      │  [✓]   │ [✕]            │   │
+│    └────────────────────────────────────────────────────┘   │
+│                                                             │
+│  ▶ Portugal — Plantilla: [22.00] EUR              [✕]      │
+│                                                             │
+│  Estado: [Borrador ▾]                                       │
+│  Permite recurrencia: [Toggle]                              │
+│                                              [Guardar]      │
+└────────────────────────────────────────────────────────────┘
 ```
 
-### Flujo de países y precios
+**Nota**: La tab Configuración debe ir ANTES de la tab Formulario, ya que los países configurados aquí determinan qué variantes están disponibles en el Form Builder.
 
-1. Se cargan todos los países activos del sistema (tabla `countries`)
-2. Para cada país, se muestra una fila con:
-   - **Nombre del país** (traducido al locale del admin)
-   - **Precio/hora** (input numérico, editable)
-   - **Moneda** (read-only, viene de `countries.currency`)
-   - **Activo** (toggle switch)
-3. Al guardar:
-   - País con precio y activo → upsert en `service_countries` con `is_active = true`
-   - País con precio pero inactivo → upsert en `service_countries` con `is_active = false`
-   - País sin precio → no se crea fila (o se elimina si existía)
+### Flujo de países y ciudades
+
+1. Se cargan todos los países activos del sistema (tabla `countries`) como opciones disponibles
+2. Se cargan todas las ciudades activas del sistema (tabla `cities`) agrupadas por país
+3. Inicialmente solo se muestran los países ya configurados para el servicio
+4. El admin añade países mediante dropdown + botón "Agregar"
+5. Cada país configurado se muestra como un card colapsable con:
+   - **Header**: nombre del país, precio plantilla (input numérico), moneda (read-only), botón "Aplicar a ciudades", chevron expand/collapse, botón eliminar (✕)
+   - **Body (colapsable)**: dropdown para agregar ciudades + tabla de ciudades configuradas
+6. Cada ciudad configurada se muestra con:
+   - **Nombre de la ciudad** (traducido al locale del admin)
+   - **Precio/hora** (input numérico, editable, inicializado desde precio plantilla del país)
+   - **Activo** (checkbox)
+   - **Eliminar** (botón ✕)
+7. **Botón "Aplicar a ciudades"**: copia el precio plantilla del país a TODAS las ciudades de ese país (acción client-side, inmediata)
+8. Al guardar:
+   - `service_countries`: se persisten con `is_active` auto-calculado (true si ≥1 ciudad activa en el país)
+   - `service_cities`: se persisten todas las ciudades configuradas con su precio individual y estado activo
+   - Países/ciudades no presentes → se eliminan (delete-all + insert)
+9. Los países configurados se comparten con la tab Formulario para determinar variantes disponibles
+
+### Formularios y ciudades
+
+Los formularios siguen siendo por **país**, no por ciudad. Las ciudades solo afectan a la disponibilidad y el precio. El Form Builder muestra variantes por país.
 
 ### Estado del servicio
 
@@ -56,7 +71,7 @@ Tab "Configuración" en la edición del servicio. Aquí el admin gestiona:
 | `archived` | Archivado. No visible. No se puede contratar. Soft-delete. |
 
 Transiciones permitidas:
-- draft → published (requiere al menos 1 país activo con precio)
+- draft → published (requiere al menos 1 ciudad activa con precio > 0)
 - published → draft
 - published → archived
 - draft → archived
@@ -72,8 +87,21 @@ Transiciones permitidas:
 |---------|------|-------|
 | service_id | uuid FK → services | PK compuesta |
 | country_id | uuid FK → countries | PK compuesta |
-| base_price | numeric(10,2) | >= 0, obligatorio |
+| base_price | numeric(10,2) | >= 0, **precio plantilla** (UX accelerator para ciudades) |
+| is_active | boolean | **Auto-calculado**: true si ≥1 ciudad activa en el país |
+
+### `service_cities` (NUEVO)
+
+| Columna | Tipo | Notas |
+|---------|------|-------|
+| service_id | uuid FK → services (CASCADE) | PK compuesta |
+| city_id | uuid FK → cities | PK compuesta |
+| base_price | numeric(10,2) | >= 0, **precio real** del servicio en esta ciudad |
 | is_active | boolean | Default true |
+| created_at | timestamptz | Default now() |
+| updated_at | timestamptz | Trigger handle_updated_at() |
+
+Nota: `country_id` se deriva de `cities.country_id` — sin denormalización.
 
 ### `countries` (lectura)
 
@@ -84,16 +112,32 @@ Transiciones permitidas:
 | currency | Moneda del precio (EUR, ARS, MXN, COP) |
 | is_active | Solo mostrar países activos |
 
+### `cities` (lectura)
+
+| Columna relevante | Uso |
+|-------------------|-----|
+| id | FK para service_cities |
+| country_id | Agrupar ciudades por país |
+| name | Display |
+| is_active | Solo mostrar ciudades activas |
+
 ---
 
 ## Criterios de aceptación
 
-- [ ] Se muestran todos los países activos del sistema
-- [ ] El admin puede poner precio por hora para cada país
+- [ ] Se muestran solo los países ya configurados (no todos los del sistema)
+- [ ] El admin puede agregar países desde un dropdown
+- [ ] El admin puede eliminar países de la configuración con botón ✕
+- [ ] Cada país es un card colapsable con tabla de ciudades dentro
+- [ ] El admin puede agregar ciudades dentro de cada país
+- [ ] El admin puede eliminar ciudades con botón ✕
+- [ ] El admin puede poner precio por hora para cada ciudad
 - [ ] La moneda es read-only (viene del país)
-- [ ] El toggle activa/desactiva el servicio en ese país
-- [ ] Guardar hace upsert correcto en `service_countries`
-- [ ] No se puede publicar sin al menos 1 país activo con precio
+- [ ] El precio plantilla del país + "Aplicar a ciudades" copia a todas las ciudades
+- [ ] `service_countries.is_active` se auto-calcula al guardar (≥1 ciudad activa)
+- [ ] Guardar persiste correctamente service_countries + service_cities
+- [ ] No se puede publicar sin al menos 1 ciudad activa con precio > 0
 - [ ] El admin puede cambiar el estado del servicio
 - [ ] Archivar = soft delete (estado 'archived')
+- [ ] Los formularios siguen mostrando variantes por país (sin cambios)
 - [ ] Build pasa sin errores

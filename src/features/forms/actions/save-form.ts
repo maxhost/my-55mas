@@ -46,7 +46,7 @@ export async function saveForm(input: SaveFormInput) {
       })
       .eq('id', existing[0].id);
 
-    if (error) throw error;
+    if (error) return { error: { _db: [error.message] } };
     return { data: { id: existing[0].id } };
   }
 
@@ -57,7 +57,7 @@ export async function saveForm(input: SaveFormInput) {
     .select('id')
     .single();
 
-  if (error) throw error;
+  if (error) return { error: { _db: [error.message] } };
   return { data: { id: newForm.id } };
 }
 
@@ -82,7 +82,7 @@ export async function saveFormTranslations(input: SaveFormTranslationsInput) {
     { onConflict: 'form_id,locale' }
   );
 
-  if (error) throw error;
+  if (error) return { error: { _db: [error.message] } };
   return { data: { form_id, locale } };
 }
 

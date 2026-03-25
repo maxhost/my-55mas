@@ -12,7 +12,10 @@
     "notFound": "Page introuvable",
     "notFoundDescription": "La page que vous recherchez n'existe pas",
     "unexpectedError": "Quelque chose s'est mal passé",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "deleting": "Suppression..."
   },
   "AdminNav": {
     "orders": "Commandes",
@@ -61,7 +64,21 @@
     "currency": "Devise",
     "active": "Actif",
     "allowsRecurrence": "Permet la récurrence",
-    "confirmArchive": "Archiver ce service ?"
+    "confirmArchive": "Archiver ce service ?",
+    "addCountry": "Ajouter",
+    "removeCountry": "Retirer le pays",
+    "noCountries": "Aucun pays configuré",
+    "selectCountry": "Sélectionner un pays",
+    "city": "Ville",
+    "selectCity": "Sélectionner une ville",
+    "addCity": "Ajouter",
+    "noCities": "Aucune ville configurée",
+    "templatePrice": "Prix modèle",
+    "applyToCities": "Appliquer aux villes",
+    "deleteServiceTitle": "Supprimer le service",
+    "deleteServiceDescription": "Ceci supprimera définitivement \"{name}\" et toutes ses données : traductions, configuration pays/villes, formulaires et documents requis. Cette action est irréversible.",
+    "deleteConfirm": "Supprimer définitivement",
+    "deleteError": "Erreur lors de la suppression du service."
   },
   "AdminFormBuilder": {
     "title": "Concepteur de formulaire",
@@ -98,7 +115,10 @@
     "stepLabel": "Libellé de l'étape",
     "fieldLabel": "Libellé",
     "fieldPlaceholder": "Placeholder",
-    "optionLabel": "Libellé de l'option"
+    "optionLabel": "Libellé de l'option",
+    "cascadeInfo": "Les modifications du formulaire général sont propagées à tous les pays",
+    "noCountriesConfigured": "Configurez les pays dans l'onglet Configuration d'abord",
+    "saveError": "Erreur lors de la sauvegarde. Vérifiez les clés des champs."
   },
   "Placeholder": {
     "comingSoon": "Prochainement",

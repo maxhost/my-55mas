@@ -53,17 +53,31 @@ Inspirado en Tally.so y Typeform. Cards apiladas verticalmente, una por paso.
 | Selección múltiple | `multiselect` | Sí — lista de option keys |
 | Archivo | `file` | No (tipos permitidos en v2) |
 
-### Variantes por país
+### Variantes por país (modelo cascade)
 
 Un servicio puede tener formularios diferentes por país (regulaciones, preguntas locales). Soportado via `service_forms.country_id`:
-- `country_id = NULL` → formulario general (aplica a todos los países sin variante propia)
+- `country_id = NULL` → formulario **General** (master, aplica a todos los países)
 - `country_id = uuid` → variante específica para ese país
 
+**Modelo cascade — General es el master:**
+- Añadir/eliminar un campo o paso en General → se propaga automáticamente a TODAS las variantes de país
+- Traducir en General → las traducciones se copian a todas las variantes (si la variante no tiene una traducción customizada para ese campo)
+- Las variantes de país pueden tener campos adicionales propios (country-specific) que no se ven afectados por el cascade
+
+**Detección de campos country-specific (sin tags en DB):**
+Al guardar General, se comparan keys contra el schema General anterior. Un campo en una variante cuyo key NO existe en el General anterior se considera "country-specific" y se preserva.
+
+**Merge de traducciones (inteligente):**
+- Traducción nueva en General → se copia a variantes
+- Traducción cambiada en General → se actualiza en variantes SI la variante aún tenía el valor anterior (heredado)
+- Traducción customizada en variante (diferente del valor General anterior) → se preserva
+
 **Flujo:**
-1. El admin crea el formulario general (se muestra por defecto)
-2. Opcionalmente, desde un dropdown "Variante", clona el general a un país específico
-3. La variante clonada es 100% independiente: puede añadir/quitar pasos y campos
-4. Todas las traducciones se clonan junto con la estructura
+1. El admin configura países en la tab **Configuración** (debe ser la tab anterior)
+2. En la tab Formulario, dropdown muestra "General" + países configurados
+3. Al seleccionar un país que no tiene variante, se auto-crea clonando de General
+4. Editar General propaga cambios automáticamente a todas las variantes
+5. Editar una variante de país permite ajustes puntuales sin afectar a General ni a otros países
 
 ### Traducciones integradas
 
@@ -148,7 +162,13 @@ Ver spec detallada en [04-translations.md](./04-translations.md).
 - [ ] Al guardar, se incrementa version si el schema cambió
 - [ ] Formulario general (country_id = NULL) funciona correctamente
 - [ ] Tabs de idioma muestran traducciones integradas en el builder
-- [ ] Crear variante para un país clona estructura + traducciones
-- [ ] Variantes son independientes (cambios no afectan al general ni a otras variantes)
+- [ ] Crear variante para un país clona estructura + traducciones (auto-clone al seleccionar)
+- [ ] Añadir campo en General → aparece en todas las variantes de país
+- [ ] Eliminar campo en General → desaparece de todas las variantes de país
+- [ ] Campos country-specific (añadidos en una variante) se preservan al editar General
+- [ ] Traducir en General → traducciones se copian a variantes para campos compartidos
+- [ ] Traducción customizada en variante se preserva al re-guardar General
+- [ ] Dropdown de variantes solo muestra países configurados en tab Configuración
 - [ ] Cambiar entre variantes recarga el formulario correcto
+- [ ] Tests unitarios para cascade algorithm (funciones puras)
 - [ ] Build pasa sin errores

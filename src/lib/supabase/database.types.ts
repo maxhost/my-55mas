@@ -455,7 +455,7 @@ export type Database = {
           created_at: string | null
           currency: string
           form_data: Json
-          form_id: string
+          form_id: string | null
           id: string
           notes: string | null
           price_subtotal: number
@@ -465,7 +465,7 @@ export type Database = {
           schedule_type: string
           service_address: string | null
           service_city_id: string | null
-          service_id: string
+          service_id: string | null
           service_postal_code: string | null
           status: string
           talent_id: string | null
@@ -481,7 +481,7 @@ export type Database = {
           created_at?: string | null
           currency: string
           form_data: Json
-          form_id: string
+          form_id?: string | null
           id?: string
           notes?: string | null
           price_subtotal: number
@@ -491,7 +491,7 @@ export type Database = {
           schedule_type?: string
           service_address?: string | null
           service_city_id?: string | null
-          service_id: string
+          service_id?: string | null
           service_postal_code?: string | null
           status?: string
           talent_id?: string | null
@@ -507,7 +507,7 @@ export type Database = {
           created_at?: string | null
           currency?: string
           form_data?: Json
-          form_id?: string
+          form_id?: string | null
           id?: string
           notes?: string | null
           price_subtotal?: number
@@ -517,7 +517,7 @@ export type Database = {
           schedule_type?: string
           service_address?: string | null
           service_city_id?: string | null
-          service_id?: string
+          service_id?: string | null
           service_postal_code?: string | null
           status?: string
           talent_id?: string | null
@@ -647,6 +647,62 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "languages"
             referencedColumns: ["code"]
+          },
+        ]
+      }
+      service_cities: {
+        Row: {
+          base_price: number
+          city_id: string
+          created_at: string | null
+          is_active: boolean
+          service_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          base_price: number
+          city_id: string
+          created_at?: string | null
+          is_active?: boolean
+          service_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          base_price?: number
+          city_id?: string
+          created_at?: string | null
+          is_active?: boolean
+          service_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_cities_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_cities_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities_localized"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_cities_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_cities_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services_localized"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1542,7 +1598,17 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      delete_service: { Args: { p_service_id: string }; Returns: undefined }
+      save_service_config: {
+        Args: {
+          p_allows_recurrence?: boolean
+          p_cities?: Json
+          p_countries?: Json
+          p_service_id: string
+          p_status?: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
@@ -1675,4 +1741,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

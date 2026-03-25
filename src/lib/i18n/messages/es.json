@@ -12,7 +12,10 @@
     "notFound": "Página no encontrada",
     "notFoundDescription": "La página que buscas no existe",
     "unexpectedError": "Algo salió mal",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "deleting": "Eliminando..."
   },
   "AdminNav": {
     "orders": "Pedidos",
@@ -61,7 +64,21 @@
     "currency": "Moneda",
     "active": "Activo",
     "allowsRecurrence": "Permite recurrencia",
-    "confirmArchive": "¿Archivar este servicio?"
+    "confirmArchive": "¿Archivar este servicio?",
+    "addCountry": "Agregar",
+    "removeCountry": "Quitar país",
+    "noCountries": "No hay países configurados",
+    "selectCountry": "Seleccionar país",
+    "city": "Ciudad",
+    "selectCity": "Seleccionar ciudad",
+    "addCity": "Agregar",
+    "noCities": "No hay ciudades configuradas",
+    "templatePrice": "Precio plantilla",
+    "applyToCities": "Aplicar a ciudades",
+    "deleteServiceTitle": "Eliminar servicio",
+    "deleteServiceDescription": "Esto eliminará permanentemente \"{name}\" y todos sus datos: traducciones, configuración de países/ciudades, formularios y documentos requeridos. Esta acción no se puede deshacer.",
+    "deleteConfirm": "Eliminar permanentemente",
+    "deleteError": "Error al eliminar el servicio."
   },
   "AdminFormBuilder": {
     "title": "Diseñador de formulario",
@@ -98,7 +115,10 @@
     "stepLabel": "Etiqueta del paso",
     "fieldLabel": "Etiqueta",
     "fieldPlaceholder": "Placeholder",
-    "optionLabel": "Etiqueta de opción"
+    "optionLabel": "Etiqueta de opción",
+    "cascadeInfo": "Los cambios en el formulario general se propagan a todos los países",
+    "noCountriesConfigured": "Configure países en la pestaña Configuración primero",
+    "saveError": "Error al guardar. Verifique las claves de los campos."
   },
   "Placeholder": {
     "comingSoon": "Próximamente",

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FormBuilderPanel } from '@/features/forms/components/form-builder-panel';
@@ -9,11 +10,14 @@ import { ServiceConfig } from '@/features/services/components/service-config';
 import type {
   ServiceDetail,
   CountryOption,
+  CityOption,
+  ServiceCountryDetail,
 } from '@/features/services/types';
 
 type Props = {
   service: ServiceDetail;
   countries: CountryOption[];
+  allCities: CityOption[];
   form: FormWithTranslations | null;
   formVariants: FormVariantSummary[];
 };
@@ -21,20 +25,29 @@ type Props = {
 export function ServiceEditTabs({
   service,
   countries,
+  allCities,
   form,
   formVariants,
 }: Props) {
   const t = useTranslations('AdminServices');
 
-  // Map CountryOption → FormCountryOption (boundary between features)
-  const formCountries = countries.map((c) => ({ id: c.id, name: c.name }));
+  // Lift configured countries state so Config and Form tabs stay in sync
+  const [configuredCountries, setConfiguredCountries] = useState<ServiceCountryDetail[]>(
+    service.countries
+  );
+
+  // Map configured ServiceCountryDetail → FormCountryOption (boundary between features)
+  const formCountries = configuredCountries.map((c) => ({
+    id: c.country_id,
+    name: c.country_name,
+  }));
 
   return (
     <Tabs defaultValue="content">
       <TabsList>
         <TabsTrigger value="content">{t('tabContent')}</TabsTrigger>
-        <TabsTrigger value="form">{t('tabForm')}</TabsTrigger>
         <TabsTrigger value="config">{t('tabConfig')}</TabsTrigger>
+        <TabsTrigger value="form">{t('tabForm')}</TabsTrigger>
       </TabsList>
 
       <TabsContent value="content" className="pt-6">
@@ -44,19 +57,21 @@ export function ServiceEditTabs({
         />
       </TabsContent>
 
+      <TabsContent value="config" className="pt-6">
+        <ServiceConfig
+          service={service}
+          countries={countries}
+          allCities={allCities}
+          onCountriesChange={setConfiguredCountries}
+        />
+      </TabsContent>
+
       <TabsContent value="form" className="pt-6">
         <FormBuilderPanel
           serviceId={service.id}
           form={form}
           formVariants={formVariants}
           serviceCountries={formCountries}
-        />
-      </TabsContent>
-
-      <TabsContent value="config" className="pt-6">
-        <ServiceConfig
-          service={service}
-          countries={countries}
         />
       </TabsContent>
     </Tabs>

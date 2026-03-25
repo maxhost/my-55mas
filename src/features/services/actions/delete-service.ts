@@ -1,16 +1,22 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { z } from 'zod';
 
-export async function archiveService(id: string) {
+const deleteServiceSchema = z.object({
+  id: z.string().uuid(),
+});
+
+export async function deleteService(id: string) {
+  const parsed = deleteServiceSchema.safeParse({ id });
+  if (!parsed.success) return { error: { _validation: ['Invalid service ID'] } };
+
   const supabase = createClient();
+  const { error } = await supabase.rpc('delete_service', {
+    p_service_id: parsed.data.id,
+  });
 
-  const { error } = await supabase
-    .from('services')
-    .update({ status: 'archived', updated_at: new Date().toISOString() })
-    .eq('id', id);
+  if (error) return { error: { _db: [error.message] } };
 
-  if (error) throw error;
-
-  return { data: { id } };
+  return { data: { id: parsed.data.id } };
 }

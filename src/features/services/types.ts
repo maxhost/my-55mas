@@ -33,6 +33,7 @@ export type ServiceListItem = Pick<
 export type ServiceDetail = ServiceRow & {
   translations: ServiceTranslationDetail[];
   countries: ServiceCountryDetail[];
+  cities: ServiceCityDetail[];
 };
 
 export type ServiceTranslationDetail = Pick<
@@ -62,5 +63,22 @@ export type CountryOption = {
   code: string;
   name: string;
   currency: string;
+};
+
+// ── City types ───────────────────────────────────────
+
+export type CityOption = {
+  id: string;
+  name: string;
+  country_id: string;
+};
+
+export type ServiceCityDetail = {
+  service_id: string;
+  city_id: string;
+  base_price: number;
+  is_active: boolean;
+  city_name: string;
+  country_id: string;
 };
 

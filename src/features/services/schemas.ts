@@ -72,6 +72,17 @@ export const countryPriceSchema = z.object({
 
 export type CountryPriceInput = z.infer<typeof countryPriceSchema>;
 
+// ── City Price ───────────────────────────────────────
+
+export const cityPriceSchema = z.object({
+  city_id: z.string().uuid(),
+  country_id: z.string().uuid(),
+  base_price: z.number().min(0),
+  is_active: z.boolean(),
+});
+
+export type CityPriceInput = z.infer<typeof cityPriceSchema>;
+
 // ── Save Configuration ────────────────────────────────
 
 export const saveConfigSchema = z.object({
@@ -79,6 +90,7 @@ export const saveConfigSchema = z.object({
   status: z.enum(['draft', 'published', 'archived']).optional(),
   allows_recurrence: z.boolean().optional(),
   countries: z.array(countryPriceSchema),
+  cities: z.array(cityPriceSchema).default([]),
 });
 
 export type SaveConfigInput = z.input<typeof saveConfigSchema>;
