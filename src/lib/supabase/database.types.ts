@@ -910,8 +910,13 @@ export type Database = {
       }
       service_translations: {
         Row: {
+          benefits: Json | null
           created_at: string | null
           description: string | null
+          faqs: Json | null
+          guarantees: Json | null
+          hero_subtitle: string | null
+          hero_title: string | null
           includes: string | null
           locale: string
           name: string
@@ -919,8 +924,13 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          benefits?: Json | null
           created_at?: string | null
           description?: string | null
+          faqs?: Json | null
+          guarantees?: Json | null
+          hero_subtitle?: string | null
+          hero_title?: string | null
           includes?: string | null
           locale: string
           name: string
@@ -928,8 +938,13 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          benefits?: Json | null
           created_at?: string | null
           description?: string | null
+          faqs?: Json | null
+          guarantees?: Json | null
+          hero_subtitle?: string | null
+          hero_title?: string | null
           includes?: string | null
           locale?: string
           name?: string
@@ -963,7 +978,8 @@ export type Database = {
       services: {
         Row: {
           allows_recurrence: boolean
-          category_id: string
+          category_id: string | null
+          cover_image_url: string | null
           created_at: string | null
           id: string
           slug: string
@@ -972,7 +988,8 @@ export type Database = {
         }
         Insert: {
           allows_recurrence?: boolean
-          category_id: string
+          category_id?: string | null
+          cover_image_url?: string | null
           created_at?: string | null
           id?: string
           slug: string
@@ -981,7 +998,8 @@ export type Database = {
         }
         Update: {
           allows_recurrence?: boolean
-          category_id?: string
+          category_id?: string | null
+          cover_image_url?: string | null
           created_at?: string | null
           id?: string
           slug?: string

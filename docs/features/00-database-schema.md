@@ -6,7 +6,7 @@
 - **next-intl** con archivos JSON en `src/lib/i18n/messages/{locale}.json`
 - Versionado en git, type-safe, no depende de DB
 
-### Contenido dinámico (servicios, categorías, formularios)
+### Contenido dinámico (servicios, formularios)
 - **Tablas `_translations` dedicadas por entidad** con columnas tipadas
 - Cada fila = un idioma. Agregar idioma = agregar filas, sin tocar datos existentes
 - FK real sobre `languages(code)`, NOT NULL en campos obligatorios
@@ -31,7 +31,7 @@ Las tablas deben crearse en este orden para respetar dependencias de FK:
 4. `staff_roles` — sin dependencias (seed obligatorio antes del primer miembro)
 5. `profiles` + `user_roles` + `staff_role_scopes` — depende de `countries`, `staff_roles`, `cities`
 6. `categories` + `category_translations` — depende de `languages`
-7. `services` + `service_translations` + `service_countries` — depende de `categories`, `countries`, `languages`
+7. `services` + `service_translations` + `service_countries` — depende de `countries`, `languages`
 8. `service_forms` + `service_form_translations` — depende de `services`, `countries`, `languages`
 9. `talent_profiles` + tablas relacionadas — depende de `profiles`, `countries`, `cities`, `services`
 10. `orders` + tablas relacionadas — depende de `profiles`, `services`, `countries`, `cities`, `service_forms`
@@ -294,7 +294,7 @@ Un servicio pertenece a 55mas. Su disponibilidad y precio se configura por país
 CREATE TABLE services (
   id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   slug              text NOT NULL UNIQUE,
-  category_id       uuid NOT NULL REFERENCES categories(id),
+  category_id       uuid REFERENCES categories(id),  -- nullable, no se usa en v1
   status            text NOT NULL DEFAULT 'draft'
                     CHECK (status IN ('draft', 'published', 'archived')),
   allows_recurrence boolean NOT NULL DEFAULT false,
@@ -871,7 +871,7 @@ ALTER TABLE order_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE order_status_history ENABLE ROW LEVEL SECURITY;
 ```
 
-> **Nota:** Las tablas de solo lectura pública (`countries`, `cities`, `categories`, `services` publicados) necesitarán una policy `SELECT` para `anon` y `authenticated`. Las tablas privadas (`orders`, `talent_documents`) solo permiten acceso al dueño + admins.
+> **Nota:** Las tablas de solo lectura pública (`countries`, `cities`, `services` publicados) necesitarán una policy `SELECT` para `anon` y `authenticated`. Las tablas privadas (`orders`, `talent_documents`) solo permiten acceso al dueño + admins.
 >
 > **Nota anon auth (guests):** Los usuarios anónimos (`signInAnonymously()`) tienen `auth.uid()` y role `client`. RLS funciona normalmente. Su policy INSERT en `orders` es la misma que para clientes registrados: `client_id = auth.uid()`.
 >
@@ -900,7 +900,7 @@ ALTER TABLE order_status_history ENABLE ROW LEVEL SECURITY;
 ```sql
 -- Búsquedas frecuentes en catálogo
 CREATE INDEX idx_services_status ON services(status);
-CREATE INDEX idx_services_category ON services(category_id);
+-- idx_services_category omitido: category_id no se usa en v1
 CREATE INDEX idx_service_countries_active ON service_countries(country_id) WHERE is_active = true;
 CREATE INDEX idx_service_translations_locale ON service_translations(locale);
 
@@ -939,7 +939,7 @@ CREATE INDEX idx_cities_country ON cities(country_id);
 ```sql
 -- Servicios con traducción, listos para queries del catálogo
 CREATE VIEW services_localized AS
-SELECT s.id, s.slug, s.category_id, s.status, s.allows_recurrence,
+SELECT s.id, s.slug, s.status, s.allows_recurrence,
        st.locale, st.name, st.description, st.includes
 FROM services s
 JOIN service_translations st ON st.service_id = s.id;
