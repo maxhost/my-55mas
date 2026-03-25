@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Plus } from 'lucide-react';
@@ -21,6 +22,7 @@ type Props = {
 
 export function ServiceConfig({ service, countries, allCities, onCountriesChange }: Props) {
   const t = useTranslations('AdminServices');
+  const tc = useTranslations('Common');
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<ServiceStatus>(service.status as ServiceStatus);
   const [allowsRecurrence, setAllowsRecurrence] = useState(service.allows_recurrence);
@@ -50,7 +52,12 @@ export function ServiceConfig({ service, countries, allCities, onCountriesChange
         cities: cityRows,
       });
 
-      if (result && 'error' in result) return;
+      if (result && 'error' in result) {
+        toast.error(tc('saveError'));
+        return;
+      }
+
+      toast.success(tc('savedSuccess'));
 
       if (onCountriesChange) {
         const updated: ServiceCountryDetail[] = countryRows.map((row) => {

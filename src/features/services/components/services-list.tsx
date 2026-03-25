@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 import { ConfirmDialog } from '@/shared/components/confirm-dialog';
 import { deleteService } from '../actions/delete-service';
 import type { ServiceListItem } from '../types';
@@ -40,6 +41,7 @@ export function ServicesList({ services }: Props) {
         return;
       }
       setDeleteTarget(null);
+      toast.success(tc('deletedSuccess'));
       router.refresh();
     });
   };

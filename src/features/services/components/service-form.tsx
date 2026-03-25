@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -57,6 +58,7 @@ function translationToData(t: ServiceTranslationDetail): LocaleData {
 
 export function ServiceForm({ serviceId, translations }: Props) {
   const t = useTranslations('AdminServices');
+  const tc = useTranslations('Common');
   const [isPending, startTransition] = useTransition();
 
   const initialData: Record<string, LocaleData> = {};
@@ -80,10 +82,15 @@ export function ServiceForm({ serviceId, translations }: Props) {
   const handleSave = () => {
     const localeData = data[activeLocale];
     startTransition(async () => {
-      await saveTranslation({
+      const result = await saveTranslation({
         service_id: serviceId,
         translation: { locale: activeLocale, ...localeData },
       });
+      if (result && 'error' in result) {
+        toast.error(tc('saveError'));
+        return;
+      }
+      toast.success(tc('savedSuccess'));
     });
   };
 

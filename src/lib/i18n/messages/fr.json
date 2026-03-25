@@ -15,7 +15,11 @@
     "retry": "Réessayer",
     "cancel": "Annuler",
     "confirm": "Confirmer",
-    "deleting": "Suppression..."
+    "deleting": "Suppression...",
+    "savedSuccess": "Enregistré avec succès",
+    "saveError": "Erreur lors de l'enregistrement",
+    "createdSuccess": "Créé avec succès",
+    "deletedSuccess": "Supprimé avec succès"
   },
   "AdminNav": {
     "orders": "Commandes",

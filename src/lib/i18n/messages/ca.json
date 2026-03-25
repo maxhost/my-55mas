@@ -15,7 +15,11 @@
     "retry": "Tornar a provar",
     "cancel": "Cancel·lar",
     "confirm": "Confirmar",
-    "deleting": "Eliminant..."
+    "deleting": "Eliminant...",
+    "savedSuccess": "Desat correctament",
+    "saveError": "Error en desar",
+    "createdSuccess": "Creat correctament",
+    "deletedSuccess": "Eliminat correctament"
   },
   "AdminNav": {
     "orders": "Comandes",

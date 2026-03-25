@@ -15,7 +15,11 @@
     "retry": "Try again",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "deleting": "Deleting..."
+    "deleting": "Deleting...",
+    "savedSuccess": "Saved successfully",
+    "saveError": "Error saving",
+    "createdSuccess": "Created successfully",
+    "deletedSuccess": "Deleted successfully"
   },
   "AdminNav": {
     "orders": "Orders",

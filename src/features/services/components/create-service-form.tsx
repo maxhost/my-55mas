@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 import { useRouter } from '@/lib/i18n/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,6 +20,7 @@ function toSlug(text: string): string {
 
 export function CreateServiceForm() {
   const t = useTranslations('AdminServices');
+  const tc = useTranslations('Common');
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [name, setName] = useState('');
@@ -45,6 +47,7 @@ export function CreateServiceForm() {
         return;
       }
       if ('data' in result && result.data) {
+        toast.success(tc('createdSuccess'));
         router.push(`/admin/services/${result.data.id}`);
       }
     });
