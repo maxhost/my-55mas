@@ -44,7 +44,11 @@ Marketplace donde personas mayores de 55 años ofrecen servicios profesionales. 
 
 ## Gotchas
 
-Agregar aquí los problemas descubiertos durante el desarrollo.
+- **Build requiere NODE_ENV=production:** `NODE_ENV=production pnpm build`. Sin esto, falla con `useContext` null errors en páginas internas de Next.js (_not-found, _error).
+- **next-intl v3 (no v4):** Se usa v3.26.x porque v4 tiene el mismo useContext bug con Next.js 14 + React 18. La API usa `unstable_setRequestLocale` (no `setRequestLocale`).
+- **Tailwind v4 + shadcn base-nova:** shadcn@latest genera componentes para Tailwind v4 (`@base-ui/react`, no `@radix-ui/react`). CSS usa `@import "tailwindcss"` en vez de `@tailwind base/components/utilities`. No hay `tailwind.config.ts` — la config es vía CSS.
+- **Route groups no pueden tener page.tsx en la raíz:** Todas las route groups resuelven a `/{locale}/`, causando conflicto. Cada group necesita segmentos únicos (e.g., `(admin)/admin/`, `(auth)/login/`).
+- **Server Components usan `getTranslations` (async):** En pages, usar `getTranslations` de `next-intl/server` (no `useTranslations`). `useTranslations` es para Client Components.
 
 ## Límites de tamaño
 

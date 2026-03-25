@@ -1,0 +1,68 @@
+{
+  "extends": "next/core-web-vitals",
+  "plugins": ["boundaries"],
+  "settings": {
+    "boundaries/include": ["src/**/*"],
+    "boundaries/elements": [
+      {
+        "type": "features",
+        "pattern": "src/features/*",
+        "capture": ["feature"]
+      },
+      {
+        "type": "shared",
+        "pattern": "src/shared/*"
+      },
+      {
+        "type": "lib",
+        "pattern": "src/lib/*"
+      },
+      {
+        "type": "app",
+        "pattern": "src/app/*"
+      },
+      {
+        "type": "components-ui",
+        "pattern": "src/components/ui/*"
+      },
+      {
+        "type": "test",
+        "pattern": "src/test/*"
+      }
+    ]
+  },
+  "rules": {
+    "boundaries/element-types": [
+      2,
+      {
+        "default": "disallow",
+        "rules": [
+          {
+            "from": "features",
+            "allow": ["shared", "lib", "components-ui"]
+          },
+          {
+            "from": "shared",
+            "allow": ["shared", "lib", "components-ui"]
+          },
+          {
+            "from": "app",
+            "allow": ["features", "shared", "lib", "components-ui", "app"]
+          },
+          {
+            "from": "lib",
+            "allow": ["lib"]
+          },
+          {
+            "from": "components-ui",
+            "allow": ["lib", "components-ui"]
+          },
+          {
+            "from": "test",
+            "allow": ["features", "shared", "lib", "components-ui"]
+          }
+        ]
+      }
+    ]
+  }
+}
