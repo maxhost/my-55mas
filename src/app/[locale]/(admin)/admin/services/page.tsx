@@ -1,6 +1,7 @@
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { getServices } from '@/features/services/actions/get-services';
 import { ServicesList } from '@/features/services/components/services-list';
+import { PageHeader } from '@/shared/components/page-header';
 
 type Props = { params: { locale: string } };
 
@@ -11,7 +12,7 @@ export default async function ServicesPage({ params: { locale } }: Props) {
 
   return (
     <div className="p-8">
-      <h1 className="mb-6 text-2xl font-bold">{t('title')}</h1>
+      <PageHeader title={t('title')} />
       <ServicesList services={services} />
     </div>
   );

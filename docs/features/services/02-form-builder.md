@@ -35,6 +35,7 @@ Inspirado en Tally.so y Typeform. Cards apiladas verticalmente, una por paso.
 |--------|---------------|
 | Agregar paso | Botón al final → card vacía con key editable |
 | Agregar campo | Botón dentro del paso → inline: key, tipo, required |
+| Escribir key de paso/campo | Sanitizada en tiempo real con `sanitizeKey()`: lowercase, caracteres inválidos → `_`, prefijo no-letra eliminado |
 | Seleccionar tipo select/multiselect | Expande editor de opciones inline (keys técnicos) |
 | Reordenar pasos | Flechas ↑↓ en header de card |
 | Reordenar campos | Flechas ↑↓ en cada fila de campo |
@@ -104,8 +105,10 @@ Las traducciones de labels, placeholders y opciones se editan **dentro del mismo
 | service_id | uuid FK → services | Obligatorio |
 | city_id | uuid FK → cities | NULL = default (General) |
 | schema | jsonb NOT NULL | Estructura del formulario (ver abajo) |
-| version | int | Default 1, incrementa al modificar |
+| version | int | Default 1, incrementa en cada guardado |
 | is_active | boolean | Default true |
+| created_at | timestamptz | Auto |
+| updated_at | timestamptz | Auto |
 
 ### Schema JSONB (estructura)
 
@@ -138,11 +141,12 @@ Las traducciones de labels, placeholders y opciones se editan **dentro del mismo
 **Reglas del schema:**
 - Cada step tiene `key` único dentro del formulario
 - Cada field tiene `key` único dentro del formulario (no solo del step)
-- Keys son snake_case, solo letras minúsculas, números y guiones bajos
-- `options` solo existe para `single_select` y `multiselect`
+- Keys: snake_case, **deben empezar con letra** (no número ni `_`), solo `[a-z0-9_]`, mínimo 1 carácter, máximo 50 caracteres
+- `options` solo existe para `single_select` y `multiselect`; estos tipos requieren **mínimo 1 opción**
+- Cada opción: string de 1–100 caracteres
 - `required` es boolean, default false
 
-**Retrocompatibilidad:** Schema legacy con `fields` (flat) se envuelve en un step único al leer.
+**Retrocompatibilidad:** Schema legacy con `fields` (flat, sin steps) se normaliza al leer: se envuelve en un step único con `key: "default"`. Si el schema es inválido o nulo, se devuelve `{ steps: [] }`.
 
 ### `service_form_translations`
 
@@ -158,14 +162,85 @@ Ver spec detallada en [04-translations.md](./04-translations.md).
 
 ---
 
+## Tipos TypeScript
+
+Definidos en `src/features/forms/types.ts`:
+
+```typescript
+// ── Estructura del formulario ─────────────────────────
+type FormField = {
+  key: string
+  type: FieldType                 // 'text' | 'number' | 'multiline_text' | 'boolean' | 'single_select' | 'multiselect' | 'file'
+  required: boolean
+  options?: string[]              // solo para single_select y multiselect
+}
+
+type FormStep = {
+  key: string
+  fields: FormField[]
+}
+
+type FormSchema = {
+  steps: FormStep[]
+}
+
+// ── Traducciones ──────────────────────────────────────
+type FormTranslationData = {
+  labels: Record<string, string>         // step key o field key → label traducido
+  placeholders: Record<string, string>   // field key → placeholder traducido
+  option_labels: Record<string, string>  // "fieldKey.optionValue" → opción traducida
+}
+
+// ── DTOs de DB ────────────────────────────────────────
+type FormDetail = {
+  id: string
+  service_id: string
+  city_id: string | null
+  schema: FormSchema
+  version: number
+  is_active: boolean
+}
+
+type FormWithTranslations = FormDetail & {
+  translations: Record<string, FormTranslationData>  // locale → traducciones
+}
+
+// ── Selector jerárquico ───────────────────────────────
+type FormVariantSummary = { id: string; city_id: string | null; city_name: string | null; country_id: string | null; version: number }
+type FormCountryOption  = { id: string; name: string }
+type FormCityOption     = { id: string; name: string; country_id: string }
+```
+
+`FormCountryOption` y `FormCityOption` se mapean desde los tipos del feature `services` en `service-edit-tabs.tsx` (`ServiceCountryDetail[]` → `FormCountryOption[]`, `ServiceCityDetail[]` → `FormCityOption[]`) antes de pasarse a `FormBuilderPanel`.
+
+---
+
+## Arquitectura — Server Actions
+
+Definidos en `src/features/forms/actions/`:
+
+| Action | Archivo | Descripción |
+|--------|---------|-------------|
+| `getForm(serviceId, cityId?, fallback?)` | `get-form.ts` | Carga form + todas sus traducciones. `fallback=true` (default): si no existe la variante de ciudad, cae al General |
+| `saveForm(input)` | `save-form.ts` | Guarda solo el schema (upsert). Incrementa `version` en cada llamada |
+| `saveFormTranslations(input)` | `save-form.ts` | Guarda traducciones de un locale (upsert por `form_id + locale`) |
+| `saveFormWithTranslations(input)` | `save-form.ts` | Combina los dos anteriores + `revalidatePath`. **Usado para variantes de ciudad** |
+| `cascadeGeneralSave(input)` | `cascade-general-save.ts` | Guarda el General y propaga la cascada a todas las variantes. **Usado solo cuando `city_id === null`** |
+| `cloneFormVariant(input)` | `clone-form-variant.ts` | Clona schema + todas las traducciones desde una ciudad origen a una destino. Usa `fallback=false` (la fuente debe existir exactamente) |
+| `listFormVariants(serviceId)` | `list-form-variants.ts` | Lista todas las variantes activas con metadata de ciudad/país. Devuelve `FormVariantSummary[]` |
+
+**Distinción crítica:** el componente `FormBuilder` llama a `cascadeGeneralSave` si `cityId === null` y a `saveFormWithTranslations` si `cityId !== null`.
+
+---
+
 ## Criterios de aceptación
 
 - [ ] El admin puede agregar/eliminar/reordenar pasos
 - [ ] El admin puede agregar/eliminar/reordenar campos dentro de un paso
 - [ ] Campos single_select y multiselect muestran editor de opciones inline
 - [ ] El schema se guarda como JSONB en `service_forms`
-- [ ] Keys son validados (únicos, snake_case)
-- [ ] Al guardar, se incrementa version si el schema cambió
+- [ ] Keys son validados (únicos, snake_case, empiezan con letra, 1–50 chars)
+- [ ] Al guardar, se incrementa `version` en cada guardado
 - [ ] Formulario general (city_id = NULL) funciona correctamente
 - [ ] Tabs de idioma muestran traducciones integradas en el builder
 - [ ] Selector jerárquico: primer dropdown (General/País), segundo dropdown (Ciudad)

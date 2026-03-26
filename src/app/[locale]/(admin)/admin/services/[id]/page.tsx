@@ -5,6 +5,7 @@ import { getCountries } from '@/features/services/actions/get-countries';
 import { getCities } from '@/features/services/actions/get-cities';
 import { getForm } from '@/features/forms/actions/get-form';
 import { listFormVariants } from '@/features/forms/actions/list-form-variants';
+import { PageHeader } from '@/shared/components/page-header';
 import { ServiceEditTabs } from './service-edit-tabs';
 
 type Props = { params: { locale: string; id: string } };
@@ -30,9 +31,10 @@ export default async function EditServicePage({ params: { locale, id } }: Props)
 
   return (
     <div className="p-8">
-      <h1 className="mb-6 text-2xl font-bold">
-        {t('editService')}: {name}
-      </h1>
+      <PageHeader
+        title={`${t('editService')}: ${name}`}
+        backHref="/admin/services"
+      />
       <ServiceEditTabs
         service={service}
         countries={countries}
