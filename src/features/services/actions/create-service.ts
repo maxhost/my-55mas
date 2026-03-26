@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceSchema, type CreateServiceInput } from '../schemas';
 
@@ -44,5 +45,6 @@ export async function createService(input: CreateServiceInput) {
 
   if (translationError) throw translationError;
 
+  revalidatePath('/[locale]/(admin)/admin/services', 'layout');
   return { data: { id: service.id } };
 }

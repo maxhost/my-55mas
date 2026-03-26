@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  getCountryOnlyFieldKeys,
+  getVariantOnlyFieldKeys,
   cascadeSchema,
   cascadeTranslations,
 } from '../cascade-helpers';
@@ -25,19 +25,19 @@ function trans(
   return { labels, placeholders, option_labels };
 }
 
-// ── getCountryOnlyFieldKeys ──────────────────────────────
+// ── getVariantOnlyFieldKeys ──────────────────────────────
 
-describe('getCountryOnlyFieldKeys', () => {
+describe('getVariantOnlyFieldKeys', () => {
   it('returns field keys in country but not in old General', () => {
     const oldGeneral = schema({ key: 's1', fields: [{ key: 'a' }, { key: 'b' }] });
     const country = schema({ key: 's1', fields: [{ key: 'a' }, { key: 'b' }, { key: 'c' }] });
-    const result = getCountryOnlyFieldKeys(oldGeneral, country);
+    const result = getVariantOnlyFieldKeys(oldGeneral, country);
     expect(result).toEqual(new Set(['c']));
   });
 
   it('returns empty set when country has no extra fields', () => {
     const s = schema({ key: 's1', fields: [{ key: 'a' }] });
-    expect(getCountryOnlyFieldKeys(s, s)).toEqual(new Set());
+    expect(getVariantOnlyFieldKeys(s, s)).toEqual(new Set());
   });
 
   it('includes step keys that are country-only', () => {
@@ -46,7 +46,7 @@ describe('getCountryOnlyFieldKeys', () => {
       { key: 's1', fields: [{ key: 'a' }] },
       { key: 's_local', fields: [{ key: 'x' }] },
     );
-    const result = getCountryOnlyFieldKeys(oldGeneral, country);
+    const result = getVariantOnlyFieldKeys(oldGeneral, country);
     expect(result).toEqual(new Set(['x']));
   });
 });

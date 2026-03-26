@@ -45,7 +45,7 @@ export const formSchemaSchema = z.object({
 
 export const saveFormSchema = z.object({
   service_id: z.string().uuid(),
-  country_id: z.string().uuid().nullable().default(null),
+  city_id: z.string().uuid().nullable().default(null),
   schema: formSchemaSchema,
 });
 
@@ -69,7 +69,7 @@ export type SaveFormTranslationsInput = z.input<
 
 export const saveFormWithTranslationsSchema = z.object({
   service_id: z.string().uuid(),
-  country_id: z.string().uuid().nullable().default(null),
+  city_id: z.string().uuid().nullable().default(null),
   schema: formSchemaSchema,
   locale: z.string().min(2).max(5),
   labels: z.record(z.string()),
@@ -85,6 +85,6 @@ export type SaveFormWithTranslationsInput = z.input<
 
 export const cloneFormVariantSchema = z.object({
   service_id: z.string().uuid(),
-  source_country_id: z.string().uuid().nullable(),
-  target_country_id: z.string().uuid(),
+  source_city_id: z.string().uuid().nullable(),
+  target_city_id: z.string().uuid(),
 });

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useRef, useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { locales } from '@/lib/i18n/config';
@@ -10,6 +10,7 @@ import type {
   FormWithTranslations,
   FormVariantSummary,
   FormCountryOption,
+  FormCityOption,
 } from '../types';
 import { VariantSelector } from './variant-selector';
 import { FormBuilder } from './form-builder';
@@ -19,6 +20,7 @@ type Props = {
   form: FormWithTranslations | null;
   formVariants: FormVariantSummary[];
   serviceCountries: FormCountryOption[];
+  serviceCities: FormCityOption[];
 };
 
 export function FormBuilderPanel({
@@ -26,23 +28,31 @@ export function FormBuilderPanel({
   form: initialForm,
   formVariants: initialVariants,
   serviceCountries,
+  serviceCities,
 }: Props) {
   const t = useTranslations('AdminFormBuilder');
-  const [activeVariant, setActiveVariant] = useState<string | null>(null);
+  const [activeCountry, setActiveCountry] = useState<string | null>(null);
+  const [activeCity, setActiveCity] = useState<string | null>(null);
   const [activeLocale, setActiveLocale] = useState<string>(locales[0]);
   const [formData, setFormData] = useState<FormWithTranslations | null>(initialForm);
   const [variants, setVariants] = useState(initialVariants);
   const [isLoading, startLoading] = useTransition();
+  const isCloningRef = useRef(false);
 
-  const variantCountryIds = new Set(
-    variants.map((v) => v.country_id).filter((id): id is string => id !== null)
+  const variantCityIds = new Set(
+    variants.map((v) => v.city_id).filter((id): id is string => id !== null)
   );
 
-  const handleVariantChange = (countryId: string | null) => {
-    setActiveVariant(countryId);
+  const handleCountryChange = (countryId: string | null) => {
+    setActiveCountry(countryId);
+  };
 
-    if (countryId === null) {
+  const handleCityChange = (cityId: string | null) => {
+    setActiveCity(cityId);
+
+    if (cityId === null && activeCountry === null) {
       // Switch to General — load it
+      isCloningRef.current = false;
       startLoading(async () => {
         const form = await getForm(serviceId, null, false);
         setFormData(form);
@@ -50,29 +60,35 @@ export function FormBuilderPanel({
       return;
     }
 
-    if (variantCountryIds.has(countryId)) {
+    // Empty string means "select a city" placeholder — don't load anything
+    if (!cityId) return;
+
+    if (variantCityIds.has(cityId)) {
       // Variant already exists — load it
+      isCloningRef.current = false;
       startLoading(async () => {
-        const form = await getForm(serviceId, countryId, false);
+        const form = await getForm(serviceId, cityId, false);
         setFormData(form);
       });
     } else {
       // No variant yet — auto-clone from General
+      isCloningRef.current = true;
       startLoading(async () => {
         const result = await cloneFormVariant({
           service_id: serviceId,
-          source_country_id: null, // always clone from General
-          target_country_id: countryId,
+          source_city_id: null,
+          target_city_id: cityId,
         });
         if (result.data) {
           setFormData(result.data);
-          const country = serviceCountries.find((c) => c.id === countryId);
+          const city = serviceCities.find((c) => c.id === cityId);
           setVariants((prev) => [
             ...prev,
             {
               id: result.data!.id,
-              country_id: countryId,
-              country_name: country?.name ?? null,
+              city_id: cityId,
+              city_name: city?.name ?? null,
+              country_id: city?.country_id ?? null,
               version: 1,
             },
           ]);
@@ -81,14 +97,20 @@ export function FormBuilderPanel({
     }
   };
 
+  // Determine if we should show the form builder
+  const showBuilder = activeCountry === null || (activeCountry !== null && !!activeCity);
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">{t('title')}</h3>
 
       <VariantSelector
         serviceCountries={serviceCountries}
-        activeVariant={activeVariant}
-        onVariantChange={handleVariantChange}
+        serviceCities={serviceCities}
+        activeCountry={activeCountry}
+        activeCity={activeCity}
+        onCountryChange={handleCountryChange}
+        onCityChange={handleCityChange}
         isLoading={isLoading}
       />
 
@@ -102,18 +124,18 @@ export function FormBuilderPanel({
         </TabsList>
       </Tabs>
 
-      {isLoading ? (
+      {isLoading && isCloningRef.current ? (
         <p className="text-muted-foreground py-4">{t('cloning')}</p>
-      ) : (
+      ) : showBuilder ? (
         <FormBuilder
           key={formData?.id ?? 'new'}
           serviceId={serviceId}
-          countryId={activeVariant}
+          cityId={activeCity}
           form={formData}
           activeLocale={activeLocale}
           onSaved={setFormData}
         />
-      )}
+      ) : null}
     </div>
   );
 }

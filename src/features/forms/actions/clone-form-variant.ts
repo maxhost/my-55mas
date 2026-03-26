@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { cloneFormVariantSchema } from '../schemas';
 import type { FormWithTranslations } from '../types';
@@ -7,8 +8,8 @@ import { getForm } from './get-form';
 
 type CloneInput = {
   service_id: string;
-  source_country_id: string | null;
-  target_country_id: string;
+  source_city_id: string | null;
+  target_city_id: string;
 };
 
 export async function cloneFormVariant(
@@ -19,21 +20,21 @@ export async function cloneFormVariant(
     return { error: parsed.error.issues[0]?.message ?? 'Invalid input' };
   }
 
-  const { service_id, source_country_id, target_country_id } = parsed.data;
+  const { service_id, source_city_id, target_city_id } = parsed.data;
   const supabase = createClient();
 
   // Load source form (no fallback — must exist exactly)
-  const source = await getForm(service_id, source_country_id, false);
+  const source = await getForm(service_id, source_city_id, false);
   if (!source) {
     return { error: 'Source form not found' };
   }
 
-  // Create new form for the target country
+  // Create new form for the target city
   const { data: newForm, error: insertError } = await supabase
     .from('service_forms')
     .insert({
       service_id,
-      country_id: target_country_id,
+      city_id: target_city_id,
       schema: source.schema,
     })
     .select('id')
@@ -60,5 +61,6 @@ export async function cloneFormVariant(
   }
 
   // Return the new form with translations
-  return { data: await getForm(service_id, target_country_id, false) ?? undefined };
+  revalidatePath('/[locale]/(admin)/admin/services', 'layout');
+  return { data: await getForm(service_id, target_city_id, false) ?? undefined };
 }

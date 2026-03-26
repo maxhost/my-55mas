@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Plus } from 'lucide-react';
 import { saveConfig } from '../actions/update-service';
 import { canPublish } from '../actions/config-helpers';
-import type { ServiceDetail, CountryOption, CityOption, ServiceStatus, ServiceCountryDetail } from '../types';
+import type { ServiceDetail, CountryOption, CityOption, ServiceStatus, ServiceCountryDetail, ServiceCityDetail } from '../types';
 import { SERVICE_STATUSES } from '../types';
 import { useConfigState } from '../hooks/use-config-state';
 import { CountryConfigCard } from './country-config-card';
@@ -18,9 +18,10 @@ type Props = {
   countries: CountryOption[];
   allCities: CityOption[];
   onCountriesChange?: (countries: ServiceCountryDetail[]) => void;
+  onCitiesChange?: (cities: ServiceCityDetail[]) => void;
 };
 
-export function ServiceConfig({ service, countries, allCities, onCountriesChange }: Props) {
+export function ServiceConfig({ service, countries, allCities, onCountriesChange, onCitiesChange }: Props) {
   const t = useTranslations('AdminServices');
   const tc = useTranslations('Common');
   const [isPending, startTransition] = useTransition();
@@ -73,6 +74,21 @@ export function ServiceConfig({ service, countries, allCities, onCountriesChange
           };
         });
         onCountriesChange(updated);
+      }
+
+      if (onCitiesChange) {
+        const updatedCities: ServiceCityDetail[] = cityRows.map((row) => {
+          const city = allCities.find((c) => c.id === row.city_id);
+          return {
+            service_id: service.id,
+            city_id: row.city_id,
+            base_price: row.base_price,
+            is_active: row.is_active,
+            city_name: city?.name ?? '',
+            country_id: city?.country_id ?? '',
+          };
+        });
+        onCitiesChange(updatedCities);
       }
     });
   };

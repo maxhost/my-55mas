@@ -17,17 +17,17 @@ function allStepKeys(schema: FormSchema): Set<string> {
 }
 
 /**
- * Returns field keys that exist in the country schema but NOT in the old General schema.
- * These are "country-specific" fields that must be preserved during cascade.
+ * Returns field keys that exist in the variant schema but NOT in the old General schema.
+ * These are "variant-specific" fields that must be preserved during cascade.
  */
-export function getCountryOnlyFieldKeys(
+export function getVariantOnlyFieldKeys(
   oldGeneral: FormSchema,
-  country: FormSchema,
+  variant: FormSchema,
 ): Set<string> {
   const generalKeys = allFieldKeys(oldGeneral);
-  const countryKeys = allFieldKeys(country);
+  const variantKeys = allFieldKeys(variant);
   const result = new Set<string>();
-  Array.from(countryKeys).forEach((key) => {
+  Array.from(variantKeys).forEach((key) => {
     if (!generalKeys.has(key)) result.add(key);
   });
   return result;
@@ -48,7 +48,7 @@ export function cascadeSchema(
   newGeneral: FormSchema,
   country: FormSchema,
 ): FormSchema {
-  const countryOnlyFields = getCountryOnlyFieldKeys(oldGeneral, country);
+  const countryOnlyFields = getVariantOnlyFieldKeys(oldGeneral, country);
   const newGeneralStepKeys = allStepKeys(newGeneral);
   const oldGeneralStepKeys = allStepKeys(oldGeneral);
 

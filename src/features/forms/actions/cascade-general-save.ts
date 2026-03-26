@@ -5,13 +5,13 @@ import { saveFormWithTranslations } from './save-form';
 import { getForm } from './get-form';
 import { listFormVariants } from './list-form-variants';
 import { saveForm, saveFormTranslations } from './save-form';
-import { cascadeSchema, cascadeTranslations, getCountryOnlyFieldKeys } from './cascade-helpers';
+import { cascadeSchema, cascadeTranslations, getVariantOnlyFieldKeys } from './cascade-helpers';
 
 /**
  * Saves the General form and cascades structural + translation changes
  * to all country variants.
  *
- * Only call this when saving the General form (country_id === null).
+ * Only call this when saving the General form (city_id === null).
  */
 export async function cascadeGeneralSave(input: SaveFormWithTranslationsInput) {
   const { service_id } = input;
@@ -30,32 +30,32 @@ export async function cascadeGeneralSave(input: SaveFormWithTranslationsInput) {
   const newGeneral = await getForm(service_id, null, false);
   if (!newGeneral) return saveResult;
 
-  // 4. List all country variants
+  // 4. List all city variants
   const variants = await listFormVariants(service_id);
-  const countryVariants = variants.filter((v) => v.country_id !== null);
-  if (countryVariants.length === 0) return saveResult;
+  const cityVariants = variants.filter((v) => v.city_id !== null);
+  if (cityVariants.length === 0) return saveResult;
 
-  // 5. Cascade to each country variant
-  for (const variant of countryVariants) {
-    const countryForm = await getForm(service_id, variant.country_id, false);
-    if (!countryForm) continue;
+  // 5. Cascade to each city variant
+  for (const variant of cityVariants) {
+    const cityForm = await getForm(service_id, variant.city_id, false);
+    if (!cityForm) continue;
 
-    const countryOnlyKeys = getCountryOnlyFieldKeys(oldGeneral.schema, countryForm.schema);
-    const mergedSchema = cascadeSchema(oldGeneral.schema, newGeneral.schema, countryForm.schema);
+    const variantOnlyKeys = getVariantOnlyFieldKeys(oldGeneral.schema, cityForm.schema);
+    const mergedSchema = cascadeSchema(oldGeneral.schema, newGeneral.schema, cityForm.schema);
     const mergedTranslations = cascadeTranslations(
       oldGeneral.translations,
       newGeneral.translations,
-      countryForm.translations,
-      countryOnlyKeys,
+      cityForm.translations,
+      variantOnlyKeys,
     );
 
-    // Save updated country schema
-    await saveForm({ service_id, country_id: variant.country_id, schema: mergedSchema });
+    // Save updated city schema
+    await saveForm({ service_id, city_id: variant.city_id, schema: mergedSchema });
 
-    // Save updated country translations (all locales)
+    // Save updated city translations (all locales)
     for (const [locale, data] of Object.entries(mergedTranslations)) {
       await saveFormTranslations({
-        form_id: countryForm.id,
+        form_id: cityForm.id,
         locale,
         labels: data.labels,
         placeholders: data.placeholders,

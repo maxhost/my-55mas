@@ -9,12 +9,12 @@ import {
 
 export async function getForm(
   serviceId: string,
-  countryId: string | null = null,
+  cityId: string | null = null,
   fallback = true
 ): Promise<FormWithTranslations | null> {
   const supabase = createClient();
 
-  // Try specific country first, then fallback to default (null)
+  // Try specific city first, then fallback to default (null)
   let query = supabase
     .from('service_forms')
     .select('*')
@@ -23,18 +23,18 @@ export async function getForm(
     .order('version', { ascending: false })
     .limit(1);
 
-  if (countryId) {
-    query = query.eq('country_id', countryId);
+  if (cityId) {
+    query = query.eq('city_id', cityId);
   } else {
-    query = query.is('country_id', null);
+    query = query.is('city_id', null);
   }
 
   const { data: forms, error } = await query;
 
   if (error) throw error;
 
-  // Fallback to default if country-specific not found
-  if ((!forms || forms.length === 0) && countryId && fallback) {
+  // Fallback to default if city-specific not found
+  if ((!forms || forms.length === 0) && cityId && fallback) {
     return getForm(serviceId, null, true);
   }
 
@@ -60,7 +60,7 @@ export async function getForm(
   return {
     id: form.id,
     service_id: form.service_id,
-    country_id: form.country_id,
+    city_id: form.city_id,
     schema: normalizeSchema(form.schema),
     version: form.version,
     is_active: form.is_active,

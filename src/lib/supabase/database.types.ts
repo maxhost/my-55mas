@@ -803,7 +803,7 @@ export type Database = {
       }
       service_forms: {
         Row: {
-          country_id: string | null
+          city_id: string | null
           created_at: string | null
           id: string
           is_active: boolean
@@ -813,7 +813,7 @@ export type Database = {
           version: number
         }
         Insert: {
-          country_id?: string | null
+          city_id?: string | null
           created_at?: string | null
           id?: string
           is_active?: boolean
@@ -823,7 +823,7 @@ export type Database = {
           version?: number
         }
         Update: {
-          country_id?: string | null
+          city_id?: string | null
           created_at?: string | null
           id?: string
           is_active?: boolean
@@ -834,17 +834,17 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "service_forms_country_id_fkey"
-            columns: ["country_id"]
+            foreignKeyName: "service_forms_city_id_fkey"
+            columns: ["city_id"]
             isOneToOne: false
-            referencedRelation: "countries"
+            referencedRelation: "cities"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "service_forms_country_id_fkey"
-            columns: ["country_id"]
+            foreignKeyName: "service_forms_city_id_fkey"
+            columns: ["city_id"]
             isOneToOne: false
-            referencedRelation: "countries_localized"
+            referencedRelation: "cities_localized"
             referencedColumns: ["id"]
           },
           {
@@ -1741,3 +1741,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

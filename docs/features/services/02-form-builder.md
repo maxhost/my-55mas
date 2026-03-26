@@ -53,31 +53,37 @@ Inspirado en Tally.so y Typeform. Cards apiladas verticalmente, una por paso.
 | Selección múltiple | `multiselect` | Sí — lista de option keys |
 | Archivo | `file` | No (tipos permitidos en v2) |
 
-### Variantes por país (modelo cascade)
+### Variantes por ciudad (modelo cascade)
 
-Un servicio puede tener formularios diferentes por país (regulaciones, preguntas locales). Soportado via `service_forms.country_id`:
-- `country_id = NULL` → formulario **General** (master, aplica a todos los países)
-- `country_id = uuid` → variante específica para ese país
+Un servicio puede tener formularios diferentes por ciudad (regulaciones locales, requisitos municipales). Soportado via `service_forms.city_id`:
+- `city_id = NULL` → formulario **General** (master, aplica a todas las ciudades)
+- `city_id = uuid` → variante específica para esa ciudad
 
 **Modelo cascade — General es el master:**
-- Añadir/eliminar un campo o paso en General → se propaga automáticamente a TODAS las variantes de país
+- Añadir/eliminar un campo o paso en General → se propaga automáticamente a TODAS las variantes de ciudad
 - Traducir en General → las traducciones se copian a todas las variantes (si la variante no tiene una traducción customizada para ese campo)
-- Las variantes de país pueden tener campos adicionales propios (country-specific) que no se ven afectados por el cascade
+- Las variantes de ciudad pueden tener campos adicionales propios (city-specific) que no se ven afectados por el cascade
 
-**Detección de campos country-specific (sin tags en DB):**
-Al guardar General, se comparan keys contra el schema General anterior. Un campo en una variante cuyo key NO existe en el General anterior se considera "country-specific" y se preserva.
+**Detección de campos city-specific (sin tags en DB):**
+Al guardar General, se comparan keys contra el schema General anterior. Un campo en una variante cuyo key NO existe en el General anterior se considera "city-specific" y se preserva.
 
 **Merge de traducciones (inteligente):**
 - Traducción nueva en General → se copia a variantes
 - Traducción cambiada en General → se actualiza en variantes SI la variante aún tenía el valor anterior (heredado)
 - Traducción customizada en variante (diferente del valor General anterior) → se preserva
 
+**Selector jerárquico (País → Ciudad):**
+El variant selector usa dos dropdowns jerárquicos:
+1. Primer dropdown: "General" + países configurados
+2. Segundo dropdown (visible al seleccionar un país): ciudades del país seleccionado
+
 **Flujo:**
-1. El admin configura países en la tab **Configuración** (debe ser la tab anterior)
-2. En la tab Formulario, dropdown muestra "General" + países configurados
-3. Al seleccionar un país que no tiene variante, se auto-crea clonando de General
-4. Editar General propaga cambios automáticamente a todas las variantes
-5. Editar una variante de país permite ajustes puntuales sin afectar a General ni a otros países
+1. El admin configura países y ciudades en la tab **Configuración** (debe ser la tab anterior)
+2. En la tab Formulario, primer dropdown muestra "General" + países configurados
+3. Al seleccionar un país, segundo dropdown muestra las ciudades de ese país
+4. Al seleccionar una ciudad que no tiene variante, se auto-crea clonando de General
+5. Editar General propaga cambios automáticamente a todas las variantes de ciudad
+6. Editar una variante de ciudad permite ajustes puntuales sin afectar a General ni a otras ciudades
 
 ### Traducciones integradas
 
@@ -96,7 +102,7 @@ Las traducciones de labels, placeholders y opciones se editan **dentro del mismo
 |---------|------|-------|
 | id | uuid PK | Auto-generado |
 | service_id | uuid FK → services | Obligatorio |
-| country_id | uuid FK → countries | NULL = default |
+| city_id | uuid FK → cities | NULL = default (General) |
 | schema | jsonb NOT NULL | Estructura del formulario (ver abajo) |
 | version | int | Default 1, incrementa al modificar |
 | is_active | boolean | Default true |
@@ -160,15 +166,18 @@ Ver spec detallada en [04-translations.md](./04-translations.md).
 - [ ] El schema se guarda como JSONB en `service_forms`
 - [ ] Keys son validados (únicos, snake_case)
 - [ ] Al guardar, se incrementa version si el schema cambió
-- [ ] Formulario general (country_id = NULL) funciona correctamente
+- [ ] Formulario general (city_id = NULL) funciona correctamente
 - [ ] Tabs de idioma muestran traducciones integradas en el builder
-- [ ] Crear variante para un país clona estructura + traducciones (auto-clone al seleccionar)
-- [ ] Añadir campo en General → aparece en todas las variantes de país
-- [ ] Eliminar campo en General → desaparece de todas las variantes de país
-- [ ] Campos country-specific (añadidos en una variante) se preservan al editar General
+- [ ] Selector jerárquico: primer dropdown (General/País), segundo dropdown (Ciudad)
+- [ ] Crear variante para una ciudad clona estructura + traducciones (auto-clone al seleccionar)
+- [ ] Añadir campo en General → aparece en todas las variantes de ciudad
+- [ ] Eliminar campo en General → desaparece de todas las variantes de ciudad
+- [ ] Campos city-specific (añadidos en una variante) se preservan al editar General
 - [ ] Traducir en General → traducciones se copian a variantes para campos compartidos
 - [ ] Traducción customizada en variante se preserva al re-guardar General
-- [ ] Dropdown de variantes solo muestra países configurados en tab Configuración
+- [ ] Dropdown de países solo muestra países configurados en tab Configuración
+- [ ] Dropdown de ciudades solo muestra ciudades del país seleccionado
+- [ ] Cambiar de país resetea la selección de ciudad
 - [ ] Cambiar entre variantes recarga el formulario correcto
 - [ ] Tests unitarios para cascade algorithm (funciones puras)
 - [ ] Build pasa sin errores

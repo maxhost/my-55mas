@@ -298,18 +298,25 @@ CREATE TABLE services (
   status            text NOT NULL DEFAULT 'draft'
                     CHECK (status IN ('draft', 'published', 'archived')),
   allows_recurrence boolean NOT NULL DEFAULT false,
+  cover_image_url   text,                            -- URL de imagen de portada del servicio
   created_at        timestamptz DEFAULT now(),
   updated_at        timestamptz DEFAULT now()
 );
 
 CREATE TABLE service_translations (
-  service_id  uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
-  locale      text NOT NULL REFERENCES languages(code),
-  name        text NOT NULL,
-  description text,
-  includes    text,
-  created_at  timestamptz DEFAULT now(),
-  updated_at  timestamptz DEFAULT now(),
+  service_id    uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
+  locale        text NOT NULL REFERENCES languages(code),
+  name          text NOT NULL,
+  description   text,
+  includes      text,
+  -- Contenido de la landing page del servicio
+  hero_title    text,                     -- título del hero section
+  hero_subtitle text,                     -- subtítulo del hero section
+  benefits      jsonb DEFAULT '[]',       -- array de beneficios: [{"icon": "...", "text": "..."}]
+  guarantees    jsonb DEFAULT '[]',       -- array de garantías
+  faqs          jsonb DEFAULT '[]',       -- array de FAQs: [{"question": "...", "answer": "..."}]
+  created_at    timestamptz DEFAULT now(),
+  updated_at    timestamptz DEFAULT now(),
   PRIMARY KEY (service_id, locale)
 );
 
@@ -343,20 +350,20 @@ CREATE TABLE service_cities (
 
 ## Capa 5 — Formularios dinámicos
 
-El formulario puede variar por país (regulaciones). Schema almacena solo estructura.
+El formulario puede variar por ciudad (regulaciones locales, requisitos municipales). Schema almacena solo estructura.
 
 ```sql
 CREATE TABLE service_forms (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   service_id  uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
-  country_id  uuid REFERENCES countries(id),  -- NULL = default para todos
+  city_id     uuid REFERENCES cities(id),     -- NULL = default para todas las ciudades
   schema      jsonb NOT NULL,                 -- solo estructura, sin texto
   version     int NOT NULL DEFAULT 1,
   is_active   boolean NOT NULL DEFAULT true,
   created_at  timestamptz DEFAULT now(),
   updated_at  timestamptz DEFAULT now(),
   -- NULLS NOT DISTINCT: PG15+ (Supabase). NULL == NULL en UNIQUE; evita múltiples defaults.
-  UNIQUE NULLS NOT DISTINCT (service_id, country_id, version)
+  UNIQUE NULLS NOT DISTINCT (service_id, city_id, version)
 );
 
 -- Traducciones de labels, placeholders y opciones del formulario
@@ -411,10 +418,10 @@ CREATE TABLE service_form_translations (
 }
 ```
 
-### Resolución del formulario para servicio X en país Y
+### Resolución del formulario para servicio X en ciudad Y
 
-1. `WHERE service_id = X AND country_id = Y AND is_active = true`
-2. Si no existe → `WHERE service_id = X AND country_id IS NULL AND is_active = true`
+1. `WHERE service_id = X AND city_id = Y AND is_active = true`
+2. Si no existe → `WHERE service_id = X AND city_id IS NULL AND is_active = true`
 
 ---
 
@@ -528,21 +535,21 @@ Las sesiones se generan bajo demanda via cron, no en cadena (push).
 
 ### Validación de form_data
 
-`form_id` y `form_data` son NOT NULL — toda orden proviene de un formulario.
+`form_data` es NOT NULL — toda orden debe incluir los datos del formulario. `form_id` es nullable (se pone a NULL si el formulario fue eliminado, preservando `form_data` como registro histórico).
 
-- **`form_id`** referencia la versión exacta del formulario usado al crear el pedido (snapshot).
+- **`form_id`** referencia la versión exacta del formulario usado al crear el pedido (snapshot). Nullable con `ON DELETE SET NULL`.
 - **`form_data`** contiene las respuestas del cliente, validadas por la aplicación (Zod) contra `service_forms.schema` al momento del submit.
 - **No hay validación de form_data a nivel DB** — la validación estructural de JSONB contra un schema dinámico sería frágil y duplicaría lógica. La capa de aplicación es la fuente de verdad para la validación.
-- **Datos históricos:** si el formulario evoluciona (nueva versión), los datos de pedidos anteriores se mantienen intactos. El `form_id` permite reconstruir qué schema se usó para ese pedido.
+- **Datos históricos:** si el formulario evoluciona (nueva versión), los datos de pedidos anteriores se mantienen intactos. El `form_id` (cuando no es NULL) permite reconstruir qué schema se usó para ese pedido.
 
 ```sql
 CREATE TABLE orders (
   id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id           uuid NOT NULL REFERENCES profiles(id) ON DELETE RESTRICT,
-  service_id          uuid NOT NULL REFERENCES services(id) ON DELETE RESTRICT,
+  service_id          uuid REFERENCES services(id) ON DELETE SET NULL,  -- nullable: servicio puede archivarse tras crear el pedido
   country_id          uuid NOT NULL REFERENCES countries(id),
   talent_id           uuid REFERENCES profiles(id) ON DELETE SET NULL,  -- NULL hasta asignación
-  form_id             uuid NOT NULL REFERENCES service_forms(id),       -- versión del formulario usado (snapshot)
+  form_id             uuid REFERENCES service_forms(id) ON DELETE SET NULL,  -- versión del formulario usado (snapshot); NULL si el form fue eliminado
   form_data           jsonb NOT NULL,                                   -- respuestas del cliente (validadas por app via Zod)
   -- Contacto del pedido (siempre explícito; para guests es la ÚNICA vía de comunicación)
   contact_email       text NOT NULL,                                    -- email de contacto para ESTE pedido
@@ -854,6 +861,8 @@ CREATE TRIGGER check_order_city_country_match BEFORE INSERT OR UPDATE ON orders
 
 ## Capa 9 — Row Level Security
 
+> **Estado actual (dev):** RLS está **pendiente de implementar**. Ninguna tabla tiene `rowsecurity = true` en el proyecto dev. El SQL de activación se incluye aquí como referencia de lo que debe aplicarse antes de producción.
+
 RLS debe estar activado en todas las tablas públicas. Sin esto, las políticas no se aplican.
 Las políticas concretas se definen en cada feature, pero la activación va en la migración base.
 
@@ -915,8 +924,9 @@ ALTER TABLE order_status_history ENABLE ROW LEVEL SECURITY;
 ```sql
 -- Búsquedas frecuentes en catálogo
 CREATE INDEX idx_services_status ON services(status);
--- idx_services_category omitido: category_id no se usa en v1
+CREATE INDEX idx_services_category ON services(category_id);
 CREATE INDEX idx_service_countries_active ON service_countries(country_id) WHERE is_active = true;
+CREATE INDEX idx_service_cities_active ON service_cities(service_id) WHERE is_active = true;
 CREATE INDEX idx_service_translations_locale ON service_translations(locale);
 
 -- Pedidos por cliente, estado, país y ubicación
@@ -954,10 +964,14 @@ CREATE INDEX idx_cities_country ON cities(country_id);
 ```sql
 -- Servicios con traducción, listos para queries del catálogo
 CREATE VIEW services_localized AS
-SELECT s.id, s.slug, s.status, s.allows_recurrence,
+SELECT s.id, s.slug, s.category_id, s.status, s.allows_recurrence,
        st.locale, st.name, st.description, st.includes
 FROM services s
 JOIN service_translations st ON st.service_id = s.id;
+
+-- Nota: los campos hero_title, hero_subtitle, benefits, guarantees, faqs de service_translations
+-- y cover_image_url de services no están incluidos en esta view. Consultarlos directamente
+-- en service_translations cuando se necesiten para landing pages de servicio.
 
 -- Categorías con traducción
 CREATE VIEW categories_localized AS
@@ -981,6 +995,17 @@ SELECT c.id, c.code, c.currency, c.timezone, c.locale_default,
 FROM countries c
 JOIN country_translations ct ON ct.country_id = c.id;
 ```
+
+---
+
+## Funciones utilitarias
+
+Funciones almacenadas en `public` que encapsulan operaciones de negocio complejas. No son triggers.
+
+| Función | Descripción |
+|---------|-------------|
+| `delete_service(service_id uuid)` | Elimina un servicio en cascada (traducciones, formularios, disponibilidad). Usar en lugar de `DELETE` directo. |
+| `save_service_config(...)` | Guarda la configuración de un servicio (países, ciudades, precios) en una transacción atómica. Usada por el panel de admin. |
 
 ---
 

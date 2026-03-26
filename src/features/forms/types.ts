@@ -48,7 +48,7 @@ export type FormTranslationData = {
 export type FormDetail = {
   id: string;
   service_id: string;
-  country_id: string | null;
+  city_id: string | null;
   schema: FormSchema;
   version: number;
   is_active: boolean;
@@ -62,16 +62,25 @@ export type FormWithTranslations = FormDetail & {
 
 export type FormVariantSummary = {
   id: string;
+  city_id: string | null;
+  city_name: string | null;
   country_id: string | null;
-  country_name: string | null;
   version: number;
 };
 
-// ── Country option (forms-local, avoids cross-feature import) ──
+// ── Country option (forms-local, for first dropdown) ──
 
 export type FormCountryOption = {
   id: string;
   name: string;
+};
+
+// ── City option (for second dropdown) ─────────────────
+
+export type FormCityOption = {
+  id: string;
+  name: string;
+  country_id: string;
 };
 
 // ── Helpers ───────────────────────────────────────────

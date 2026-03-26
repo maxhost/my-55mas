@@ -10,37 +10,41 @@ export async function listFormVariants(
 
   const { data: forms, error } = await supabase
     .from('service_forms')
-    .select('id, country_id, version')
+    .select('id, city_id, version')
     .eq('service_id', serviceId)
     .eq('is_active', true)
-    .order('country_id', { ascending: true, nullsFirst: true });
+    .order('city_id', { ascending: true, nullsFirst: true });
 
   if (error) throw error;
   if (!forms || forms.length === 0) return [];
 
-  // Fetch country names for non-null country_ids
-  const countryIds = forms
-    .map((f) => f.country_id)
+  // Fetch city names + country_id for non-null city_ids
+  const cityIds = forms
+    .map((f) => f.city_id)
     .filter((id): id is string => id !== null);
 
-  let countryMap: Record<string, string> = {};
+  let cityMap: Record<string, { name: string; country_id: string }> = {};
 
-  if (countryIds.length > 0) {
-    const { data: countries } = await supabase
-      .from('country_translations')
-      .select('country_id, name')
+  if (cityIds.length > 0) {
+    const { data: cityData } = await supabase
+      .from('city_translations')
+      .select('city_id, name, cities!inner(country_id)')
       .eq('locale', 'es')
-      .in('country_id', countryIds);
+      .in('city_id', cityIds);
 
-    countryMap = Object.fromEntries(
-      (countries ?? []).map((c) => [c.country_id, c.name])
+    cityMap = Object.fromEntries(
+      (cityData ?? []).map((c) => {
+        const city = c.cities as unknown as { country_id: string };
+        return [c.city_id, { name: c.name, country_id: city.country_id }];
+      })
     );
   }
 
   return forms.map((f) => ({
     id: f.id,
-    country_id: f.country_id,
-    country_name: f.country_id ? (countryMap[f.country_id] ?? null) : null,
+    city_id: f.city_id,
+    city_name: f.city_id ? (cityMap[f.city_id]?.name ?? null) : null,
+    country_id: f.city_id ? (cityMap[f.city_id]?.country_id ?? null) : null,
     version: f.version,
   }));
 }

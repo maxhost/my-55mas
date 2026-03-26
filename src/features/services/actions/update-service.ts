@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import type { Json } from '@/lib/supabase/database.types';
 import {
@@ -33,6 +34,7 @@ export async function updateService(input: UpdateServiceInput) {
     throw error;
   }
 
+  revalidatePath('/[locale]/(admin)/admin/services', 'layout');
   return { data: { id } };
 }
 
@@ -64,6 +66,7 @@ export async function saveTranslation(input: SaveTranslationInput) {
 
   if (error) throw error;
 
+  revalidatePath('/[locale]/(admin)/admin/services', 'layout');
   return { data: { service_id, locale: translation.locale } };
 }
 
@@ -97,5 +100,6 @@ export async function saveConfig(input: SaveConfigInput) {
 
   if (error) return { error: { _rpc: [error.message] } };
 
+  revalidatePath('/[locale]/(admin)/admin/services', 'layout');
   return { data: { service_id } };
 }

@@ -19,7 +19,7 @@ import { StepCard } from './step-card';
 
 type Props = {
   serviceId: string;
-  countryId: string | null;
+  cityId: string | null;
   form: FormWithTranslations | null;
   activeLocale: string;
   onSaved?: (form: FormWithTranslations) => void;
@@ -45,7 +45,7 @@ function initTranslations(
   return init;
 }
 
-export function FormBuilder({ serviceId, countryId, form, activeLocale, onSaved }: Props) {
+export function FormBuilder({ serviceId, cityId, form, activeLocale, onSaved }: Props) {
   const t = useTranslations('AdminFormBuilder');
   const tc = useTranslations('Common');
   const [isPending, startTransition] = useTransition();
@@ -103,13 +103,13 @@ export function FormBuilder({ serviceId, countryId, form, activeLocale, onSaved 
   const handleSave = () => {
     const payload = {
       service_id: serviceId,
-      country_id: countryId,
+      city_id: cityId,
       schema,
       locale: activeLocale,
       ...current,
     };
     startTransition(async () => {
-      const result = countryId === null
+      const result = cityId === null
         ? await cascadeGeneralSave(payload)
         : await saveFormWithTranslations(payload);
 
@@ -124,7 +124,7 @@ export function FormBuilder({ serviceId, countryId, form, activeLocale, onSaved 
 
       // Sincronizar parent con datos guardados
       if (onSaved) {
-        const saved = await getForm(serviceId, countryId, false);
+        const saved = await getForm(serviceId, cityId, false);
         if (saved) onSaved(saved);
       }
     });

@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import {
   saveFormSchema,
@@ -16,10 +17,10 @@ export async function saveForm(input: SaveFormInput) {
     return { error: parsed.error.flatten().fieldErrors };
   }
 
-  const { service_id, country_id, schema } = parsed.data;
+  const { service_id, city_id, schema } = parsed.data;
   const supabase = createClient();
 
-  // Check if a form already exists for this service+country
+  // Check if a form already exists for this service+city
   let query = supabase
     .from('service_forms')
     .select('id, version')
@@ -27,10 +28,10 @@ export async function saveForm(input: SaveFormInput) {
     .eq('is_active', true)
     .limit(1);
 
-  if (country_id) {
-    query = query.eq('country_id', country_id);
+  if (city_id) {
+    query = query.eq('city_id', city_id);
   } else {
-    query = query.is('country_id', null);
+    query = query.is('city_id', null);
   }
 
   const { data: existing } = await query;
@@ -53,7 +54,7 @@ export async function saveForm(input: SaveFormInput) {
   // Create new form
   const { data: newForm, error } = await supabase
     .from('service_forms')
-    .insert({ service_id, country_id, schema })
+    .insert({ service_id, city_id, schema })
     .select('id')
     .single();
 
@@ -94,11 +95,11 @@ export async function saveFormWithTranslations(
     return { error: parsed.error.flatten().fieldErrors };
   }
 
-  const { service_id, country_id, schema, locale, labels, placeholders, option_labels } =
+  const { service_id, city_id, schema, locale, labels, placeholders, option_labels } =
     parsed.data;
 
   // Save schema (reuses existing saveForm logic)
-  const formResult = await saveForm({ service_id, country_id, schema });
+  const formResult = await saveForm({ service_id, city_id, schema });
   if ('error' in formResult && formResult.error) return formResult;
 
   const formId = formResult.data!.id;
@@ -113,5 +114,6 @@ export async function saveFormWithTranslations(
   });
   if ('error' in transResult && transResult.error) return transResult;
 
+  revalidatePath('/[locale]/(admin)/admin/services', 'layout');
   return { data: { id: formId } };
 }

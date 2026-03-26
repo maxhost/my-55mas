@@ -9,7 +9,7 @@ El sistema de toast usa **Sonner** (librería recomendada por shadcn/ui). Un com
 las route groups (admin, public, client, talent, auth).
 
 **Configuración:**
-- Posición: `bottom-right`
+- Posición: `top-right`
 - Duración: 4000ms
 - `richColors`: sí (verde success, rojo error)
 - `closeButton`: sí (dismiss manual + accesibilidad)

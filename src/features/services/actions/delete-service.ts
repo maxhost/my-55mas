@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
@@ -18,5 +19,6 @@ export async function deleteService(id: string) {
 
   if (error) return { error: { _db: [error.message] } };
 
+  revalidatePath('/[locale]/(admin)/admin/services', 'layout');
   return { data: { id: parsed.data.id } };
 }
