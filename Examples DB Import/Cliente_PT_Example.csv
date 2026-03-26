@@ -1,0 +1,5 @@
+Client Type;Client #;Name;Email;Phone;Preferred Contact;Joined At;Month;Year;NIF;Terms of Conditions;Billing Address;State/Province;City;Postal Code
+Individual;1;maria josé cassola;test@test1.com;999999999;Whatsapp;2020-11-20;11;2020;;Não Aceite;;;;
+Individual;2;mafalda bello;test2@test.com;999999999;Whatsapp;2020-11-20;11;2020;;Não Aceite;;;;
+Individual;3;fernanda coelho;te2t@test.com;999999999;Messenger;2020-11-20;11;2020;;Não Aceite;;;;
+Business;4;impact trip;busi2@test.com;999999999;Telefone;2020-11-20;11;2020;;Não Aceite;;;;
