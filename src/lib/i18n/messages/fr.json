@@ -30,6 +30,7 @@
     "services": "Services",
     "dashboard": "Tableau de bord",
     "talentServices": "Services Talent",
+    "surveyQuestions": "Questions Statistiques",
     "payments": "Paiements",
     "notifications": "Notifications"
   },
@@ -151,6 +152,27 @@
     "noVariant": "Aucune variante — créez-la depuis le designer",
     "save": "Enregistrer",
     "saving": "Enregistrement..."
+  },
+  "AdminSurveyQuestions": {
+    "title": "Questions Statistiques",
+    "description": "Définissez des questions statistiques pour collecter des données des talents (ex : Comment nous avez-vous trouvé ?, évaluation de 1 à 5).",
+    "addQuestion": "Ajouter une question",
+    "noQuestions": "Aucune question statistique définie.",
+    "keyPlaceholder": "clé",
+    "labelPlaceholder": "Texte de la question",
+    "descriptionPlaceholder": "Description (optionnel)",
+    "responseType": "Type de réponse",
+    "options": "Options",
+    "optionLabel": "Libellé",
+    "addOption": "Ajouter une option",
+    "active": "Actif",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "text": "Texte libre",
+    "scale_1_5": "Échelle 1-5",
+    "scale_1_10": "Échelle 1-10",
+    "single_select": "Sélection unique",
+    "yes_no": "Oui / Non"
   },
   "AdminSubtypes": {
     "title": "Sous-types",

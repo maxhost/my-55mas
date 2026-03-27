@@ -30,6 +30,7 @@
     "services": "Serviços",
     "dashboard": "Dashboard",
     "talentServices": "Serviços Talento",
+    "surveyQuestions": "Perguntas Estatísticas",
     "payments": "Pagamentos",
     "notifications": "Notificações"
   },
@@ -151,6 +152,27 @@
     "noVariant": "Sem variante — crie-a no designer",
     "save": "Salvar",
     "saving": "Salvando..."
+  },
+  "AdminSurveyQuestions": {
+    "title": "Perguntas Estatísticas",
+    "description": "Defina perguntas estatísticas para recolher dados dos talentos (ex: Como nos encontrou?, avaliação de 1 a 5).",
+    "addQuestion": "Adicionar pergunta",
+    "noQuestions": "Nenhuma pergunta estatística definida.",
+    "keyPlaceholder": "chave",
+    "labelPlaceholder": "Texto da pergunta",
+    "descriptionPlaceholder": "Descrição (opcional)",
+    "responseType": "Tipo de resposta",
+    "options": "Opções",
+    "optionLabel": "Etiqueta",
+    "addOption": "Adicionar opção",
+    "active": "Ativo",
+    "save": "Salvar",
+    "saving": "Salvando...",
+    "text": "Texto livre",
+    "scale_1_5": "Escala 1-5",
+    "scale_1_10": "Escala 1-10",
+    "single_select": "Seleção única",
+    "yes_no": "Sim / Não"
   },
   "AdminSubtypes": {
     "title": "Sub-tipos",

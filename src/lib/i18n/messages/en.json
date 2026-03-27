@@ -30,6 +30,7 @@
     "services": "Services",
     "dashboard": "Dashboard",
     "talentServices": "Talent Services",
+    "surveyQuestions": "Survey Questions",
     "payments": "Payments",
     "notifications": "Notifications"
   },
@@ -151,6 +152,27 @@
     "noVariant": "No variant — create it from the form designer",
     "save": "Save",
     "saving": "Saving..."
+  },
+  "AdminSurveyQuestions": {
+    "title": "Survey Questions",
+    "description": "Define survey questions to collect data from talents (e.g., How did you find us?, rate 1 to 5).",
+    "addQuestion": "Add question",
+    "noQuestions": "No survey questions defined.",
+    "keyPlaceholder": "key",
+    "labelPlaceholder": "Question text",
+    "descriptionPlaceholder": "Description (optional)",
+    "responseType": "Response type",
+    "options": "Options",
+    "optionLabel": "Label",
+    "addOption": "Add option",
+    "active": "Active",
+    "save": "Save",
+    "saving": "Saving...",
+    "text": "Free text",
+    "scale_1_5": "Scale 1-5",
+    "scale_1_10": "Scale 1-10",
+    "single_select": "Single select",
+    "yes_no": "Yes / No"
   },
   "AdminSubtypes": {
     "title": "Subtypes",

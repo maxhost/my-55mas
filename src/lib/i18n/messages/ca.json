@@ -30,6 +30,7 @@
     "services": "Serveis",
     "dashboard": "Tauler",
     "talentServices": "Serveis Talent",
+    "surveyQuestions": "Preguntes Estadístiques",
     "payments": "Pagaments",
     "notifications": "Notificacions"
   },
@@ -151,6 +152,27 @@
     "noVariant": "Sense variant — crea-la des del dissenyador",
     "save": "Desar",
     "saving": "Desant..."
+  },
+  "AdminSurveyQuestions": {
+    "title": "Preguntes Estadístiques",
+    "description": "Definiu preguntes estadístiques per recollir dades dels talents (ex: Com ens heu trobat?, valoració de l'1 al 5).",
+    "addQuestion": "Afegir pregunta",
+    "noQuestions": "No hi ha preguntes estadístiques definides.",
+    "keyPlaceholder": "clau",
+    "labelPlaceholder": "Text de la pregunta",
+    "descriptionPlaceholder": "Descripció (opcional)",
+    "responseType": "Tipus de resposta",
+    "options": "Opcions",
+    "optionLabel": "Etiqueta",
+    "addOption": "Afegir opció",
+    "active": "Actiu",
+    "save": "Desar",
+    "saving": "Desant...",
+    "text": "Text lliure",
+    "scale_1_5": "Escala 1-5",
+    "scale_1_10": "Escala 1-10",
+    "single_select": "Selecció única",
+    "yes_no": "Sí / No"
   },
   "AdminSubtypes": {
     "title": "Subtipus",

@@ -21,6 +21,7 @@ export const adminNavGroups: NavGroup[] = [
     items: [
       { labelKey: 'dashboard', href: '/admin', icon: 'layout-dashboard' },
       { labelKey: 'talentServices', href: '/admin/talent-services', icon: 'file-text' },
+      { labelKey: 'surveyQuestions', href: '/admin/survey-questions', icon: 'bar-chart-2' },
       { labelKey: 'payments', href: '/admin/payments', icon: 'credit-card' },
       { labelKey: 'notifications', href: '/admin/notifications', icon: 'bell' },
     ],

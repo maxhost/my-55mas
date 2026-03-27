@@ -537,6 +537,29 @@ CREATE TABLE talent_analytics (
   UNIQUE (talent_id, key)
 );
 
+-- Preguntas estadísticas (definiciones de preguntas para talent_analytics)
+CREATE TABLE survey_questions (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  key           text NOT NULL UNIQUE,           -- 'how_found', 'ease_finding_job'
+  response_type text NOT NULL,                  -- 'text', 'scale_1_5', 'scale_1_10', 'single_select', 'yes_no'
+  options       jsonb DEFAULT NULL,             -- para single_select
+  sort_order    int NOT NULL DEFAULT 0,
+  is_active     boolean NOT NULL DEFAULT true,
+  created_at    timestamptz DEFAULT now(),
+  updated_at    timestamptz DEFAULT now()
+);
+
+CREATE TABLE survey_question_translations (
+  question_id  uuid NOT NULL REFERENCES survey_questions(id) ON DELETE CASCADE,
+  locale       text NOT NULL REFERENCES languages(code),
+  label        text NOT NULL,
+  description  text,
+  option_labels jsonb,
+  created_at   timestamptz DEFAULT now(),
+  updated_at   timestamptz DEFAULT now(),
+  PRIMARY KEY (question_id, locale)
+);
+
 -- Grupos de sub-tipos (ej: "tipo_de_mascota", "tamaño")
 -- Cada servicio puede tener múltiples grupos independientes
 CREATE TABLE service_subtype_groups (
@@ -796,6 +819,10 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON talent_profile_translations
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_required_document_translations
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON survey_questions
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON survey_question_translations
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_subtype_groups
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_subtype_group_translations
@@ -1015,6 +1042,8 @@ ALTER TABLE talent_profile_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE talent_services ENABLE ROW LEVEL SECURITY;
 ALTER TABLE talent_documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE talent_analytics ENABLE ROW LEVEL SECURITY;
+ALTER TABLE survey_questions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE survey_question_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE service_subtype_groups ENABLE ROW LEVEL SECURITY;
 ALTER TABLE service_subtype_group_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE service_subtypes ENABLE ROW LEVEL SECURITY;

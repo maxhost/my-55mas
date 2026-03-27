@@ -12,6 +12,7 @@ import {
   CreditCard,
   Bell,
   Briefcase,
+  BarChart2,
   Circle,
 } from 'lucide-react';
 
@@ -26,6 +27,7 @@ const icons: Record<string, LucideIcon> = {
   'credit-card': CreditCard,
   bell: Bell,
   briefcase: Briefcase,
+  'bar-chart-2': BarChart2,
 };
 
 export function getNavIcon(name: string): LucideIcon {

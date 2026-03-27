@@ -1373,6 +1373,84 @@ export type Database = {
         }
         Relationships: []
       }
+      survey_question_translations: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          label: string
+          locale: string
+          option_labels: Json | null
+          question_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          label: string
+          locale: string
+          option_labels?: Json | null
+          question_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          label?: string
+          locale?: string
+          option_labels?: Json | null
+          question_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "survey_question_translations_locale_fkey"
+            columns: ["locale"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "survey_question_translations_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "survey_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      survey_questions: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean
+          key: string
+          options: Json | null
+          response_type: string
+          sort_order: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          key: string
+          options?: Json | null
+          response_type: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          key?: string
+          options?: Json | null
+          response_type?: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       talent_analytics: {
         Row: {
           created_at: string | null
