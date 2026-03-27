@@ -203,7 +203,11 @@
     "active": "Actif",
     "noVariant": "Pas de variante — créez-en depuis le concepteur",
     "save": "Enregistrer",
-    "saving": "Enregistrement..."
+    "saving": "Enregistrement...",
+    "deleteFormTitle": "Supprimer le formulaire",
+    "deleteFormDescription": "Ceci supprimera définitivement \"{name}\" et toutes ses données : traductions, configuration pays/villes et variantes. Cette action est irréversible.",
+    "deleteConfirm": "Supprimer définitivement",
+    "deleteError": "Erreur lors de la suppression du formulaire."
   },
   "AdminSubtypes": {
     "title": "Sous-types",

@@ -33,3 +33,12 @@ Nuevo tipo de campo en el form builder que referencia una pregunta de `survey_qu
 - parent_id FK con CASCADE para limpiar variantes al eliminar General
 - countries/cities FK al General form con CASCADE
 - Key de survey question inmutable después de creación
+
+## Eliminación
+
+- Solo formularios General (`parent_id IS NULL`) pueden eliminarse desde la lista admin
+- CASCADE elimina automáticamente: traducciones, config países/ciudades, y variantes hijas
+- No afecta datos externos: perfiles de talentos, pedidos, respuestas de formularios de servicio
+- Requiere confirmación explícita con modal destructivo que describe qué se eliminará
+- La acción verifica que el DELETE afectó filas; si el form no existe o ya fue eliminado, muestra error
+- Variantes no pueden eliminarse individualmente — se eliminan vía CASCADE al eliminar su formulario General padre

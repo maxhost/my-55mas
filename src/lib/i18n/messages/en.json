@@ -203,7 +203,11 @@
     "active": "Active",
     "noVariant": "No variant — create from the designer",
     "save": "Save",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "deleteFormTitle": "Delete form",
+    "deleteFormDescription": "This will permanently delete \"{name}\" and all its data: translations, country/city configuration, and variants. This action cannot be undone.",
+    "deleteConfirm": "Delete permanently",
+    "deleteError": "Error deleting form."
   },
   "AdminSubtypes": {
     "title": "Subtypes",

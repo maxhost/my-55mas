@@ -203,7 +203,11 @@
     "active": "Actiu",
     "noVariant": "Sense variant — creeu-la des del dissenyador",
     "save": "Desar",
-    "saving": "Desant..."
+    "saving": "Desant...",
+    "deleteFormTitle": "Eliminar formulari",
+    "deleteFormDescription": "Això eliminarà permanentment \"{name}\" i totes les seves dades: traduccions, configuració de països/ciutats i variants. Aquesta acció no es pot desfer.",
+    "deleteConfirm": "Eliminar permanentment",
+    "deleteError": "Error en eliminar el formulari."
   },
   "AdminSubtypes": {
     "title": "Subtipus",

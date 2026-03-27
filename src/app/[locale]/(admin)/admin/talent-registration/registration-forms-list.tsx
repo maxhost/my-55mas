@@ -1,9 +1,14 @@
 'use client';
 
+import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 import { Link } from '@/lib/i18n/navigation';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { ConfirmDialog } from '@/shared/components/confirm-dialog';
+import { deleteRegistrationForm } from '@/features/registration';
+import { Plus, Trash2 } from 'lucide-react';
 import type { RegistrationFormListItem } from '@/features/registration/types';
 
 type Props = {
@@ -12,6 +17,28 @@ type Props = {
 
 export function RegistrationFormsList({ forms }: Props) {
   const t = useTranslations('AdminRegistration');
+  const tc = useTranslations('Common');
+  const router = useRouter();
+  const [deleteTarget, setDeleteTarget] = useState<RegistrationFormListItem | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  const handleConfirmDelete = () => {
+    if (!deleteTarget) return;
+    setDeleteError(null);
+    startTransition(async () => {
+      const result = await deleteRegistrationForm(deleteTarget.id);
+      if (result && 'error' in result) {
+        const errObj = result.error as Record<string, string[] | undefined>;
+        const msg = Object.values(errObj).flat().filter(Boolean)[0];
+        setDeleteError(msg ?? t('deleteError'));
+        return;
+      }
+      setDeleteTarget(null);
+      toast.success(tc('deletedSuccess'));
+      router.refresh();
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -34,6 +61,7 @@ export function RegistrationFormsList({ forms }: Props) {
               <th className="py-2 font-medium">{t('variants')}</th>
               <th className="py-2 font-medium">{t('created')}</th>
               <th className="py-2 font-medium">{t('updated')}</th>
+              <th />
             </tr>
           </thead>
           <tbody>
@@ -62,11 +90,41 @@ export function RegistrationFormsList({ forms }: Props) {
                     ? new Date(form.updated_at).toLocaleDateString()
                     : '—'}
                 </td>
+                <td className="py-2">
+                  <Button
+                    variant="ghost"
+                    size="icon-xs"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteTarget(form);
+                    }}
+                  >
+                    <Trash2 className="size-3" />
+                  </Button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteTarget(null);
+            setDeleteError(null);
+          }
+        }}
+        title={t('deleteFormTitle')}
+        description={t('deleteFormDescription', { name: deleteTarget?.name ?? '' })}
+        confirmLabel={t('deleteConfirm')}
+        cancelLabel={tc('cancel')}
+        onConfirm={handleConfirmDelete}
+        variant="destructive"
+        isPending={isPending}
+        error={deleteError}
+      />
     </div>
   );
 }

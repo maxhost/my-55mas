@@ -3,6 +3,7 @@ import {
   saveRegistrationFormSchema,
   createRegistrationFormSchema,
   saveRegistrationConfigSchema,
+  deleteRegistrationFormSchema,
 } from '../schemas';
 
 describe('createRegistrationFormSchema', () => {
@@ -67,7 +68,7 @@ describe('createRegistrationFormSchema', () => {
 
 describe('saveRegistrationFormSchema', () => {
   const validInput = {
-    slug: 'talentos_premium',
+    slug: 'talentos-premium',
     city_id: null,
     schema: { steps: [{ key: 'step_1', fields: [{ key: 'f1', type: 'text', required: false }] }] },
     locale: 'es',
@@ -97,10 +98,10 @@ describe('saveRegistrationFormSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('rejects slug starting with number', () => {
+  it('rejects slug with underscores', () => {
     const result = saveRegistrationFormSchema.safeParse({
       ...validInput,
-      slug: '1slug',
+      slug: 'bad_slug',
     });
     expect(result.success).toBe(false);
   });
@@ -139,6 +140,30 @@ describe('saveRegistrationConfigSchema', () => {
       country_ids: [],
       city_ids: [],
     });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('deleteRegistrationFormSchema', () => {
+  it('accepts a valid UUID', () => {
+    const result = deleteRegistrationFormSchema.safeParse({
+      id: '550e8400-e29b-41d4-a716-446655440000',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects a non-UUID string', () => {
+    const result = deleteRegistrationFormSchema.safeParse({ id: 'not-a-uuid' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects empty string', () => {
+    const result = deleteRegistrationFormSchema.safeParse({ id: '' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects missing id', () => {
+    const result = deleteRegistrationFormSchema.safeParse({});
     expect(result.success).toBe(false);
   });
 });

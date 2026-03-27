@@ -203,7 +203,11 @@
     "active": "Activo",
     "noVariant": "Sin variante — créala desde el diseñador",
     "save": "Guardar",
-    "saving": "Guardando..."
+    "saving": "Guardando...",
+    "deleteFormTitle": "Eliminar formulario",
+    "deleteFormDescription": "Esto eliminará permanentemente \"{name}\" y todos sus datos: traducciones, configuración de países/ciudades y variantes. Esta acción no se puede deshacer.",
+    "deleteConfirm": "Eliminar permanentemente",
+    "deleteError": "Error al eliminar el formulario."
   },
   "AdminSubtypes": {
     "title": "Sub-tipos",

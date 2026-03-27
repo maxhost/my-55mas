@@ -5,7 +5,7 @@ const slugSchema = z
   .string()
   .min(1)
   .max(50)
-  .regex(/^[a-z][a-z0-9_]*$/, 'Slug must be snake_case starting with a letter');
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be kebab-case');
 
 // ── Save form schema + translations ─────────────────
 
@@ -38,4 +38,10 @@ export const saveRegistrationConfigSchema = z.object({
   form_id: z.string().uuid(),
   country_ids: z.array(z.string().uuid()),
   city_ids: z.array(z.string().uuid()),
+});
+
+// ── Delete form ─────────────────────────────────────
+
+export const deleteRegistrationFormSchema = z.object({
+  id: z.string().uuid(),
 });
