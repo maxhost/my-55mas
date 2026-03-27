@@ -128,7 +128,9 @@
     "selectCity": "Select city",
     "selectCityPrompt": "Select a city to view the form",
     "noCitiesForCountry": "No cities configured for this country",
-    "saveError": "Error saving. Check field keys."
+    "saveError": "Error saving. Check field keys.",
+    "subtypeGroup": "Subtype group",
+    "selectGroup": "Select group..."
   },
   "AdminTalentForms": {
     "title": "Talent Forms",
@@ -152,10 +154,14 @@
   },
   "AdminSubtypes": {
     "title": "Subtypes",
-    "description": "Define subtypes for this service (e.g., Pet Sitting → dog, cat, fish).",
-    "addSubtype": "Add subtype",
-    "noSubtypes": "No subtypes defined for this service.",
-    "slugPlaceholder": "slug",
+    "description": "Define subtype groups for this service (e.g., \"Pet type\" → dog, cat; \"Size\" → small, large).",
+    "addGroup": "Add group",
+    "addItem": "Add item",
+    "noGroups": "No subtype groups defined.",
+    "noItems": "No items in this group.",
+    "groupSlug": "group slug",
+    "groupName": "Group name",
+    "itemSlug": "slug",
     "namePlaceholder": "Name",
     "active": "Active",
     "save": "Save",

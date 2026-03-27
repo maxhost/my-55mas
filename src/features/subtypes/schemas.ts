@@ -6,7 +6,7 @@ const slugSchema = z
   .max(50)
   .regex(/^[a-z][a-z0-9_]*$/, 'Slug must be snake_case starting with a letter');
 
-export const subtypeInputSchema = z.object({
+export const subtypeItemInputSchema = z.object({
   id: z.string().uuid().optional(),
   slug: slugSchema,
   sort_order: z.number().int().min(0),
@@ -14,9 +14,18 @@ export const subtypeInputSchema = z.object({
   translations: z.record(z.string().min(1)),
 });
 
-export const saveSubtypesSchema = z.object({
-  service_id: z.string().uuid(),
-  subtypes: z.array(subtypeInputSchema),
+export const subtypeGroupInputSchema = z.object({
+  id: z.string().uuid().optional(),
+  slug: slugSchema,
+  sort_order: z.number().int().min(0),
+  is_active: z.boolean(),
+  translations: z.record(z.string().min(1)),
+  items: z.array(subtypeItemInputSchema),
 });
 
-export type SaveSubtypesSchemaInput = z.input<typeof saveSubtypesSchema>;
+export const saveSubtypeGroupsSchema = z.object({
+  service_id: z.string().uuid(),
+  groups: z.array(subtypeGroupInputSchema),
+});
+
+export type SaveSubtypeGroupsSchemaInput = z.input<typeof saveSubtypeGroupsSchema>;

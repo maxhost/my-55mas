@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import type { FormWithTranslations, FormField } from '@/shared/lib/forms/types';
 import { submitTalentForm } from '../actions/submit-talent-form';
 
-type SubtypeOption = { id: string; slug: string; name: string };
+type SubtypeOption = { id: string; slug: string; name: string; group_slug: string };
 
 type Props = {
   talentId: string;
@@ -78,14 +78,18 @@ export function TalentFormRenderer({
     const placeholder = trans.placeholders[field.key] ?? '';
 
     if (field.type === 'subtype') {
+      const groupOptions = field.subtype_group
+        ? subtypeOptions.filter((opt) => opt.group_slug === field.subtype_group)
+        : subtypeOptions;
+
       return (
         <div key={field.key} className="space-y-2">
           <Label>{label}{field.required && ' *'}</Label>
-          {subtypeOptions.length === 0 ? (
+          {groupOptions.length === 0 ? (
             <p className="text-muted-foreground text-sm">{t('noSubtypes')}</p>
           ) : (
             <div className="flex flex-wrap gap-2">
-              {subtypeOptions.map((opt) => (
+              {groupOptions.map((opt) => (
                 <label key={opt.id} className="flex items-center gap-1.5 text-sm">
                   <input
                     type="checkbox"

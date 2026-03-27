@@ -25,6 +25,7 @@ export type FormField = {
   type: FieldType;
   required: boolean;
   options?: string[];
+  subtype_group?: string; // slug del grupo (solo para type === 'subtype')
 };
 
 export type FormStep = {

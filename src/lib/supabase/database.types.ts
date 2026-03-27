@@ -970,6 +970,90 @@ export type Database = {
           },
         ]
       }
+      service_subtype_group_translations: {
+        Row: {
+          created_at: string | null
+          group_id: string
+          locale: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          group_id: string
+          locale: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          group_id?: string
+          locale?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_subtype_group_translations_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "service_subtype_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_subtype_group_translations_locale_fkey"
+            columns: ["locale"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      service_subtype_groups: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean
+          service_id: string
+          slug: string
+          sort_order: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          service_id: string
+          slug: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          service_id?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_subtype_groups_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_subtype_groups_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services_localized"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_subtype_translations: {
         Row: {
           created_at: string | null
@@ -1012,6 +1096,7 @@ export type Database = {
       service_subtypes: {
         Row: {
           created_at: string | null
+          group_id: string
           id: string
           is_active: boolean
           service_id: string
@@ -1021,6 +1106,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          group_id: string
           id?: string
           is_active?: boolean
           service_id: string
@@ -1030,6 +1116,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          group_id?: string
           id?: string
           is_active?: boolean
           service_id?: string
@@ -1038,6 +1125,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "service_subtypes_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "service_subtype_groups"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "service_subtypes_service_id_fkey"
             columns: ["service_id"]
@@ -2050,3 +2144,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

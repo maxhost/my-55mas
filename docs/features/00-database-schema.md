@@ -33,7 +33,7 @@ Las tablas deben crearse en este orden para respetar dependencias de FK:
 6. `categories` + `category_translations` — depende de `languages`
 7. `services` + `service_translations` + `service_countries` — depende de `countries`, `languages`
 8. `service_forms` + `service_form_translations` — depende de `services`, `countries`, `languages`
-9. `talent_profiles` + `talent_services` + `talent_analytics` + `service_subtypes` + `talent_service_subtypes` — depende de `profiles`, `countries`, `cities`, `services`
+9. `talent_profiles` + `talent_services` + `talent_analytics` + `service_subtype_groups` + `service_subtype_group_translations` + `service_subtypes` + `talent_service_subtypes` — depende de `profiles`, `countries`, `cities`, `services`, `languages`
 9.5. `talent_forms` + `talent_form_translations` — depende de `services`, `cities`, `languages`
 10. `orders` + tablas relacionadas — depende de `profiles`, `services`, `countries`, `cities`, `service_forms`
 11. Triggers
@@ -537,17 +537,40 @@ CREATE TABLE talent_analytics (
   UNIQUE (talent_id, key)
 );
 
--- Sub-tipos de servicio (ej: Pet Sitting → perro, gato, pez)
--- Definidos a nivel de servicio, usables en formularios de cliente y talento
+-- Grupos de sub-tipos (ej: "tipo_de_mascota", "tamaño")
+-- Cada servicio puede tener múltiples grupos independientes
+CREATE TABLE service_subtype_groups (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  service_id  uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
+  slug        text NOT NULL,              -- 'tipo_de_mascota', 'tamano'
+  sort_order  int NOT NULL DEFAULT 0,
+  is_active   boolean NOT NULL DEFAULT true,
+  created_at  timestamptz DEFAULT now(),
+  updated_at  timestamptz DEFAULT now(),
+  UNIQUE (service_id, slug)
+);
+
+CREATE TABLE service_subtype_group_translations (
+  group_id   uuid NOT NULL REFERENCES service_subtype_groups(id) ON DELETE CASCADE,
+  locale     text NOT NULL REFERENCES languages(code),
+  name       text NOT NULL,              -- 'Tipo de mascota', 'Pet type'
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now(),
+  PRIMARY KEY (group_id, locale)
+);
+
+-- Sub-tipos de servicio (items dentro de un grupo)
+-- Ej: grupo "tipo_de_mascota" → items perro, gato, pez
 CREATE TABLE service_subtypes (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  group_id    uuid NOT NULL REFERENCES service_subtype_groups(id) ON DELETE CASCADE,
   service_id  uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
   slug        text NOT NULL,              -- 'dog', 'cat', 'fish'
   sort_order  int DEFAULT 0,
   is_active   boolean NOT NULL DEFAULT true,
   created_at  timestamptz DEFAULT now(),
   updated_at  timestamptz DEFAULT now(),
-  UNIQUE (service_id, slug)
+  UNIQUE (group_id, slug)
 );
 
 CREATE TABLE service_subtype_translations (
@@ -773,6 +796,10 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON talent_profile_translations
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_required_document_translations
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_subtype_groups
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_subtype_group_translations
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_subtypes
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_subtype_translations
@@ -988,6 +1015,8 @@ ALTER TABLE talent_profile_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE talent_services ENABLE ROW LEVEL SECURITY;
 ALTER TABLE talent_documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE talent_analytics ENABLE ROW LEVEL SECURITY;
+ALTER TABLE service_subtype_groups ENABLE ROW LEVEL SECURITY;
+ALTER TABLE service_subtype_group_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE service_subtypes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE service_subtype_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE talent_service_subtypes ENABLE ROW LEVEL SECURITY;

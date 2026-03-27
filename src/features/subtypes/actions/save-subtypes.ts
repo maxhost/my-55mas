@@ -2,100 +2,151 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import { saveSubtypesSchema } from '../schemas';
-import type { SaveSubtypesInput } from '../types';
+import { saveSubtypeGroupsSchema } from '../schemas';
+import type { SaveSubtypeGroupsInput, SubtypeGroupInput } from '../types';
 
 /**
- * Saves all subtypes for a service (full replace strategy):
- * 1. Delete subtypes no longer in the list
- * 2. Upsert existing + new subtypes
- * 3. Upsert translations
+ * Saves all subtype groups + items for a service (full replace strategy):
+ * 1. Delete groups no longer in the list (CASCADE handles items + translations)
+ * 2. Upsert groups: update existing, insert new
+ * 3. For each group: upsert items + translations
  */
-export async function saveSubtypes(input: SaveSubtypesInput) {
-  const parsed = saveSubtypesSchema.safeParse(input);
+export async function saveSubtypes(input: SaveSubtypeGroupsInput) {
+  const parsed = saveSubtypeGroupsSchema.safeParse(input);
   if (!parsed.success) {
     return { error: parsed.error.flatten().fieldErrors };
   }
 
-  const { service_id, subtypes } = parsed.data;
+  const { service_id, groups } = parsed.data;
   const supabase = createClient();
 
-  // 1. Get existing subtype IDs for this service
+  // 1. Get existing group IDs for this service
   const { data: existing } = await supabase
-    .from('service_subtypes')
+    .from('service_subtype_groups')
     .select('id')
     .eq('service_id', service_id);
 
   const existingIds = (existing ?? []).map((e) => e.id);
-  const existingIdSet = new Set(existingIds);
-  const incomingIds = subtypes.filter((s) => s.id).map((s) => s.id!);
+  const incomingIds = groups.filter((g) => g.id).map((g) => g.id!);
   const incomingIdSet = new Set(incomingIds);
 
-  // 2. Delete removed subtypes (CASCADE handles translations + talent_service_subtypes)
+  // 2. Delete removed groups (CASCADE deletes items + all translations)
   const toDelete = existingIds.filter((id) => !incomingIdSet.has(id));
   if (toDelete.length > 0) {
     const { error: delError } = await supabase
-      .from('service_subtypes')
+      .from('service_subtype_groups')
       .delete()
       .in('id', toDelete);
     if (delError) return { error: { _db: [delError.message] } };
   }
 
-  // 3. Upsert subtypes one by one (to handle both insert and update)
-  for (const subtype of subtypes) {
-    if (subtype.id && existingIdSet.has(subtype.id)) {
-      // Update existing
-      const { error } = await supabase
-        .from('service_subtypes')
-        .update({
-          slug: subtype.slug,
-          sort_order: subtype.sort_order,
-          is_active: subtype.is_active,
-        })
-        .eq('id', subtype.id);
-      if (error) return { error: { _db: [error.message] } };
-
-      // Upsert translations
-      for (const [locale, name] of Object.entries(subtype.translations)) {
-        const { error: transError } = await supabase
-          .from('service_subtype_translations')
-          .upsert(
-            { subtype_id: subtype.id, locale, name },
-            { onConflict: 'subtype_id,locale' }
-          );
-        if (transError) return { error: { _db: [transError.message] } };
-      }
-    } else {
-      // Insert new
-      const { data: newSubtype, error } = await supabase
-        .from('service_subtypes')
-        .insert({
-          service_id,
-          slug: subtype.slug,
-          sort_order: subtype.sort_order,
-          is_active: subtype.is_active,
-        })
-        .select('id')
-        .single();
-      if (error) return { error: { _db: [error.message] } };
-
-      // Insert translations
-      const transRows = Object.entries(subtype.translations).map(
-        ([locale, name]) => ({
-          subtype_id: newSubtype.id,
-          locale,
-          name,
-        })
-      );
-      if (transRows.length > 0) {
-        const { error: transError } = await supabase
-          .from('service_subtype_translations')
-          .insert(transRows);
-        if (transError) return { error: { _db: [transError.message] } };
-      }
-    }
+  // 3. Upsert each group + its items
+  for (const group of groups) {
+    const result = await upsertGroup(supabase, service_id, group);
+    if (result?.error) return result;
   }
 
   revalidatePath('/[locale]/(admin)/admin/services', 'layout');
   return { data: { service_id } };
+}
+
+async function upsertGroup(
+  supabase: ReturnType<typeof createClient>,
+  serviceId: string,
+  group: SubtypeGroupInput
+) {
+  let groupId: string;
+
+  if (group.id) {
+    // Update existing group
+    const { error } = await supabase
+      .from('service_subtype_groups')
+      .update({ slug: group.slug, sort_order: group.sort_order, is_active: group.is_active })
+      .eq('id', group.id);
+    if (error) return { error: { _db: [error.message] } };
+    groupId = group.id;
+  } else {
+    // Insert new group
+    const { data, error } = await supabase
+      .from('service_subtype_groups')
+      .insert({ service_id: serviceId, slug: group.slug, sort_order: group.sort_order, is_active: group.is_active })
+      .select('id')
+      .single();
+    if (error) return { error: { _db: [error.message] } };
+    groupId = data.id;
+  }
+
+  // Upsert group translations
+  for (const [locale, name] of Object.entries(group.translations)) {
+    const { error } = await supabase
+      .from('service_subtype_group_translations')
+      .upsert({ group_id: groupId, locale, name }, { onConflict: 'group_id,locale' });
+    if (error) return { error: { _db: [error.message] } };
+  }
+
+  // Upsert items within this group
+  return upsertItems(supabase, serviceId, groupId, group.items);
+}
+
+async function upsertItems(
+  supabase: ReturnType<typeof createClient>,
+  serviceId: string,
+  groupId: string,
+  items: SubtypeGroupInput['items']
+) {
+  // Get existing item IDs for this group
+  const { data: existingItems } = await supabase
+    .from('service_subtypes')
+    .select('id')
+    .eq('group_id', groupId);
+
+  const existingIds = (existingItems ?? []).map((e) => e.id);
+  const incomingIds = items.filter((i) => i.id).map((i) => i.id!);
+  const incomingIdSet = new Set(incomingIds);
+
+  // Delete removed items (CASCADE handles talent_service_subtypes)
+  const toDelete = existingIds.filter((id) => !incomingIdSet.has(id));
+  if (toDelete.length > 0) {
+    const { error } = await supabase
+      .from('service_subtypes')
+      .delete()
+      .in('id', toDelete);
+    if (error) return { error: { _db: [error.message] } };
+  }
+
+  // Upsert each item + translations
+  for (const item of items) {
+    let itemId: string;
+
+    if (item.id && existingIds.includes(item.id)) {
+      const { error } = await supabase
+        .from('service_subtypes')
+        .update({ slug: item.slug, sort_order: item.sort_order, is_active: item.is_active })
+        .eq('id', item.id);
+      if (error) return { error: { _db: [error.message] } };
+      itemId = item.id;
+    } else {
+      const { data, error } = await supabase
+        .from('service_subtypes')
+        .insert({
+          service_id: serviceId,
+          group_id: groupId,
+          slug: item.slug,
+          sort_order: item.sort_order,
+          is_active: item.is_active,
+        })
+        .select('id')
+        .single();
+      if (error) return { error: { _db: [error.message] } };
+      itemId = data.id;
+    }
+
+    // Upsert item translations
+    for (const [locale, name] of Object.entries(item.translations)) {
+      const { error } = await supabase
+        .from('service_subtype_translations')
+        .upsert({ subtype_id: itemId, locale, name }, { onConflict: 'subtype_id,locale' });
+      if (error) return { error: { _db: [error.message] } };
+    }
+  }
 }

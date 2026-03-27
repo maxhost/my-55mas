@@ -1,14 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useMemo, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ServiceFormBuilder } from '@/features/forms/components/service-form-builder';
 import type { FormWithTranslations, FormVariantSummary, FormCityOption } from '@/shared/lib/forms/types';
 import { ServiceForm } from '@/features/services/components/service-form';
 import { ServiceConfig } from '@/features/services/components/service-config';
 import { SubtypesEditor } from '@/features/subtypes/components/subtypes-editor';
-import type { SubtypeWithTranslations } from '@/features/subtypes/types';
+import type { SubtypeGroupWithTranslations } from '@/features/subtypes/types';
 import type {
   ServiceDetail,
   CountryOption,
@@ -23,7 +23,7 @@ type Props = {
   allCities: CityOption[];
   form: FormWithTranslations | null;
   formVariants: FormVariantSummary[];
-  subtypes: SubtypeWithTranslations[];
+  subtypes: SubtypeGroupWithTranslations[];
 };
 
 export function ServiceEditTabs({
@@ -35,6 +35,13 @@ export function ServiceEditTabs({
   subtypes,
 }: Props) {
   const t = useTranslations('AdminServices');
+  const locale = useLocale();
+
+  // Derive subtypeGroups for form builder dropdown
+  const subtypeGroups = useMemo(
+    () => subtypes.map((g) => ({ slug: g.slug, name: g.translations[locale] ?? g.slug })),
+    [subtypes, locale]
+  );
 
   // Lift configured countries + cities state so Config and Form tabs stay in sync
   const [configuredCountries, setConfiguredCountries] = useState<ServiceCountryDetail[]>(
@@ -89,6 +96,7 @@ export function ServiceEditTabs({
           formVariants={formVariants}
           serviceCountries={formCountries}
           serviceCities={formCities}
+          subtypeGroups={subtypeGroups}
         />
       </TabsContent>
 

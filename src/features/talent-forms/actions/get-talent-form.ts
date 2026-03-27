@@ -15,9 +15,10 @@ export async function getTalentForm(
 ): Promise<FormWithTranslations | null> {
   const supabase = createClient();
 
+  // Single query with JOIN — eliminates sequential translations roundtrip
   let query = supabase
     .from('talent_forms')
-    .select('*')
+    .select('*, talent_form_translations(locale, labels, placeholders, option_labels)')
     .eq('service_id', serviceId)
     .order('version', { ascending: false })
     .limit(1);
@@ -44,12 +45,12 @@ export async function getTalentForm(
   if (!forms || forms.length === 0) return null;
 
   const form = forms[0];
-
-  // Fetch translations
-  const { data: rawTranslations } = await supabase
-    .from('talent_form_translations')
-    .select('*')
-    .eq('form_id', form.id);
+  const rawTranslations = form.talent_form_translations as unknown as {
+    locale: string;
+    labels: Record<string, string>;
+    placeholders: Record<string, string> | null;
+    option_labels: Record<string, string> | null;
+  }[];
 
   const translations: Record<string, FormTranslationData> = {};
   for (const t of rawTranslations ?? []) {

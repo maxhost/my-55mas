@@ -5,6 +5,7 @@ import { getTalentForm } from '@/features/talent-forms/actions/get-talent-form';
 import { listTalentFormVariants } from '@/features/talent-forms/actions/list-talent-form-variants';
 import { getCountries } from '@/features/services/actions/get-countries';
 import { getCities } from '@/features/services/actions/get-cities';
+import { listSubtypes } from '@/features/subtypes/actions/list-subtypes';
 import { PageHeader } from '@/shared/components/page-header';
 import { TalentFormEditor } from './talent-form-editor';
 
@@ -15,7 +16,7 @@ export default async function EditTalentFormPage({ params: { locale, id } }: Pro
   const t = await getTranslations('AdminTalentForms');
   const supabase = createClient();
 
-  // Load the form to get service_id
+  // Phase 1: get service_id (required before everything else)
   const { data: formRow } = await supabase
     .from('talent_forms')
     .select('id, service_id, city_id')
@@ -24,34 +25,39 @@ export default async function EditTalentFormPage({ params: { locale, id } }: Pro
 
   if (!formRow) notFound();
 
-  // Get service name for the header
-  const { data: serviceTrans } = await supabase
-    .from('service_translations')
-    .select('name')
-    .eq('service_id', formRow.service_id)
-    .eq('locale', locale)
-    .single();
-
-  const serviceName = serviceTrans?.name ?? formRow.service_id;
-
-  // Load form data + variants + countries/cities in parallel
-  const [form, formVariants, countries, allCities] = await Promise.all([
+  // Phase 2: ALL remaining queries in parallel (all depend only on service_id)
+  const [
+    { data: serviceTrans },
+    form,
+    formVariants,
+    countries,
+    allCities,
+    { data: serviceCountries },
+    { data: serviceCities },
+    subtypeGroupsRaw,
+  ] = await Promise.all([
+    supabase
+      .from('service_translations')
+      .select('name')
+      .eq('service_id', formRow.service_id)
+      .eq('locale', locale)
+      .single(),
     getTalentForm(formRow.service_id, formRow.city_id, false, false),
     listTalentFormVariants(formRow.service_id, false),
     getCountries(locale),
     getCities(locale),
+    supabase
+      .from('service_countries')
+      .select('country_id')
+      .eq('service_id', formRow.service_id),
+    supabase
+      .from('service_cities')
+      .select('city_id, cities!inner(country_id)')
+      .eq('service_id', formRow.service_id),
+    listSubtypes(formRow.service_id),
   ]);
 
-  // Get configured countries/cities for this service
-  const { data: serviceCountries } = await supabase
-    .from('service_countries')
-    .select('country_id')
-    .eq('service_id', formRow.service_id);
-
-  const { data: serviceCities } = await supabase
-    .from('service_cities')
-    .select('city_id, cities!inner(country_id)')
-    .eq('service_id', formRow.service_id);
+  const serviceName = serviceTrans?.name ?? formRow.service_id;
 
   const configuredCountryIds = new Set(
     (serviceCountries ?? []).map((sc) => sc.country_id)
@@ -89,6 +95,10 @@ export default async function EditTalentFormPage({ params: { locale, id } }: Pro
         formVariants={formVariants}
         serviceCountries={formCountries}
         serviceCities={formCities}
+        subtypeGroups={subtypeGroupsRaw.map((g) => ({
+          slug: g.slug,
+          name: g.translations[locale] ?? g.slug,
+        }))}
       />
     </div>
   );

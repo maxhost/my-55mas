@@ -9,7 +9,7 @@ import { FIELD_TYPES_WITH_OPTIONS, type FormField } from '@/shared/lib/forms/typ
 import { sanitizeKey } from '@/shared/lib/forms/utils';
 import { FieldTypePicker } from './field-type-picker';
 import { FieldOptionsEditor } from './field-options-editor';
-import { SubtypeFieldConfig } from './subtype-field-config';
+import { SubtypeFieldConfig, type SubtypeGroupOption } from './subtype-field-config';
 
 type Props = {
   field: FormField;
@@ -18,6 +18,7 @@ type Props = {
   label: string;
   placeholder: string;
   optionLabels: Record<string, string>;
+  subtypeGroups: SubtypeGroupOption[];
   onChange: (field: FormField) => void;
   onRemove: () => void;
   onMoveUp: () => void;
@@ -34,6 +35,7 @@ export function FieldEditor({
   label,
   placeholder,
   optionLabels,
+  subtypeGroups,
   onChange,
   onRemove,
   onMoveUp,
@@ -135,7 +137,13 @@ export function FieldEditor({
           onOptionLabelChange={onOptionLabelChange}
         />
       )}
-      {field.type === 'subtype' && <SubtypeFieldConfig />}
+      {field.type === 'subtype' && (
+        <SubtypeFieldConfig
+          subtypeGroups={subtypeGroups}
+          selectedGroup={field.subtype_group}
+          onGroupChange={(slug) => onChange({ ...field, subtype_group: slug || undefined })}
+        />
+      )}
     </div>
   );
 }

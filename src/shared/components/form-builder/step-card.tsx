@@ -9,12 +9,14 @@ import { ArrowUp, ArrowDown, X, Plus } from 'lucide-react';
 import type { FormStep, FormField, FormTranslationData } from '@/shared/lib/forms/types';
 import { sanitizeKey } from '@/shared/lib/forms/utils';
 import { FieldEditor } from './field-editor';
+import type { SubtypeGroupOption } from './subtype-field-config';
 
 type Props = {
   step: FormStep;
   stepIndex: number;
   totalSteps: number;
   translations: FormTranslationData;
+  subtypeGroups: SubtypeGroupOption[];
   onChange: (step: FormStep) => void;
   onRemove: () => void;
   onMoveUp: () => void;
@@ -35,6 +37,7 @@ export function StepCard({
   stepIndex,
   totalSteps,
   translations,
+  subtypeGroups,
   onChange,
   onRemove,
   onMoveUp,
@@ -111,6 +114,7 @@ export function StepCard({
             label={translations.labels[field.key] ?? ''}
             placeholder={translations.placeholders[field.key] ?? ''}
             optionLabels={translations.option_labels}
+            subtypeGroups={subtypeGroups}
             onChange={(f) => updateField(fieldIndex, f)}
             onRemove={() => removeField(fieldIndex)}
             onMoveUp={() => onChange({ ...step, fields: swap(step.fields, fieldIndex, fieldIndex - 1) })}

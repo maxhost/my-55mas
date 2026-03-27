@@ -128,7 +128,9 @@
     "selectCity": "Seleccionar ciutat",
     "selectCityPrompt": "Seleccioneu una ciutat per veure el formulari",
     "noCitiesForCountry": "No hi ha ciutats configurades per a aquest país",
-    "saveError": "Error en desar. Verifiqueu les claus dels camps."
+    "saveError": "Error en desar. Verifiqueu les claus dels camps.",
+    "subtypeGroup": "Grup de subtipus",
+    "selectGroup": "Seleccionar grup..."
   },
   "AdminTalentForms": {
     "title": "Formularis de Talent",
@@ -152,10 +154,14 @@
   },
   "AdminSubtypes": {
     "title": "Subtipus",
-    "description": "Definiu subtipus per a aquest servei (ex: Pet Sitting → gos, gat, peix).",
-    "addSubtype": "Afegir subtipus",
-    "noSubtypes": "No hi ha subtipus definits per a aquest servei.",
-    "slugPlaceholder": "slug",
+    "description": "Definiu grups de subtipus per a aquest servei (ex: \"Tipus d'animal\" → gos, gat; \"Mida\" → petit, gran).",
+    "addGroup": "Afegir grup",
+    "addItem": "Afegir element",
+    "noGroups": "No hi ha grups de subtipus definits.",
+    "noItems": "Cap element en aquest grup.",
+    "groupSlug": "slug del grup",
+    "groupName": "Nom del grup",
+    "itemSlug": "slug",
     "namePlaceholder": "Nom",
     "active": "Actiu",
     "save": "Desar",

@@ -10,6 +10,7 @@ import type {
   FormCountryOption,
   FormCityOption,
 } from '@/shared/lib/forms/types';
+import type { SubtypeGroupOption } from '@/shared/components/form-builder/subtype-field-config';
 
 type Props = {
   serviceId: string;
@@ -17,6 +18,7 @@ type Props = {
   formVariants: FormVariantSummary[];
   serviceCountries: FormCountryOption[];
   serviceCities: FormCityOption[];
+  subtypeGroups: SubtypeGroupOption[];
 };
 
 export function TalentFormEditor({
@@ -25,6 +27,7 @@ export function TalentFormEditor({
   formVariants,
   serviceCountries,
   serviceCities,
+  subtypeGroups,
 }: Props) {
   const t = useTranslations('AdminTalentForms');
 
@@ -50,6 +53,7 @@ export function TalentFormEditor({
           formVariants={formVariants}
           serviceCountries={serviceCountries}
           serviceCities={serviceCities}
+          subtypeGroups={subtypeGroups}
         />
       </TabsContent>
     </Tabs>

@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { saveSubtypesSchema, subtypeInputSchema } from '../schemas';
+import { subtypeItemInputSchema, subtypeGroupInputSchema, saveSubtypeGroupsSchema } from '../schemas';
 
-describe('subtypeInputSchema', () => {
-  it('accepts valid subtype input', () => {
-    const result = subtypeInputSchema.safeParse({
+describe('subtypeItemInputSchema', () => {
+  it('accepts valid item input', () => {
+    const result = subtypeItemInputSchema.safeParse({
       slug: 'dog',
       sort_order: 0,
       is_active: true,
@@ -13,7 +13,7 @@ describe('subtypeInputSchema', () => {
   });
 
   it('accepts input with existing id (update)', () => {
-    const result = subtypeInputSchema.safeParse({
+    const result = subtypeItemInputSchema.safeParse({
       id: '550e8400-e29b-41d4-a716-446655440000',
       slug: 'cat',
       sort_order: 1,
@@ -24,7 +24,7 @@ describe('subtypeInputSchema', () => {
   });
 
   it('rejects empty slug', () => {
-    const result = subtypeInputSchema.safeParse({
+    const result = subtypeItemInputSchema.safeParse({
       slug: '',
       sort_order: 0,
       is_active: true,
@@ -34,7 +34,7 @@ describe('subtypeInputSchema', () => {
   });
 
   it('rejects slug with uppercase', () => {
-    const result = subtypeInputSchema.safeParse({
+    const result = subtypeItemInputSchema.safeParse({
       slug: 'Dog',
       sort_order: 0,
       is_active: true,
@@ -44,7 +44,7 @@ describe('subtypeInputSchema', () => {
   });
 
   it('rejects slug starting with number', () => {
-    const result = subtypeInputSchema.safeParse({
+    const result = subtypeItemInputSchema.safeParse({
       slug: '1dog',
       sort_order: 0,
       is_active: true,
@@ -54,7 +54,7 @@ describe('subtypeInputSchema', () => {
   });
 
   it('rejects negative sort_order', () => {
-    const result = subtypeInputSchema.safeParse({
+    const result = subtypeItemInputSchema.safeParse({
       slug: 'dog',
       sort_order: -1,
       is_active: true,
@@ -64,7 +64,7 @@ describe('subtypeInputSchema', () => {
   });
 
   it('rejects empty translation name', () => {
-    const result = subtypeInputSchema.safeParse({
+    const result = subtypeItemInputSchema.safeParse({
       slug: 'dog',
       sort_order: 0,
       is_active: true,
@@ -74,11 +74,14 @@ describe('subtypeInputSchema', () => {
   });
 });
 
-describe('saveSubtypesSchema', () => {
-  it('accepts valid save input', () => {
-    const result = saveSubtypesSchema.safeParse({
-      service_id: '550e8400-e29b-41d4-a716-446655440000',
-      subtypes: [
+describe('subtypeGroupInputSchema', () => {
+  it('accepts valid group with items', () => {
+    const result = subtypeGroupInputSchema.safeParse({
+      slug: 'pet_type',
+      sort_order: 0,
+      is_active: true,
+      translations: { es: 'Tipo de mascota', en: 'Pet type' },
+      items: [
         { slug: 'dog', sort_order: 0, is_active: true, translations: { es: 'Perro' } },
         { slug: 'cat', sort_order: 1, is_active: true, translations: { es: 'Gato' } },
       ],
@@ -86,18 +89,49 @@ describe('saveSubtypesSchema', () => {
     expect(result.success).toBe(true);
   });
 
-  it('accepts empty subtypes array (clear all)', () => {
-    const result = saveSubtypesSchema.safeParse({
+  it('accepts group with empty items (no items yet)', () => {
+    const result = subtypeGroupInputSchema.safeParse({
+      slug: 'size',
+      sort_order: 0,
+      is_active: true,
+      translations: { es: 'Tamaño' },
+      items: [],
+    });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe('saveSubtypeGroupsSchema', () => {
+  it('accepts valid save input with groups', () => {
+    const result = saveSubtypeGroupsSchema.safeParse({
       service_id: '550e8400-e29b-41d4-a716-446655440000',
-      subtypes: [],
+      groups: [
+        {
+          slug: 'pet_type',
+          sort_order: 0,
+          is_active: true,
+          translations: { es: 'Tipo' },
+          items: [
+            { slug: 'dog', sort_order: 0, is_active: true, translations: { es: 'Perro' } },
+          ],
+        },
+      ],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts empty groups array (clear all)', () => {
+    const result = saveSubtypeGroupsSchema.safeParse({
+      service_id: '550e8400-e29b-41d4-a716-446655440000',
+      groups: [],
     });
     expect(result.success).toBe(true);
   });
 
   it('rejects invalid service_id', () => {
-    const result = saveSubtypesSchema.safeParse({
+    const result = saveSubtypeGroupsSchema.safeParse({
       service_id: 'not-a-uuid',
-      subtypes: [],
+      groups: [],
     });
     expect(result.success).toBe(false);
   });

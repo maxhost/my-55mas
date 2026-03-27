@@ -4,23 +4,32 @@ import { useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus } from 'lucide-react';
+import { locales } from '@/lib/i18n/config';
 import { saveSubtypes } from '../actions/save-subtypes';
-import type { SubtypeWithTranslations, SubtypeInput } from '../types';
-import { SubtypeRow } from './subtype-row';
+import type { SubtypeGroupWithTranslations, SubtypeGroupInput } from '../types';
+import { SubtypeGroupCard } from './subtype-group-card';
 
 type Props = {
   serviceId: string;
-  initialSubtypes: SubtypeWithTranslations[];
+  initialSubtypes: SubtypeGroupWithTranslations[];
 };
 
-function toInput(s: SubtypeWithTranslations): SubtypeInput {
+function toGroupInput(g: SubtypeGroupWithTranslations): SubtypeGroupInput {
   return {
-    id: s.id,
-    slug: s.slug,
-    sort_order: s.sort_order,
-    is_active: s.is_active,
-    translations: { ...s.translations },
+    id: g.id,
+    slug: g.slug,
+    sort_order: g.sort_order,
+    is_active: g.is_active,
+    translations: { ...g.translations },
+    items: g.items.map((item) => ({
+      id: item.id,
+      slug: item.slug,
+      sort_order: item.sort_order,
+      is_active: item.is_active,
+      translations: { ...item.translations },
+    })),
   };
 }
 
@@ -34,39 +43,46 @@ export function SubtypesEditor({ serviceId, initialSubtypes }: Props) {
   const t = useTranslations('AdminSubtypes');
   const tc = useTranslations('Common');
   const [isPending, startTransition] = useTransition();
-  const [subtypes, setSubtypes] = useState<SubtypeInput[]>(
-    initialSubtypes.map(toInput)
+  const [groups, setGroups] = useState<SubtypeGroupInput[]>(
+    initialSubtypes.map(toGroupInput)
   );
 
-  const addSubtype = () => {
-    const idx = subtypes.length + 1;
-    setSubtypes([
-      ...subtypes,
+  const primaryLocale = locales[0]; // 'es'
+
+  const addGroup = () => {
+    const idx = groups.length + 1;
+    setGroups([
+      ...groups,
       {
-        slug: `subtype_${idx}`,
-        sort_order: subtypes.length,
+        slug: `group_${idx}`,
+        sort_order: groups.length,
         is_active: true,
         translations: {},
+        items: [],
       },
     ]);
   };
 
-  const updateSubtype = (index: number, subtype: SubtypeInput) => {
-    setSubtypes(subtypes.map((s, i) => (i === index ? subtype : s)));
+  const updateGroup = (index: number, group: SubtypeGroupInput) => {
+    setGroups(groups.map((g, i) => (i === index ? group : g)));
   };
 
-  const removeSubtype = (index: number) => {
-    setSubtypes(subtypes.filter((_, i) => i !== index));
+  const removeGroup = (index: number) => {
+    setGroups(groups.filter((_, i) => i !== index));
   };
 
   const handleSave = () => {
-    // Recompute sort_order from current array position
-    const normalized = subtypes.map((s, i) => ({ ...s, sort_order: i }));
+    // Normalize sort_order from array position
+    const normalized = groups.map((g, gi) => ({
+      ...g,
+      sort_order: gi,
+      items: g.items.map((item, ii) => ({ ...item, sort_order: ii })),
+    }));
 
     startTransition(async () => {
       const result = await saveSubtypes({
         service_id: serviceId,
-        subtypes: normalized,
+        groups: normalized,
       });
 
       if (result && 'error' in result) {
@@ -77,8 +93,7 @@ export function SubtypesEditor({ serviceId, initialSubtypes }: Props) {
       }
 
       toast.success(tc('savedSuccess'));
-      // Update local state with normalized sort_order
-      setSubtypes(normalized);
+      setGroups(normalized);
     });
   };
 
@@ -87,27 +102,43 @@ export function SubtypesEditor({ serviceId, initialSubtypes }: Props) {
       <h3 className="text-lg font-medium">{t('title')}</h3>
       <p className="text-muted-foreground text-sm">{t('description')}</p>
 
-      {subtypes.length === 0 && (
-        <p className="text-muted-foreground py-4">{t('noSubtypes')}</p>
-      )}
+      <Tabs defaultValue={primaryLocale}>
+        <TabsList>
+          {locales.map((locale) => (
+            <TabsTrigger key={locale} value={locale}>
+              {locale.toUpperCase()}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-      {subtypes.map((subtype, index) => (
-        <SubtypeRow
-          key={subtype.id ?? `new-${index}`}
-          subtype={subtype}
-          index={index}
-          total={subtypes.length}
-          onChange={(s) => updateSubtype(index, s)}
-          onRemove={() => removeSubtype(index)}
-          onMoveUp={() => setSubtypes(swap(subtypes, index, index - 1))}
-          onMoveDown={() => setSubtypes(swap(subtypes, index, index + 1))}
-        />
-      ))}
+        {locales.map((locale) => (
+          <TabsContent key={locale} value={locale} className="space-y-3 pt-3">
+            {groups.length === 0 && (
+              <p className="text-muted-foreground py-4">{t('noGroups')}</p>
+            )}
+
+            {groups.map((group, index) => (
+              <SubtypeGroupCard
+                key={group.id ?? `new-${index}`}
+                group={group}
+                locale={locale}
+                isPrimary={locale === primaryLocale}
+                index={index}
+                total={groups.length}
+                onChange={(g) => updateGroup(index, g)}
+                onRemove={() => removeGroup(index)}
+                onMoveUp={() => setGroups(swap(groups, index, index - 1))}
+                onMoveDown={() => setGroups(swap(groups, index, index + 1))}
+              />
+            ))}
+          </TabsContent>
+        ))}
+      </Tabs>
 
       <div className="flex gap-3">
-        <Button type="button" variant="outline" onClick={addSubtype}>
+        <Button type="button" variant="outline" onClick={addGroup}>
           <Plus className="mr-2 h-4 w-4" />
-          {t('addSubtype')}
+          {t('addGroup')}
         </Button>
         <Button onClick={handleSave} disabled={isPending}>
           {isPending ? t('saving') : t('save')}

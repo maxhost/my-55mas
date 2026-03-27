@@ -128,7 +128,9 @@
     "selectCity": "Selecionar cidade",
     "selectCityPrompt": "Selecione uma cidade para ver o formulário",
     "noCitiesForCountry": "Não há cidades configuradas para este país",
-    "saveError": "Erro ao salvar. Verifique as chaves dos campos."
+    "saveError": "Erro ao salvar. Verifique as chaves dos campos.",
+    "subtypeGroup": "Grupo de sub-tipo",
+    "selectGroup": "Selecionar grupo..."
   },
   "AdminTalentForms": {
     "title": "Formulários de Talento",
@@ -152,10 +154,14 @@
   },
   "AdminSubtypes": {
     "title": "Sub-tipos",
-    "description": "Defina sub-tipos para este serviço (ex: Pet Sitting → cão, gato, peixe).",
-    "addSubtype": "Adicionar sub-tipo",
-    "noSubtypes": "Nenhum sub-tipo definido para este serviço.",
-    "slugPlaceholder": "slug",
+    "description": "Defina grupos de sub-tipos para este serviço (ex: \"Tipo de animal\" → cão, gato; \"Tamanho\" → pequeno, grande).",
+    "addGroup": "Adicionar grupo",
+    "addItem": "Adicionar item",
+    "noGroups": "Nenhum grupo de sub-tipos definido.",
+    "noItems": "Nenhum item neste grupo.",
+    "groupSlug": "slug do grupo",
+    "groupName": "Nome do grupo",
+    "itemSlug": "slug",
     "namePlaceholder": "Nome",
     "active": "Ativo",
     "save": "Salvar",

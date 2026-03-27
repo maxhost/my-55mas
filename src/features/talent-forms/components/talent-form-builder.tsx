@@ -12,6 +12,7 @@ import type {
   FormCityOption,
 } from '@/shared/lib/forms/types';
 import type { SaveFormWithTranslationsInput } from '@/shared/lib/forms/schemas';
+import type { SubtypeGroupOption } from '@/shared/components/form-builder/subtype-field-config';
 
 type Props = {
   serviceId: string;
@@ -19,6 +20,7 @@ type Props = {
   formVariants: FormVariantSummary[];
   serviceCountries: FormCountryOption[];
   serviceCities: FormCityOption[];
+  subtypeGroups?: SubtypeGroupOption[];
 };
 
 export function TalentFormBuilder({
@@ -27,6 +29,7 @@ export function TalentFormBuilder({
   formVariants,
   serviceCountries,
   serviceCities,
+  subtypeGroups,
 }: Props) {
   const handleSave = async (input: SaveFormWithTranslationsInput) => {
     if (input.city_id === null) {
@@ -42,6 +45,7 @@ export function TalentFormBuilder({
       formVariants={formVariants}
       serviceCountries={serviceCountries}
       serviceCities={serviceCities}
+      subtypeGroups={subtypeGroups}
       onGetForm={getTalentForm}
       onCloneVariant={cloneTalentFormVariant}
       onSave={handleSave}

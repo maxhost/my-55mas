@@ -14,10 +14,10 @@ export async function getForm(
 ): Promise<FormWithTranslations | null> {
   const supabase = createClient();
 
-  // Try specific city first, then fallback to default (null)
+  // Single query with JOIN — eliminates sequential translations roundtrip
   let query = supabase
     .from('service_forms')
-    .select('*')
+    .select('*, service_form_translations(locale, labels, placeholders, option_labels)')
     .eq('service_id', serviceId)
     .eq('is_active', true)
     .order('version', { ascending: false })
@@ -41,12 +41,12 @@ export async function getForm(
   if (!forms || forms.length === 0) return null;
 
   const form = forms[0];
-
-  // Fetch translations
-  const { data: rawTranslations } = await supabase
-    .from('service_form_translations')
-    .select('*')
-    .eq('form_id', form.id);
+  const rawTranslations = form.service_form_translations as unknown as {
+    locale: string;
+    labels: Record<string, string>;
+    placeholders: Record<string, string> | null;
+    option_labels: Record<string, string> | null;
+  }[];
 
   const translations: Record<string, FormTranslationData> = {};
   for (const t of rawTranslations ?? []) {
