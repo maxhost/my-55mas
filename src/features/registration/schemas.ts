@@ -25,6 +25,11 @@ export type SaveRegistrationFormSchemaInput = z.input<typeof saveRegistrationFor
 
 export const createRegistrationFormSchema = z.object({
   name: z.string().min(1).max(100),
+  slug: z
+    .string()
+    .min(2)
+    .max(100)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be kebab-case'),
 });
 
 // ── Save config (countries + cities) ─────────────────

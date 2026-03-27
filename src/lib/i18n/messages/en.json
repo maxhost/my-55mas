@@ -183,6 +183,8 @@
     "title": "Talent Form",
     "description": "Create and manage registration forms for talents.",
     "createForm": "Create form",
+    "name": "Name",
+    "slug": "Slug",
     "namePlaceholder": "Form name",
     "noForms": "No registration forms created.",
     "formName": "Name",

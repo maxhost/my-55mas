@@ -183,6 +183,8 @@
     "title": "Formulaire Talent",
     "description": "Créez et gérez des formulaires d'inscription pour les talents.",
     "createForm": "Créer un formulaire",
+    "name": "Nom",
+    "slug": "Slug",
     "namePlaceholder": "Nom du formulaire",
     "noForms": "Aucun formulaire d'inscription créé.",
     "formName": "Nom",

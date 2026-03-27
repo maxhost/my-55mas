@@ -6,18 +6,61 @@ import {
 } from '../schemas';
 
 describe('createRegistrationFormSchema', () => {
-  it('accepts valid name', () => {
-    const result = createRegistrationFormSchema.safeParse({ name: 'Talentos Premium' });
+  it('accepts valid name + slug', () => {
+    const result = createRegistrationFormSchema.safeParse({
+      name: 'Talentos Premium',
+      slug: 'talentos-premium',
+    });
     expect(result.success).toBe(true);
   });
 
   it('rejects empty name', () => {
-    const result = createRegistrationFormSchema.safeParse({ name: '' });
+    const result = createRegistrationFormSchema.safeParse({ name: '', slug: 'test' });
     expect(result.success).toBe(false);
   });
 
   it('rejects name over 100 chars', () => {
-    const result = createRegistrationFormSchema.safeParse({ name: 'a'.repeat(101) });
+    const result = createRegistrationFormSchema.safeParse({
+      name: 'a'.repeat(101),
+      slug: 'test',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects slug with uppercase', () => {
+    const result = createRegistrationFormSchema.safeParse({
+      name: 'Test',
+      slug: 'Bad-Slug',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects slug with underscores', () => {
+    const result = createRegistrationFormSchema.safeParse({
+      name: 'Test',
+      slug: 'bad_slug',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects slug starting with hyphen', () => {
+    const result = createRegistrationFormSchema.safeParse({
+      name: 'Test',
+      slug: '-bad-slug',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts single-word slug', () => {
+    const result = createRegistrationFormSchema.safeParse({
+      name: 'Premium',
+      slug: 'premium',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects missing slug', () => {
+    const result = createRegistrationFormSchema.safeParse({ name: 'Test' });
     expect(result.success).toBe(false);
   });
 });

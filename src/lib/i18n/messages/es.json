@@ -183,6 +183,8 @@
     "title": "Talento Formulario",
     "description": "Crea y gestiona formularios de registro para talentos.",
     "createForm": "Crear formulario",
+    "name": "Nombre",
+    "slug": "Slug",
     "namePlaceholder": "Nombre del formulario",
     "noForms": "No hay formularios de registro creados.",
     "formName": "Nombre",

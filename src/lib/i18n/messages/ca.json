@@ -183,6 +183,8 @@
     "title": "Formulari Talent",
     "description": "Creeu i gestioneu formularis de registre per a talents.",
     "createForm": "Crear formulari",
+    "name": "Nom",
+    "slug": "Slug",
     "namePlaceholder": "Nom del formulari",
     "noForms": "No hi ha formularis de registre creats.",
     "formName": "Nom",

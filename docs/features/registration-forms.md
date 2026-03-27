@@ -22,13 +22,14 @@ Nuevo tipo de campo en el form builder que referencia una pregunta de `survey_qu
 
 ## Admin UI
 
-- Lista: tabla con nombre, fecha creación, última actualización
+- Lista: tabla con nombre, variantes, fecha creación, última actualización
+- Crear: página `/admin/talent-registration/new` con nombre + slug (kebab-case, auto-generado, editable). Mismo patrón que Servicios.
 - Editor: tabs Config (países/ciudades) + Formulario (form builder)
 - Config: add/remove países/ciudades (como ServiceConfig pero sin precios)
 
 ## Consideraciones de producción
 
-- Slug auto-generado del nombre (snake_case), verificación de duplicados
+- Slug kebab-case auto-generado del nombre, editable por el admin. Duplicados detectados por UNIQUE constraint con mensaje amigable.
 - parent_id FK con CASCADE para limpiar variantes al eliminar General
 - countries/cities FK al General form con CASCADE
 - Key de survey question inmutable después de creación
