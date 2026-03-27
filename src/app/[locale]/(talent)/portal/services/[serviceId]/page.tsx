@@ -1,9 +1,9 @@
 import { notFound, redirect } from 'next/navigation';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
-import { getTalentServiceForm } from '@/features/talent-forms/actions/get-talent-service-form';
+import { getTalentServiceForm } from '@/features/talent-services/actions/get-talent-service-form';
 import { getSubtypes } from '@/features/subtypes/actions/get-subtypes';
-import { TalentFormRenderer } from '@/features/talent-forms/components/talent-form-renderer';
+import { TalentServiceRenderer } from '@/features/talent-services/components/talent-service-renderer';
 
 type Props = { params: { locale: string; serviceId: string } };
 
@@ -69,7 +69,7 @@ export default async function TalentServiceFormPage({ params: { locale, serviceI
   return (
     <div className="p-8">
       <h1 className="mb-6 text-2xl font-bold">{serviceName}</h1>
-      <TalentFormRenderer
+      <TalentServiceRenderer
         talentId={talentProfile.id}
         serviceId={serviceId}
         countryId={countryId}

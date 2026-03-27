@@ -7,16 +7,16 @@ import { toast } from 'sonner';
 import { Link } from '@/lib/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { createTalentForm } from '@/features/talent-forms/actions/create-talent-form';
-import type { TalentFormListItem } from '@/features/talent-forms/actions/list-talent-forms';
+import { createTalentService } from '@/features/talent-services/actions/create-talent-service';
+import type { TalentServiceListItem } from '@/features/talent-services/actions/list-talent-services';
 
 type Props = {
-  forms: TalentFormListItem[];
+  forms: TalentServiceListItem[];
   availableServices: { id: string; name: string }[];
 };
 
-export function TalentFormsList({ forms, availableServices }: Props) {
-  const t = useTranslations('AdminTalentForms');
+export function TalentServicesList({ forms, availableServices }: Props) {
+  const t = useTranslations('AdminTalentServices');
   const tc = useTranslations('Common');
   const router = useRouter();
   const [selectedService, setSelectedService] = useState('');
@@ -25,7 +25,7 @@ export function TalentFormsList({ forms, availableServices }: Props) {
   const handleCreate = () => {
     if (!selectedService) return;
     startTransition(async () => {
-      const result = await createTalentForm(selectedService);
+      const result = await createTalentService(selectedService);
       if ('error' in result) {
         const errors = result.error as Record<string, string[]>;
         const firstMsg = Object.values(errors).flat()[0];
@@ -33,7 +33,7 @@ export function TalentFormsList({ forms, availableServices }: Props) {
         return;
       }
       toast.success(tc('savedSuccess'));
-      router.push(`/admin/talent-forms/${result.id}`);
+      router.push(`/admin/talent-services/${result.id}`);
     });
   };
 
@@ -82,7 +82,7 @@ export function TalentFormsList({ forms, availableServices }: Props) {
               <tr key={form.id} className="border-border border-b">
                 <td className="py-2">
                   <Link
-                    href={`/admin/talent-forms/${form.id}`}
+                    href={`/admin/talent-services/${form.id}`}
                     className="text-primary hover:underline"
                   >
                     {form.service_name}

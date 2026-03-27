@@ -29,7 +29,7 @@
     "members": "Membres",
     "services": "Serveis",
     "dashboard": "Tauler",
-    "talentForms": "Formularis Talent",
+    "talentServices": "Serveis Talent",
     "payments": "Pagaments",
     "notifications": "Notificacions"
   },
@@ -132,8 +132,8 @@
     "subtypeGroup": "Grup de subtipus",
     "selectGroup": "Seleccionar grup..."
   },
-  "AdminTalentForms": {
-    "title": "Formularis de Talent",
+  "AdminTalentServices": {
+    "title": "Serveis Talent",
     "editForm": "Editar formulari",
     "noForms": "No hi ha formularis de talent creats.",
     "createForm": "Crear formulari",

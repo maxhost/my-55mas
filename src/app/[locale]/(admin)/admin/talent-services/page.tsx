@@ -1,18 +1,18 @@
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
-import { listTalentForms } from '@/features/talent-forms/actions/list-talent-forms';
+import { listTalentServices } from '@/features/talent-services/actions/list-talent-services';
 import { PageHeader } from '@/shared/components/page-header';
-import { TalentFormsList } from './talent-forms-list';
+import { TalentServicesList } from './talent-services-list';
 
 type Props = { params: { locale: string } };
 
-export default async function TalentFormsPage({ params: { locale } }: Props) {
+export default async function TalentServicesPage({ params: { locale } }: Props) {
   unstable_setRequestLocale(locale);
-  const t = await getTranslations('AdminTalentForms');
+  const t = await getTranslations('AdminTalentServices');
   const supabase = createClient();
 
   const [forms, { data: allServices }] = await Promise.all([
-    listTalentForms(locale),
+    listTalentServices(locale),
     supabase
       .from('service_translations')
       .select('service_id, name')
@@ -28,7 +28,7 @@ export default async function TalentFormsPage({ params: { locale } }: Props) {
   return (
     <div className="p-8">
       <PageHeader title={t('title')} />
-      <TalentFormsList forms={forms} availableServices={availableServices} />
+      <TalentServicesList forms={forms} availableServices={availableServices} />
     </div>
   );
 }

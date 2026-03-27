@@ -23,7 +23,7 @@ type Props = {
   subtypeGroups?: SubtypeGroupOption[];
 };
 
-export function TalentFormBuilder({
+export function TalentServiceBuilder({
   serviceId,
   form,
   formVariants,

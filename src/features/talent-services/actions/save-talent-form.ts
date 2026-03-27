@@ -108,6 +108,6 @@ export async function saveTalentFormWithTranslations(
   });
   if ('error' in transResult && transResult.error) return transResult;
 
-  revalidatePath('/[locale]/(admin)/admin/talent-forms', 'layout');
+  revalidatePath('/[locale]/(admin)/admin/talent-services', 'layout');
   return { data: { id: formId } };
 }

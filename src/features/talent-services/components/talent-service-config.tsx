@@ -15,8 +15,8 @@ type Props = {
   formVariants: FormVariantSummary[];
 };
 
-export function TalentFormConfig({ serviceCountries, serviceCities, formVariants }: Props) {
-  const t = useTranslations('AdminTalentForms');
+export function TalentServiceConfig({ serviceCountries, serviceCities, formVariants }: Props) {
+  const t = useTranslations('AdminTalentServices');
   const tc = useTranslations('Common');
   const [variants, setVariants] = useState(formVariants);
   const savedRef = useRef(formVariants);

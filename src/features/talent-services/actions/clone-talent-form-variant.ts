@@ -57,6 +57,6 @@ export async function cloneTalentFormVariant(
     if (transError) throw transError;
   }
 
-  revalidatePath('/[locale]/(admin)/admin/talent-forms', 'layout');
+  revalidatePath('/[locale]/(admin)/admin/talent-services', 'layout');
   return { data: await getTalentForm(service_id, target_city_id, false) ?? undefined };
 }

@@ -1,19 +1,19 @@
 import { notFound } from 'next/navigation';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
-import { getTalentForm } from '@/features/talent-forms/actions/get-talent-form';
-import { listTalentFormVariants } from '@/features/talent-forms/actions/list-talent-form-variants';
+import { getTalentForm } from '@/features/talent-services/actions/get-talent-form';
+import { listTalentFormVariants } from '@/features/talent-services/actions/list-talent-form-variants';
 import { getCountries } from '@/features/services/actions/get-countries';
 import { getCities } from '@/features/services/actions/get-cities';
 import { listSubtypes } from '@/features/subtypes/actions/list-subtypes';
 import { PageHeader } from '@/shared/components/page-header';
-import { TalentFormEditor } from './talent-form-editor';
+import { TalentServiceEditor } from './talent-service-editor';
 
 type Props = { params: { locale: string; id: string } };
 
-export default async function EditTalentFormPage({ params: { locale, id } }: Props) {
+export default async function EditTalentServicePage({ params: { locale, id } }: Props) {
   unstable_setRequestLocale(locale);
-  const t = await getTranslations('AdminTalentForms');
+  const t = await getTranslations('AdminTalentServices');
   const supabase = createClient();
 
   // Phase 1: get service_id (required before everything else)
@@ -87,9 +87,9 @@ export default async function EditTalentFormPage({ params: { locale, id } }: Pro
     <div className="p-8">
       <PageHeader
         title={`${t('editForm')}: ${serviceName}`}
-        backHref="/admin/talent-forms"
+        backHref="/admin/talent-services"
       />
-      <TalentFormEditor
+      <TalentServiceEditor
         serviceId={formRow.service_id}
         form={form}
         formVariants={formVariants}

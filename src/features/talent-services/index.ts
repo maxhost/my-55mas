@@ -3,11 +3,11 @@ export { saveTalentForm, saveTalentFormTranslations, saveTalentFormWithTranslati
 export { cloneTalentFormVariant } from './actions/clone-talent-form-variant';
 export { listTalentFormVariants } from './actions/list-talent-form-variants';
 export { cascadeTalentGeneralSave } from './actions/cascade-talent-general-save';
-export { listTalentForms, type TalentFormListItem } from './actions/list-talent-forms';
-export { createTalentForm } from './actions/create-talent-form';
-export { submitTalentForm } from './actions/submit-talent-form';
+export { listTalentServices, type TalentServiceListItem } from './actions/list-talent-services';
+export { createTalentService } from './actions/create-talent-service';
+export { submitTalentService } from './actions/submit-talent-service';
 export { getTalentServiceForm } from './actions/get-talent-service-form';
 export { saveTalentFormActivation } from './actions/save-talent-form-activation';
-export { TalentFormBuilder } from './components/talent-form-builder';
-export { TalentFormConfig } from './components/talent-form-config';
-export { TalentFormRenderer } from './components/talent-form-renderer';
+export { TalentServiceBuilder } from './components/talent-service-builder';
+export { TalentServiceConfig } from './components/talent-service-config';
+export { TalentServiceRenderer } from './components/talent-service-renderer';

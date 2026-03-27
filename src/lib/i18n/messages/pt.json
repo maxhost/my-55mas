@@ -29,7 +29,7 @@
     "members": "Membros",
     "services": "Serviços",
     "dashboard": "Dashboard",
-    "talentForms": "Formulários Talento",
+    "talentServices": "Serviços Talento",
     "payments": "Pagamentos",
     "notifications": "Notificações"
   },
@@ -132,8 +132,8 @@
     "subtypeGroup": "Grupo de sub-tipo",
     "selectGroup": "Selecionar grupo..."
   },
-  "AdminTalentForms": {
-    "title": "Formulários de Talento",
+  "AdminTalentServices": {
+    "title": "Serviços Talento",
     "editForm": "Editar formulário",
     "noForms": "Nenhum formulário de talento criado.",
     "createForm": "Criar formulário",

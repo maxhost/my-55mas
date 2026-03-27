@@ -18,7 +18,7 @@ type SubmitInput = {
  * 1. Updates talent_services.form_data + form_id
  * 2. Syncs talent_service_subtypes (delete old + insert new)
  */
-export async function submitTalentForm(input: SubmitInput) {
+export async function submitTalentService(input: SubmitInput) {
   const { talent_id, service_id, country_id, form_id, form_data, subtype_ids } = input;
   const supabase = createClient();
 

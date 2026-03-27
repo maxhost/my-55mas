@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import type { FormWithTranslations, FormField } from '@/shared/lib/forms/types';
-import { submitTalentForm } from '../actions/submit-talent-form';
+import { submitTalentService } from '../actions/submit-talent-service';
 
 type SubtypeOption = { id: string; slug: string; name: string; group_slug: string };
 
@@ -23,7 +23,7 @@ type Props = {
   subtypeOptions: SubtypeOption[];
 };
 
-export function TalentFormRenderer({
+export function TalentServiceRenderer({
   talentId,
   serviceId,
   countryId,
@@ -53,7 +53,7 @@ export function TalentFormRenderer({
 
   const handleSubmit = () => {
     startTransition(async () => {
-      const result = await submitTalentForm({
+      const result = await submitTalentService({
         talent_id: talentId,
         service_id: serviceId,
         country_id: countryId,

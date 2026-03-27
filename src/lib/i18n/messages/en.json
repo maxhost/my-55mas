@@ -29,7 +29,7 @@
     "members": "Members",
     "services": "Services",
     "dashboard": "Dashboard",
-    "talentForms": "Talent Forms",
+    "talentServices": "Talent Services",
     "payments": "Payments",
     "notifications": "Notifications"
   },
@@ -132,8 +132,8 @@
     "subtypeGroup": "Subtype group",
     "selectGroup": "Select group..."
   },
-  "AdminTalentForms": {
-    "title": "Talent Forms",
+  "AdminTalentServices": {
+    "title": "Talent Services",
     "editForm": "Edit form",
     "noForms": "No talent forms created yet.",
     "createForm": "Create form",

@@ -28,6 +28,6 @@ export async function saveTalentFormActivation(
     if (error) return { error: { _db: [error.message] } };
   }
 
-  revalidatePath('/[locale]/(admin)/admin/talent-forms', 'layout');
+  revalidatePath('/[locale]/(admin)/admin/talent-services', 'layout');
   return { data: true };
 }

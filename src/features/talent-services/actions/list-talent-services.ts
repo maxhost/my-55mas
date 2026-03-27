@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 
-export type TalentFormListItem = {
+export type TalentServiceListItem = {
   id: string;
   service_id: string;
   service_name: string;
@@ -14,9 +14,9 @@ export type TalentFormListItem = {
  * Lists General talent forms (one per service) for the admin list page.
  * Includes variant count per service.
  */
-export async function listTalentForms(
+export async function listTalentServices(
   locale: string
-): Promise<TalentFormListItem[]> {
+): Promise<TalentServiceListItem[]> {
   const supabase = createClient();
 
   // Only General forms (city_id IS NULL)

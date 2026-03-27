@@ -2,8 +2,8 @@
 
 import { useTranslations } from 'next-intl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TalentFormBuilder } from '@/features/talent-forms/components/talent-form-builder';
-import { TalentFormConfig } from '@/features/talent-forms/components/talent-form-config';
+import { TalentServiceBuilder } from '@/features/talent-services/components/talent-service-builder';
+import { TalentServiceConfig } from '@/features/talent-services/components/talent-service-config';
 import type {
   FormWithTranslations,
   FormVariantSummary,
@@ -21,7 +21,7 @@ type Props = {
   subtypeGroups: SubtypeGroupOption[];
 };
 
-export function TalentFormEditor({
+export function TalentServiceEditor({
   serviceId,
   form,
   formVariants,
@@ -29,7 +29,7 @@ export function TalentFormEditor({
   serviceCities,
   subtypeGroups,
 }: Props) {
-  const t = useTranslations('AdminTalentForms');
+  const t = useTranslations('AdminTalentServices');
 
   return (
     <Tabs defaultValue="config">
@@ -39,7 +39,7 @@ export function TalentFormEditor({
       </TabsList>
 
       <TabsContent value="config" className="pt-6">
-        <TalentFormConfig
+        <TalentServiceConfig
           serviceCountries={serviceCountries}
           serviceCities={serviceCities}
           formVariants={formVariants}
@@ -47,7 +47,7 @@ export function TalentFormEditor({
       </TabsContent>
 
       <TabsContent value="form" className="pt-6">
-        <TalentFormBuilder
+        <TalentServiceBuilder
           serviceId={serviceId}
           form={form}
           formVariants={formVariants}
