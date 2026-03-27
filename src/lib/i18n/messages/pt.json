@@ -19,7 +19,8 @@
     "savedSuccess": "Guardado com sucesso",
     "saveError": "Erro ao guardar",
     "createdSuccess": "Criado com sucesso",
-    "deletedSuccess": "Eliminado com sucesso"
+    "deletedSuccess": "Eliminado com sucesso",
+    "copiedSuccess": "Copiado para a área de transferência"
   },
   "AdminNav": {
     "orders": "Pedidos",
@@ -204,6 +205,7 @@
     "noVariant": "Sem variante — crie a partir do designer",
     "save": "Salvar",
     "saving": "Salvando...",
+    "embedCode": "Código de embed",
     "deleteFormTitle": "Eliminar formulário",
     "deleteFormDescription": "Isto eliminará permanentemente \"{name}\" e todos os seus dados: traduções, configuração de países/cidades e variantes. Esta ação não pode ser desfeita.",
     "deleteConfirm": "Eliminar permanentemente",

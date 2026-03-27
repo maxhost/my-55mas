@@ -19,7 +19,8 @@
     "savedSuccess": "Desat correctament",
     "saveError": "Error en desar",
     "createdSuccess": "Creat correctament",
-    "deletedSuccess": "Eliminat correctament"
+    "deletedSuccess": "Eliminat correctament",
+    "copiedSuccess": "Copiat al porta-retalls"
   },
   "AdminNav": {
     "orders": "Comandes",
@@ -204,6 +205,7 @@
     "noVariant": "Sense variant — creeu-la des del dissenyador",
     "save": "Desar",
     "saving": "Desant...",
+    "embedCode": "Codi d'embed",
     "deleteFormTitle": "Eliminar formulari",
     "deleteFormDescription": "Això eliminarà permanentment \"{name}\" i totes les seves dades: traduccions, configuració de països/ciutats i variants. Aquesta acció no es pot desfer.",
     "deleteConfirm": "Eliminar permanentment",

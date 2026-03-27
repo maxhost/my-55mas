@@ -42,3 +42,28 @@ Nuevo tipo de campo en el form builder que referencia una pregunta de `survey_qu
 - Requiere confirmación explícita con modal destructivo que describe qué se eliminará
 - La acción verifica que el DELETE afectó filas; si el form no existe o ya fue eliminado, muestra error
 - Variantes no pueden eliminarse individualmente — se eliminan vía CASCADE al eliminar su formulario General padre
+
+## Sistema de embed
+
+Los formularios pueden insertarse en cualquier página de la app (pública o privada) usando su slug.
+
+### Componentes
+
+- `FormRenderer` (`shared/components/form-renderer.tsx`) — Renderizador genérico de formularios. Recibe `FormWithTranslations`, maneja estado de campos, delega submit vía callback. Sin imports de features/. Soporta `renderCustomField` para tipos de campo específicos de un feature.
+- `RegistrationFormEmbed` (`features/registration/components/registration-form-embed.tsx`) — Wrapper que agrega `useTransition`, error display y toast. La página carga el form vía `getRegistrationForm(slug)` y lo pasa como prop.
+
+### Uso
+
+```tsx
+// En page.tsx (server component):
+const form = await getRegistrationForm('mi-formulario');
+
+// En JSX:
+<RegistrationFormEmbed form={form} locale={locale} onSubmit={myServerAction} />
+```
+
+La página decide qué hacer con los datos (crear usuario, actualizar perfil, guardar en tabla genérica).
+
+### Embed code en admin
+
+El editor muestra el snippet de embed en la tab Configuración con botón copiar. El slug del formulario es el identificador para el embed.

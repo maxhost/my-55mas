@@ -19,7 +19,8 @@
     "savedSuccess": "Saved successfully",
     "saveError": "Error saving",
     "createdSuccess": "Created successfully",
-    "deletedSuccess": "Deleted successfully"
+    "deletedSuccess": "Deleted successfully",
+    "copiedSuccess": "Copied to clipboard"
   },
   "AdminNav": {
     "orders": "Orders",
@@ -204,6 +205,7 @@
     "noVariant": "No variant — create from the designer",
     "save": "Save",
     "saving": "Saving...",
+    "embedCode": "Embed code",
     "deleteFormTitle": "Delete form",
     "deleteFormDescription": "This will permanently delete \"{name}\" and all its data: translations, country/city configuration, and variants. This action cannot be undone.",
     "deleteConfirm": "Delete permanently",

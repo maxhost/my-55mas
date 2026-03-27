@@ -19,7 +19,8 @@
     "savedSuccess": "Enregistré avec succès",
     "saveError": "Erreur lors de l'enregistrement",
     "createdSuccess": "Créé avec succès",
-    "deletedSuccess": "Supprimé avec succès"
+    "deletedSuccess": "Supprimé avec succès",
+    "copiedSuccess": "Copié dans le presse-papiers"
   },
   "AdminNav": {
     "orders": "Commandes",
@@ -204,6 +205,7 @@
     "noVariant": "Pas de variante — créez-en depuis le concepteur",
     "save": "Enregistrer",
     "saving": "Enregistrement...",
+    "embedCode": "Code d'intégration",
     "deleteFormTitle": "Supprimer le formulaire",
     "deleteFormDescription": "Ceci supprimera définitivement \"{name}\" et toutes ses données : traductions, configuration pays/villes et variantes. Cette action est irréversible.",
     "deleteConfirm": "Supprimer définitivement",
