@@ -137,7 +137,20 @@
     "survey": "Question statistique",
     "surveyFieldInfo": "Sélectionnez une question statistique. Créez-les d'abord dans Questions Statistiques.",
     "surveyQuestion": "Question",
-    "selectQuestion": "Sélectionner une question..."
+    "selectQuestion": "Sélectionner une question...",
+    "email": "Email",
+    "password": "Mot de passe",
+    "actions": "Actions",
+    "addAction": "Ajouter une action",
+    "actionType": "Type d'action",
+    "actionLabel": "Libellé du bouton",
+    "redirectToggle": "Rediriger après",
+    "redirectUrl": "Chemin de redirection",
+    "redirectHint": "Chemin interne sans langue (ex : /merci)",
+    "action_next": "Suivant",
+    "action_back": "Retour",
+    "action_submit": "Envoyer",
+    "action_register": "S'inscrire"
   },
   "AdminTalentServices": {
     "title": "Services Talent",

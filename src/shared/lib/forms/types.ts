@@ -10,6 +10,8 @@ export const FIELD_TYPES = [
   'file',
   'subtype',
   'survey',
+  'email',
+  'password',
 ] as const;
 
 export type FieldType = (typeof FIELD_TYPES)[number];
@@ -18,6 +20,18 @@ export const FIELD_TYPES_WITH_OPTIONS: FieldType[] = [
   'single_select',
   'multiselect',
 ];
+
+// ── Step Action Types ─────────────────────────────────
+
+export const STEP_ACTION_TYPES = ['next', 'back', 'submit', 'register'] as const;
+
+export type StepActionType = (typeof STEP_ACTION_TYPES)[number];
+
+export type StepAction = {
+  key: string;
+  type: StepActionType;
+  redirect_url?: string;
+};
 
 // ── Form Schema Structure ─────────────────────────────
 
@@ -33,6 +47,7 @@ export type FormField = {
 export type FormStep = {
   key: string;
   fields: FormField[];
+  actions?: StepAction[];
 };
 
 export type FormSchema = {

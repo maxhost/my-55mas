@@ -137,7 +137,20 @@
     "survey": "Pregunta estadística",
     "surveyFieldInfo": "Selecciona una pregunta estadística. Créalas primero en Preguntas Estadísticas.",
     "surveyQuestion": "Pregunta",
-    "selectQuestion": "Seleccionar pregunta..."
+    "selectQuestion": "Seleccionar pregunta...",
+    "email": "Email",
+    "password": "Contraseña",
+    "actions": "Acciones",
+    "addAction": "Agregar acción",
+    "actionType": "Tipo de acción",
+    "actionLabel": "Etiqueta del botón",
+    "redirectToggle": "Redirigir después",
+    "redirectUrl": "Ruta de redirección",
+    "redirectHint": "Ruta interna sin idioma (ej: /gracias)",
+    "action_next": "Siguiente",
+    "action_back": "Volver",
+    "action_submit": "Enviar",
+    "action_register": "Registrar"
   },
   "AdminTalentServices": {
     "title": "Servicios Talento",

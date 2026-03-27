@@ -137,7 +137,20 @@
     "survey": "Survey question",
     "surveyFieldInfo": "Select a survey question. Create them first in Survey Questions.",
     "surveyQuestion": "Question",
-    "selectQuestion": "Select question..."
+    "selectQuestion": "Select question...",
+    "email": "Email",
+    "password": "Password",
+    "actions": "Actions",
+    "addAction": "Add action",
+    "actionType": "Action type",
+    "actionLabel": "Button label",
+    "redirectToggle": "Redirect after",
+    "redirectUrl": "Redirect path",
+    "redirectHint": "Internal path without locale (e.g. /thanks)",
+    "action_next": "Next",
+    "action_back": "Back",
+    "action_submit": "Submit",
+    "action_register": "Register"
   },
   "AdminTalentServices": {
     "title": "Talent Services",

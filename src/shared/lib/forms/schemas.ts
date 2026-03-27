@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { FIELD_TYPES } from './types';
+import { FIELD_TYPES, STEP_ACTION_TYPES } from './types';
 
 // ── Key validation ────────────────────────────────────
 
@@ -30,11 +30,24 @@ export const formFieldSchema = z
     { message: 'Select fields must have at least one option' }
   );
 
+// ── Step Action ───────────────────────────────────────
+
+export const stepActionSchema = z.object({
+  key: keySchema,
+  type: z.enum(STEP_ACTION_TYPES),
+  redirect_url: z
+    .string()
+    .startsWith('/', 'Redirect URL must start with /')
+    .max(200)
+    .optional(),
+});
+
 // ── Form Step ─────────────────────────────────────────
 
 export const formStepSchema = z.object({
   key: keySchema,
   fields: z.array(formFieldSchema).min(1),
+  actions: z.array(stepActionSchema).optional(),
 });
 
 // ── Form Schema ───────────────────────────────────────

@@ -9,6 +9,7 @@ import { ArrowUp, ArrowDown, X, Plus } from 'lucide-react';
 import type { FormStep, FormField, FormTranslationData } from '@/shared/lib/forms/types';
 import { sanitizeKey } from '@/shared/lib/forms/utils';
 import { FieldEditor } from './field-editor';
+import { StepActionEditor } from './step-action-editor';
 import type { SubtypeGroupOption } from './subtype-field-config';
 import type { SurveyQuestionOption } from './survey-field-config';
 
@@ -133,6 +134,15 @@ export function StepCard({
           <Plus className="mr-1 h-3 w-3" />
           {t('addField')}
         </Button>
+
+        {/* Step actions (wizard buttons) */}
+        <StepActionEditor
+          actions={step.actions ?? []}
+          stepIndex={stepIndex}
+          translations={translations}
+          onChange={(actions) => onChange({ ...step, actions })}
+          onLabelChange={onLabelChange}
+        />
       </CardContent>
     </Card>
   );

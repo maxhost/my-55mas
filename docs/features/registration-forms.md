@@ -67,3 +67,71 @@ La página decide qué hacer con los datos (crear usuario, actualizar perfil, gu
 ### Embed code en admin
 
 El editor muestra el snippet de embed en la tab Configuración con botón copiar. El slug del formulario es el identificador para el embed.
+
+## Acciones y navegación wizard
+
+### Casos de uso
+
+**Signup de talento**:
+- Paso 1: Nombre, Dirección, Email (tipo email), Contraseña (tipo password) → [Siguiente]
+- Paso 2: Preguntas estadísticas → [Volver] [Registrar cuenta]
+- Registrar crea usuario en Supabase Auth + perfil → redirige a `/portal`
+
+**Encuesta**:
+- Paso 1: Preguntas generales → [Siguiente]
+- Paso 2: Preguntas específicas → [Volver] [Enviar]
+- Enviar guarda respuestas → redirige a `/encuesta/gracias`
+
+### Schema extendido
+
+```typescript
+// Nuevos field types
+FIELD_TYPES = [...existing, 'email', 'password'] as const;
+
+// Acciones por paso
+type StepAction = {
+  key: string;              // ej: 'btn_next', 'btn_register'
+  type: 'next' | 'back' | 'submit' | 'register';
+  redirect_url?: string;    // ruta interna sin locale (ej: '/gracias')
+};
+
+// FormStep extendido
+type FormStep = {
+  key: string;
+  fields: FormField[];
+  actions?: StepAction[];   // botones al final del paso
+};
+```
+
+- `actions` es opcional — forms sin acciones: último paso muestra submit genérico, otros muestran next
+- Labels de acciones vía traducciones: `translations.labels[action.key]`
+- Redirect: ruta sin locale, el renderer auto-prepende `/{locale}/`
+
+### Wizard mode (FormRenderer)
+
+- Solo muestra un paso a la vez (`currentStepIndex` state)
+- Indicador de progreso: "Paso X de N"
+- Validación de campos requeridos antes de next/submit
+- Datos persisten al navegar back/next (useState)
+- `onSubmit(formData, meta?)` — meta incluye `action` y `redirect_url`
+
+### Acciones en el Builder (admin)
+
+- StepActionEditor por cada paso: agregar/eliminar botones, tipo, label, redirect
+- Validaciones: no back en paso 1, máximo 1 submit/register por paso
+- Checkbox "¿Redirigir?" en acciones submit/register → input de ruta interna
+
+### Register Action
+
+- Server action: `supabase.auth.signUp` + insert `profiles` + insert `talent_profiles`
+- Campos email/password detectados por `field.type` (no por key)
+- Password nunca se incluye en form_data guardado — se extrae y descarta
+- Supabase maneja email de verificación automáticamente
+- Si signUp falla, error en paso actual sin redirigir
+
+### Sessions de implementación
+
+1. **Schema + Types + Zod + Tests** — StepAction, email/password types, Zod validation
+2. **FormRenderer Wizard Mode** — Step navigation, action buttons, validación, email/password render
+3. **Form Builder - Tipos + Acciones + i18n** — FieldTypePicker, StepActionEditor, builder integration
+4. **Register Action + Redirect** — Signup server action, RegistrationFormEmbed integration
