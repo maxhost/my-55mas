@@ -3,22 +3,27 @@
 import { createClient } from '@/lib/supabase/server';
 import type { FormVariantSummary } from '@/shared/lib/forms/types';
 
-export async function listFormVariants(
-  serviceId: string
+export async function listTalentFormVariants(
+  serviceId: string,
+  activeOnly = true
 ): Promise<FormVariantSummary[]> {
   const supabase = createClient();
 
-  const { data: forms, error } = await supabase
-    .from('service_forms')
+  let query = supabase
+    .from('talent_forms')
     .select('id, city_id, version, is_active')
     .eq('service_id', serviceId)
-    .eq('is_active', true)
     .order('city_id', { ascending: true, nullsFirst: true });
+
+  if (activeOnly) {
+    query = query.eq('is_active', true);
+  }
+
+  const { data: forms, error } = await query;
 
   if (error) throw error;
   if (!forms || forms.length === 0) return [];
 
-  // Fetch city names + country_id for non-null city_ids
   const cityIds = forms
     .map((f) => f.city_id)
     .filter((id): id is string => id !== null);

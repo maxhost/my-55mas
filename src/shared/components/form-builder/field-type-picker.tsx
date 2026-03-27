@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { FIELD_TYPES, type FieldType } from '../types';
+import { FIELD_TYPES, type FieldType } from '@/shared/lib/forms/types';
 
 type Props = {
   value: FieldType;

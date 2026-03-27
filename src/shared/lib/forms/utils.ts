@@ -1,4 +1,4 @@
-/** Convierte input a snake_case válido para keys de formulario */
+/** Convierte input a snake_case valido para keys de formulario */
 export function sanitizeKey(value: string): string {
   return value
     .toLowerCase()

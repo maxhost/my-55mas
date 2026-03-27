@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import type { FormCountryOption, FormCityOption } from '../types';
+import type { FormCountryOption, FormCityOption } from '@/shared/lib/forms/types';
 
 type Props = {
   serviceCountries: FormCountryOption[];

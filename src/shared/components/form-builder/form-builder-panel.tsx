@@ -4,14 +4,15 @@ import { useRef, useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { locales } from '@/lib/i18n/config';
-import { getForm } from '../actions/get-form';
-import { cloneFormVariant } from '../actions/clone-form-variant';
 import type {
   FormWithTranslations,
   FormVariantSummary,
   FormCountryOption,
   FormCityOption,
-} from '../types';
+  SaveFormResult,
+  CloneFormResult,
+} from '@/shared/lib/forms/types';
+import type { SaveFormWithTranslationsInput } from '@/shared/lib/forms/schemas';
 import { VariantSelector } from './variant-selector';
 import { FormBuilder } from './form-builder';
 
@@ -21,6 +22,10 @@ type Props = {
   formVariants: FormVariantSummary[];
   serviceCountries: FormCountryOption[];
   serviceCities: FormCityOption[];
+  // Callbacks — injected by feature wrapper
+  onGetForm: (serviceId: string, cityId: string | null, fallback?: boolean) => Promise<FormWithTranslations | null>;
+  onCloneVariant: (input: { service_id: string; source_city_id: string | null; target_city_id: string }) => Promise<CloneFormResult>;
+  onSave: (input: SaveFormWithTranslationsInput) => Promise<SaveFormResult>;
 };
 
 export function FormBuilderPanel({
@@ -29,6 +34,9 @@ export function FormBuilderPanel({
   formVariants: initialVariants,
   serviceCountries,
   serviceCities,
+  onGetForm,
+  onCloneVariant,
+  onSave,
 }: Props) {
   const t = useTranslations('AdminFormBuilder');
   const [activeCountry, setActiveCountry] = useState<string | null>(null);
@@ -54,7 +62,7 @@ export function FormBuilderPanel({
       // Switch to General — load it
       isCloningRef.current = false;
       startLoading(async () => {
-        const form = await getForm(serviceId, null, false);
+        const form = await onGetForm(serviceId, null, false);
         setFormData(form);
       });
       return;
@@ -67,14 +75,14 @@ export function FormBuilderPanel({
       // Variant already exists — load it
       isCloningRef.current = false;
       startLoading(async () => {
-        const form = await getForm(serviceId, cityId, false);
+        const form = await onGetForm(serviceId, cityId, false);
         setFormData(form);
       });
     } else {
       // No variant yet — auto-clone from General
       isCloningRef.current = true;
       startLoading(async () => {
-        const result = await cloneFormVariant({
+        const result = await onCloneVariant({
           service_id: serviceId,
           source_city_id: null,
           target_city_id: cityId,
@@ -90,12 +98,16 @@ export function FormBuilderPanel({
               city_name: city?.name ?? null,
               country_id: city?.country_id ?? null,
               version: 1,
+              is_active: true,
             },
           ]);
         }
       });
     }
   };
+
+  const handleGetForm = (svcId: string, cId: string | null) =>
+    onGetForm(svcId, cId, false);
 
   // Determine if we should show the form builder
   const showBuilder = activeCountry === null || (activeCountry !== null && !!activeCity);
@@ -134,6 +146,8 @@ export function FormBuilderPanel({
           form={formData}
           activeLocale={activeLocale}
           onSaved={setFormData}
+          onSave={onSave}
+          onGetForm={handleGetForm}
         />
       ) : null}
     </div>

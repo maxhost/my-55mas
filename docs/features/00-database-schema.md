@@ -33,7 +33,8 @@ Las tablas deben crearse en este orden para respetar dependencias de FK:
 6. `categories` + `category_translations` — depende de `languages`
 7. `services` + `service_translations` + `service_countries` — depende de `countries`, `languages`
 8. `service_forms` + `service_form_translations` — depende de `services`, `countries`, `languages`
-9. `talent_profiles` + tablas relacionadas — depende de `profiles`, `countries`, `cities`, `services`
+9. `talent_profiles` + `talent_services` + `talent_analytics` + `service_subtypes` + `talent_service_subtypes` — depende de `profiles`, `countries`, `cities`, `services`
+9.5. `talent_forms` + `talent_form_translations` — depende de `services`, `cities`, `languages`
 10. `orders` + tablas relacionadas — depende de `profiles`, `services`, `countries`, `cities`, `service_forms`
 11. Triggers
 12. `ENABLE ROW LEVEL SECURITY`
@@ -211,6 +212,9 @@ CREATE TABLE profiles (
   preferred_country uuid REFERENCES countries(id),
   active_role       text NOT NULL DEFAULT 'client'
                     CHECK (active_role IN ('client', 'talent', 'admin', 'manager', 'viewer')),
+  nif               text,                  -- Tax ID (NIF en PT, DNI/CIF en ES). Compartido: clientes y talentos
+  preferred_contact text                   -- Método de contacto preferido
+                    CHECK (preferred_contact IN ('phone', 'whatsapp', 'email', 'messenger')),
   created_at        timestamptz DEFAULT now(),
   updated_at        timestamptz DEFAULT now()
 );
@@ -441,6 +445,15 @@ CREATE TABLE talent_profiles (
               CHECK (status IN ('pending', 'approved', 'rejected', 'suspended')),
   approved_at timestamptz,
   approved_by uuid REFERENCES profiles(id) ON DELETE SET NULL,
+  -- Datos personales
+  gender      text CHECK (gender IN ('male', 'female', 'other')),
+  has_car     boolean DEFAULT false,
+  -- Operaciones
+  preferred_payment   text CHECK (preferred_payment IN ('acumulate', 'per_service', 'other')),
+  professional_status text CHECK (professional_status IN ('unemployed', 'retired', 'employed', 'self_employed', 'other')),
+  handler_id  uuid REFERENCES profiles(id) ON DELETE SET NULL,  -- staff member que gestiona/reclutó al talento
+  internal_notes text,                    -- notas internas del equipo (solo admin/staff)
+  legacy_id   integer UNIQUE,             -- ID del sistema legacy (CSV import)
   created_at  timestamptz DEFAULT now(),
   updated_at  timestamptz DEFAULT now(),
   -- Onboarding multi-step: pending/rejected permiten NULL (perfil incompleto).
@@ -461,11 +474,15 @@ CREATE TABLE talent_profile_translations (
   PRIMARY KEY (talent_id, locale)
 );
 
--- Qué servicios ofrece un talento, por país
+-- Qué servicios ofrece un talento, por país, y a qué precio
 CREATE TABLE talent_services (
   talent_id   uuid NOT NULL REFERENCES talent_profiles(id) ON DELETE CASCADE,
   service_id  uuid NOT NULL REFERENCES services(id),
   country_id  uuid NOT NULL REFERENCES countries(id),
+  unit_price  numeric(10,2) CHECK (unit_price >= 0),  -- precio que cobra el talento por este servicio
+  specializations jsonb DEFAULT NULL,     -- DEPRECATED: usar talent_service_subtypes. Temporal para CSV import.
+  form_data   jsonb,                      -- respuestas del talento al formulario de talento
+  form_id     uuid REFERENCES talent_forms(id) ON DELETE SET NULL,  -- snapshot del formulario usado
   is_verified boolean NOT NULL DEFAULT false,  -- admin verificó docs
   created_at  timestamptz DEFAULT now(),
   updated_at  timestamptz DEFAULT now(),
@@ -508,7 +525,82 @@ CREATE TABLE service_required_document_translations (
   updated_at  timestamptz DEFAULT now(),
   PRIMARY KEY (document_id, locale)
 );
+
+-- Datos estadísticos/analytics del talento (append-only, key-value)
+-- Ej: cómo encontró 55+, por qué se unió, idiomas adicionales
+CREATE TABLE talent_analytics (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  talent_id   uuid NOT NULL REFERENCES talent_profiles(id) ON DELETE CASCADE,
+  key         text NOT NULL,              -- 'how_found', 'why_join', 'terms_accepted', etc.
+  value       text,
+  created_at  timestamptz DEFAULT now(),
+  UNIQUE (talent_id, key)
+);
+
+-- Sub-tipos de servicio (ej: Pet Sitting → perro, gato, pez)
+-- Definidos a nivel de servicio, usables en formularios de cliente y talento
+CREATE TABLE service_subtypes (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  service_id  uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
+  slug        text NOT NULL,              -- 'dog', 'cat', 'fish'
+  sort_order  int DEFAULT 0,
+  is_active   boolean NOT NULL DEFAULT true,
+  created_at  timestamptz DEFAULT now(),
+  updated_at  timestamptz DEFAULT now(),
+  UNIQUE (service_id, slug)
+);
+
+CREATE TABLE service_subtype_translations (
+  subtype_id  uuid NOT NULL REFERENCES service_subtypes(id) ON DELETE CASCADE,
+  locale      text NOT NULL REFERENCES languages(code),
+  name        text NOT NULL,              -- 'Perro', 'Dog', 'Cão'
+  created_at  timestamptz DEFAULT now(),
+  updated_at  timestamptz DEFAULT now(),
+  PRIMARY KEY (subtype_id, locale)
+);
+
+-- Qué sub-tipos maneja cada talento (relación normalizada)
+CREATE TABLE talent_service_subtypes (
+  talent_id   uuid NOT NULL REFERENCES talent_profiles(id) ON DELETE CASCADE,
+  subtype_id  uuid NOT NULL REFERENCES service_subtypes(id) ON DELETE CASCADE,
+  created_at  timestamptz DEFAULT now(),
+  PRIMARY KEY (talent_id, subtype_id)
+);
 ```
+
+---
+
+## Capa 6.5 — Formularios de talento
+
+Formularios dinámicos que el talento completa al registrarse para ofrecer un servicio.
+Estructura idéntica a `service_forms` pero con FK a `talent_forms`.
+
+```sql
+CREATE TABLE talent_forms (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  service_id  uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
+  city_id     uuid REFERENCES cities(id),
+  schema      jsonb NOT NULL DEFAULT '{"steps": []}',
+  version     int NOT NULL DEFAULT 1,
+  is_active   boolean NOT NULL DEFAULT true,
+  created_at  timestamptz DEFAULT now(),
+  updated_at  timestamptz DEFAULT now(),
+  UNIQUE NULLS NOT DISTINCT (service_id, city_id, version)
+);
+
+CREATE TABLE talent_form_translations (
+  form_id       uuid NOT NULL REFERENCES talent_forms(id) ON DELETE CASCADE,
+  locale        text NOT NULL REFERENCES languages(code),
+  labels        jsonb NOT NULL,
+  placeholders  jsonb,
+  option_labels jsonb,
+  created_at    timestamptz DEFAULT now(),
+  updated_at    timestamptz DEFAULT now(),
+  PRIMARY KEY (form_id, locale)
+);
+```
+
+Resolución del formulario: misma lógica que service_forms (city_id específico → fallback a NULL).
 
 ---
 
@@ -680,6 +772,14 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_form_translations
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON talent_profile_translations
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_required_document_translations
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_subtypes
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_subtype_translations
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON talent_forms
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON talent_form_translations
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 ```
 
@@ -887,6 +987,12 @@ ALTER TABLE talent_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE talent_profile_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE talent_services ENABLE ROW LEVEL SECURITY;
 ALTER TABLE talent_documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE talent_analytics ENABLE ROW LEVEL SECURITY;
+ALTER TABLE service_subtypes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE service_subtype_translations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE talent_service_subtypes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE talent_forms ENABLE ROW LEVEL SECURITY;
+ALTER TABLE talent_form_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE service_required_documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE service_required_document_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;

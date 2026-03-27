@@ -6,15 +6,14 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { locales } from '@/lib/i18n/config';
-import { saveFormWithTranslations } from '../actions/save-form';
-import { cascadeGeneralSave } from '../actions/cascade-general-save';
-import { getForm } from '../actions/get-form';
 import type {
   FormSchema,
   FormStep,
   FormTranslationData,
   FormWithTranslations,
-} from '../types';
+  SaveFormResult,
+} from '@/shared/lib/forms/types';
+import type { SaveFormWithTranslationsInput } from '@/shared/lib/forms/schemas';
 import { StepCard } from './step-card';
 
 type Props = {
@@ -23,6 +22,9 @@ type Props = {
   form: FormWithTranslations | null;
   activeLocale: string;
   onSaved?: (form: FormWithTranslations) => void;
+  // Callbacks — injected by feature wrapper
+  onSave: (input: SaveFormWithTranslationsInput) => Promise<SaveFormResult>;
+  onGetForm: (serviceId: string, cityId: string | null) => Promise<FormWithTranslations | null>;
 };
 
 function swap<T>(arr: T[], i: number, j: number): T[] {
@@ -45,7 +47,9 @@ function initTranslations(
   return init;
 }
 
-export function FormBuilder({ serviceId, cityId, form, activeLocale, onSaved }: Props) {
+export function FormBuilder({
+  serviceId, cityId, form, activeLocale, onSaved, onSave, onGetForm,
+}: Props) {
   const t = useTranslations('AdminFormBuilder');
   const tc = useTranslations('Common');
   const [isPending, startTransition] = useTransition();
@@ -109,9 +113,7 @@ export function FormBuilder({ serviceId, cityId, form, activeLocale, onSaved }: 
       ...current,
     };
     startTransition(async () => {
-      const result = cityId === null
-        ? await cascadeGeneralSave(payload)
-        : await saveFormWithTranslations(payload);
+      const result = await onSave(payload);
 
       if (result && 'error' in result) {
         const errors = result.error as Record<string, string[] | undefined>;
@@ -122,9 +124,9 @@ export function FormBuilder({ serviceId, cityId, form, activeLocale, onSaved }: 
 
       toast.success(tc('savedSuccess'));
 
-      // Sincronizar parent con datos guardados
+      // Sync parent with saved data
       if (onSaved) {
-        const saved = await getForm(serviceId, cityId, false);
+        const saved = await onGetForm(serviceId, cityId);
         if (saved) onSaved(saved);
       }
     });

@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FormBuilderPanel } from '@/features/forms/components/form-builder-panel';
-import type { FormWithTranslations, FormVariantSummary, FormCityOption } from '@/features/forms/types';
+import { ServiceFormBuilder } from '@/features/forms/components/service-form-builder';
+import type { FormWithTranslations, FormVariantSummary, FormCityOption } from '@/shared/lib/forms/types';
 import { ServiceForm } from '@/features/services/components/service-form';
 import { ServiceConfig } from '@/features/services/components/service-config';
+import { SubtypesEditor } from '@/features/subtypes/components/subtypes-editor';
+import type { SubtypeWithTranslations } from '@/features/subtypes/types';
 import type {
   ServiceDetail,
   CountryOption,
@@ -21,6 +23,7 @@ type Props = {
   allCities: CityOption[];
   form: FormWithTranslations | null;
   formVariants: FormVariantSummary[];
+  subtypes: SubtypeWithTranslations[];
 };
 
 export function ServiceEditTabs({
@@ -29,6 +32,7 @@ export function ServiceEditTabs({
   allCities,
   form,
   formVariants,
+  subtypes,
 }: Props) {
   const t = useTranslations('AdminServices');
 
@@ -58,6 +62,7 @@ export function ServiceEditTabs({
         <TabsTrigger value="content">{t('tabContent')}</TabsTrigger>
         <TabsTrigger value="config">{t('tabConfig')}</TabsTrigger>
         <TabsTrigger value="form">{t('tabForm')}</TabsTrigger>
+        <TabsTrigger value="subtypes">{t('tabSubtypes')}</TabsTrigger>
       </TabsList>
 
       <TabsContent value="content" className="pt-6">
@@ -78,12 +83,19 @@ export function ServiceEditTabs({
       </TabsContent>
 
       <TabsContent value="form" className="pt-6">
-        <FormBuilderPanel
+        <ServiceFormBuilder
           serviceId={service.id}
           form={form}
           formVariants={formVariants}
           serviceCountries={formCountries}
           serviceCities={formCities}
+        />
+      </TabsContent>
+
+      <TabsContent value="subtypes" className="pt-6">
+        <SubtypesEditor
+          serviceId={service.id}
+          initialSubtypes={subtypes}
         />
       </TabsContent>
     </Tabs>

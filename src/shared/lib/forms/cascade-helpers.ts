@@ -1,4 +1,4 @@
-import type { FormSchema, FormStep, FormField, FormTranslationData } from '../types';
+import type { FormSchema, FormStep, FormField, FormTranslationData } from './types';
 
 // ── Field key extraction ─────────────────────────────────
 
@@ -110,17 +110,17 @@ function mergeBucket(
   // Process General keys
   for (const key of Object.keys(newGen)) {
     if (!(key in oldGen)) {
-      // New key in General → copy to country
+      // New key in General -> copy to country
       result[key] = newGen[key];
     } else if (oldGen[key] !== newGen[key]) {
       // General changed this value
       if (country[key] === oldGen[key] || country[key] === undefined) {
-        result[key] = newGen[key]; // inherited → update
+        result[key] = newGen[key]; // inherited -> update
       } else {
-        result[key] = country[key]; // customized → preserve
+        result[key] = country[key]; // customized -> preserve
       }
     } else {
-      // General unchanged → keep country's value (or General's if country missing)
+      // General unchanged -> keep country's value (or General's if country missing)
       result[key] = country[key] ?? newGen[key];
     }
   }

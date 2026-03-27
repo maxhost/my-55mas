@@ -7,21 +7,24 @@ import {
   type FormTranslationData,
 } from '@/shared/lib/forms/types';
 
-export async function getForm(
+export async function getTalentForm(
   serviceId: string,
   cityId: string | null = null,
-  fallback = true
+  fallback = true,
+  activeOnly = true
 ): Promise<FormWithTranslations | null> {
   const supabase = createClient();
 
-  // Try specific city first, then fallback to default (null)
   let query = supabase
-    .from('service_forms')
+    .from('talent_forms')
     .select('*')
     .eq('service_id', serviceId)
-    .eq('is_active', true)
     .order('version', { ascending: false })
     .limit(1);
+
+  if (activeOnly) {
+    query = query.eq('is_active', true);
+  }
 
   if (cityId) {
     query = query.eq('city_id', cityId);
@@ -35,7 +38,7 @@ export async function getForm(
 
   // Fallback to default if city-specific not found
   if ((!forms || forms.length === 0) && cityId && fallback) {
-    return getForm(serviceId, null, true);
+    return getTalentForm(serviceId, null, true, activeOnly);
   }
 
   if (!forms || forms.length === 0) return null;
@@ -44,7 +47,7 @@ export async function getForm(
 
   // Fetch translations
   const { data: rawTranslations } = await supabase
-    .from('service_form_translations')
+    .from('talent_form_translations')
     .select('*')
     .eq('form_id', form.id);
 

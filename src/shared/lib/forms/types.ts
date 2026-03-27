@@ -8,6 +8,7 @@ export const FIELD_TYPES = [
   'single_select',
   'multiselect',
   'file',
+  'subtype',
 ] as const;
 
 export type FieldType = (typeof FIELD_TYPES)[number];
@@ -66,6 +67,7 @@ export type FormVariantSummary = {
   city_name: string | null;
   country_id: string | null;
   version: number;
+  is_active: boolean;
 };
 
 // ── Country option (forms-local, for first dropdown) ──
@@ -81,6 +83,17 @@ export type FormCityOption = {
   id: string;
   name: string;
   country_id: string;
+};
+
+// ── Callback result types (for shared components) ─────
+
+export type SaveFormResult =
+  | { error: Record<string, string[] | undefined> }
+  | { data: { id: string } };
+
+export type CloneFormResult = {
+  data?: FormWithTranslations;
+  error?: string;
 };
 
 // ── Helpers ───────────────────────────────────────────

@@ -3,8 +3,8 @@ import {
   getVariantOnlyFieldKeys,
   cascadeSchema,
   cascadeTranslations,
-} from '../cascade-helpers';
-import type { FormSchema, FormTranslationData } from '../../types';
+} from '@/shared/lib/forms/cascade-helpers';
+import type { FormSchema, FormTranslationData } from '@/shared/lib/forms/types';
 
 // ── Helpers ──────────────────────────────────────────────
 

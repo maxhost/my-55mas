@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sanitizeKey } from '../utils';
+import { sanitizeKey } from '@/shared/lib/forms/utils';
 
 describe('sanitizeKey', () => {
   it('converts to lowercase', () => {

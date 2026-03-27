@@ -5,10 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { ArrowUp, ArrowDown, X } from 'lucide-react';
-import { FIELD_TYPES_WITH_OPTIONS, type FormField } from '../types';
-import { sanitizeKey } from '../utils';
+import { FIELD_TYPES_WITH_OPTIONS, type FormField } from '@/shared/lib/forms/types';
+import { sanitizeKey } from '@/shared/lib/forms/utils';
 import { FieldTypePicker } from './field-type-picker';
 import { FieldOptionsEditor } from './field-options-editor';
+import { SubtypeFieldConfig } from './subtype-field-config';
 
 type Props = {
   field: FormField;
@@ -134,6 +135,7 @@ export function FieldEditor({
           onOptionLabelChange={onOptionLabelChange}
         />
       )}
+      {field.type === 'subtype' && <SubtypeFieldConfig />}
     </div>
   );
 }

@@ -6,8 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ArrowUp, ArrowDown, X, Plus } from 'lucide-react';
-import type { FormStep, FormField, FormTranslationData } from '../types';
-import { sanitizeKey } from '../utils';
+import type { FormStep, FormField, FormTranslationData } from '@/shared/lib/forms/types';
+import { sanitizeKey } from '@/shared/lib/forms/utils';
 import { FieldEditor } from './field-editor';
 
 type Props = {

@@ -597,7 +597,9 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          nif: string | null
           phone: string | null
+          preferred_contact: string | null
           preferred_country: string | null
           preferred_locale: string | null
           updated_at: string | null
@@ -609,7 +611,9 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          nif?: string | null
           phone?: string | null
+          preferred_contact?: string | null
           preferred_country?: string | null
           preferred_locale?: string | null
           updated_at?: string | null
@@ -621,7 +625,9 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          nif?: string | null
           phone?: string | null
+          preferred_contact?: string | null
           preferred_country?: string | null
           preferred_locale?: string | null
           updated_at?: string | null
@@ -964,6 +970,90 @@ export type Database = {
           },
         ]
       }
+      service_subtype_translations: {
+        Row: {
+          created_at: string | null
+          locale: string
+          name: string
+          subtype_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          locale: string
+          name: string
+          subtype_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          locale?: string
+          name?: string
+          subtype_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_subtype_translations_locale_fkey"
+            columns: ["locale"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "service_subtype_translations_subtype_id_fkey"
+            columns: ["subtype_id"]
+            isOneToOne: false
+            referencedRelation: "service_subtypes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_subtypes: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean
+          service_id: string
+          slug: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          service_id: string
+          slug: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          service_id?: string
+          slug?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_subtypes_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_subtypes_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services_localized"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_translations: {
         Row: {
           benefits: Json | null
@@ -1189,6 +1279,38 @@ export type Database = {
         }
         Relationships: []
       }
+      talent_analytics: {
+        Row: {
+          created_at: string | null
+          id: string
+          key: string
+          talent_id: string
+          value: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          key: string
+          talent_id: string
+          value?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          key?: string
+          talent_id?: string
+          value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "talent_analytics_talent_id_fkey"
+            columns: ["talent_id"]
+            isOneToOne: false
+            referencedRelation: "talent_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       talent_documents: {
         Row: {
           created_at: string | null
@@ -1239,6 +1361,113 @@ export type Database = {
             columns: ["talent_id"]
             isOneToOne: false
             referencedRelation: "talent_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      talent_form_translations: {
+        Row: {
+          created_at: string | null
+          form_id: string
+          labels: Json
+          locale: string
+          option_labels: Json | null
+          placeholders: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          form_id: string
+          labels: Json
+          locale: string
+          option_labels?: Json | null
+          placeholders?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          form_id?: string
+          labels?: Json
+          locale?: string
+          option_labels?: Json | null
+          placeholders?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "talent_form_translations_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "talent_forms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "talent_form_translations_locale_fkey"
+            columns: ["locale"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      talent_forms: {
+        Row: {
+          city_id: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean
+          schema: Json
+          service_id: string
+          updated_at: string | null
+          version: number
+        }
+        Insert: {
+          city_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          schema?: Json
+          service_id: string
+          updated_at?: string | null
+          version?: number
+        }
+        Update: {
+          city_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          schema?: Json
+          service_id?: string
+          updated_at?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "talent_forms_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "talent_forms_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities_localized"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "talent_forms_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "talent_forms_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services_localized"
             referencedColumns: ["id"]
           },
         ]
@@ -1294,9 +1523,16 @@ export type Database = {
           city_id: string | null
           country_id: string | null
           created_at: string | null
+          gender: string | null
+          handler_id: string | null
+          has_car: boolean | null
           id: string
+          internal_notes: string | null
+          legacy_id: number | null
           photo_url: string | null
           postal_code: string | null
+          preferred_payment: string | null
+          professional_status: string | null
           status: string
           updated_at: string | null
           user_id: string
@@ -1309,9 +1545,16 @@ export type Database = {
           city_id?: string | null
           country_id?: string | null
           created_at?: string | null
+          gender?: string | null
+          handler_id?: string | null
+          has_car?: boolean | null
           id?: string
+          internal_notes?: string | null
+          legacy_id?: number | null
           photo_url?: string | null
           postal_code?: string | null
+          preferred_payment?: string | null
+          professional_status?: string | null
           status?: string
           updated_at?: string | null
           user_id: string
@@ -1324,9 +1567,16 @@ export type Database = {
           city_id?: string | null
           country_id?: string | null
           created_at?: string | null
+          gender?: string | null
+          handler_id?: string | null
+          has_car?: boolean | null
           id?: string
+          internal_notes?: string | null
+          legacy_id?: number | null
           photo_url?: string | null
           postal_code?: string | null
+          preferred_payment?: string | null
+          professional_status?: string | null
           status?: string
           updated_at?: string | null
           user_id?: string
@@ -1368,6 +1618,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "talent_profiles_handler_id_fkey"
+            columns: ["handler_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "talent_profiles_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
@@ -1376,29 +1633,74 @@ export type Database = {
           },
         ]
       }
+      talent_service_subtypes: {
+        Row: {
+          created_at: string | null
+          subtype_id: string
+          talent_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          subtype_id: string
+          talent_id: string
+        }
+        Update: {
+          created_at?: string | null
+          subtype_id?: string
+          talent_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "talent_service_subtypes_subtype_id_fkey"
+            columns: ["subtype_id"]
+            isOneToOne: false
+            referencedRelation: "service_subtypes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "talent_service_subtypes_talent_id_fkey"
+            columns: ["talent_id"]
+            isOneToOne: false
+            referencedRelation: "talent_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       talent_services: {
         Row: {
           country_id: string
           created_at: string | null
+          form_data: Json | null
+          form_id: string | null
           is_verified: boolean
           service_id: string
+          specializations: Json | null
           talent_id: string
+          unit_price: number | null
           updated_at: string | null
         }
         Insert: {
           country_id: string
           created_at?: string | null
+          form_data?: Json | null
+          form_id?: string | null
           is_verified?: boolean
           service_id: string
+          specializations?: Json | null
           talent_id: string
+          unit_price?: number | null
           updated_at?: string | null
         }
         Update: {
           country_id?: string
           created_at?: string | null
+          form_data?: Json | null
+          form_id?: string | null
           is_verified?: boolean
           service_id?: string
+          specializations?: Json | null
           talent_id?: string
+          unit_price?: number | null
           updated_at?: string | null
         }
         Relationships: [
@@ -1414,6 +1716,13 @@ export type Database = {
             columns: ["country_id"]
             isOneToOne: false
             referencedRelation: "countries_localized"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "talent_services_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "talent_forms"
             referencedColumns: ["id"]
           },
           {
@@ -1741,4 +2050,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

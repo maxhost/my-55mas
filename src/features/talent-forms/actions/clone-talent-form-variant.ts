@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { cloneFormVariantSchema } from '@/shared/lib/forms/schemas';
 import type { FormWithTranslations } from '@/shared/lib/forms/types';
-import { getForm } from './get-form';
+import { getTalentForm } from './get-talent-form';
 
 type CloneInput = {
   service_id: string;
@@ -12,7 +12,7 @@ type CloneInput = {
   target_city_id: string;
 };
 
-export async function cloneFormVariant(
+export async function cloneTalentFormVariant(
   input: CloneInput
 ): Promise<{ data?: FormWithTranslations; error?: string }> {
   const parsed = cloneFormVariantSchema.safeParse(input);
@@ -23,15 +23,13 @@ export async function cloneFormVariant(
   const { service_id, source_city_id, target_city_id } = parsed.data;
   const supabase = createClient();
 
-  // Load source form (no fallback — must exist exactly)
-  const source = await getForm(service_id, source_city_id, false);
+  const source = await getTalentForm(service_id, source_city_id, false);
   if (!source) {
     return { error: 'Source form not found' };
   }
 
-  // Create new form for the target city
   const { data: newForm, error: insertError } = await supabase
-    .from('service_forms')
+    .from('talent_forms')
     .insert({
       service_id,
       city_id: target_city_id,
@@ -42,7 +40,6 @@ export async function cloneFormVariant(
 
   if (insertError) throw insertError;
 
-  // Clone all translations
   const locales = Object.keys(source.translations);
   if (locales.length > 0) {
     const translationRows = locales.map((locale) => ({
@@ -54,13 +51,12 @@ export async function cloneFormVariant(
     }));
 
     const { error: transError } = await supabase
-      .from('service_form_translations')
+      .from('talent_form_translations')
       .insert(translationRows);
 
     if (transError) throw transError;
   }
 
-  // Return the new form with translations
-  revalidatePath('/[locale]/(admin)/admin/services', 'layout');
-  return { data: await getForm(service_id, target_city_id, false) ?? undefined };
+  revalidatePath('/[locale]/(admin)/admin/talent-forms', 'layout');
+  return { data: await getTalentForm(service_id, target_city_id, false) ?? undefined };
 }

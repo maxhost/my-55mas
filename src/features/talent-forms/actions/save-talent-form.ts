@@ -11,7 +11,7 @@ import {
   type SaveFormWithTranslationsInput,
 } from '@/shared/lib/forms/schemas';
 
-export async function saveForm(input: SaveFormInput) {
+export async function saveTalentForm(input: SaveFormInput) {
   const parsed = saveFormSchema.safeParse(input);
   if (!parsed.success) {
     return { error: parsed.error.flatten().fieldErrors };
@@ -20,12 +20,10 @@ export async function saveForm(input: SaveFormInput) {
   const { service_id, city_id, schema } = parsed.data;
   const supabase = createClient();
 
-  // Check if a form already exists for this service+city
   let query = supabase
-    .from('service_forms')
+    .from('talent_forms')
     .select('id, version')
     .eq('service_id', service_id)
-    .eq('is_active', true)
     .limit(1);
 
   if (city_id) {
@@ -37,9 +35,8 @@ export async function saveForm(input: SaveFormInput) {
   const { data: existing } = await query;
 
   if (existing && existing.length > 0) {
-    // Update existing form, increment version
     const { error } = await supabase
-      .from('service_forms')
+      .from('talent_forms')
       .update({
         schema,
         version: existing[0].version + 1,
@@ -51,9 +48,8 @@ export async function saveForm(input: SaveFormInput) {
     return { data: { id: existing[0].id } };
   }
 
-  // Create new form
   const { data: newForm, error } = await supabase
-    .from('service_forms')
+    .from('talent_forms')
     .insert({ service_id, city_id, schema })
     .select('id')
     .single();
@@ -62,7 +58,7 @@ export async function saveForm(input: SaveFormInput) {
   return { data: { id: newForm.id } };
 }
 
-export async function saveFormTranslations(input: SaveFormTranslationsInput) {
+export async function saveTalentFormTranslations(input: SaveFormTranslationsInput) {
   const parsed = saveFormTranslationsSchema.safeParse(input);
   if (!parsed.success) {
     return { error: parsed.error.flatten().fieldErrors };
@@ -71,7 +67,7 @@ export async function saveFormTranslations(input: SaveFormTranslationsInput) {
   const { form_id, locale, labels, placeholders, option_labels } = parsed.data;
   const supabase = createClient();
 
-  const { error } = await supabase.from('service_form_translations').upsert(
+  const { error } = await supabase.from('talent_form_translations').upsert(
     {
       form_id,
       locale,
@@ -87,7 +83,7 @@ export async function saveFormTranslations(input: SaveFormTranslationsInput) {
   return { data: { form_id, locale } };
 }
 
-export async function saveFormWithTranslations(
+export async function saveTalentFormWithTranslations(
   input: SaveFormWithTranslationsInput
 ) {
   const parsed = saveFormWithTranslationsSchema.safeParse(input);
@@ -98,14 +94,12 @@ export async function saveFormWithTranslations(
   const { service_id, city_id, schema, locale, labels, placeholders, option_labels } =
     parsed.data;
 
-  // Save schema (reuses existing saveForm logic)
-  const formResult = await saveForm({ service_id, city_id, schema });
+  const formResult = await saveTalentForm({ service_id, city_id, schema });
   if ('error' in formResult && formResult.error) return formResult;
 
   const formId = formResult.data!.id;
 
-  // Save translations for the active locale
-  const transResult = await saveFormTranslations({
+  const transResult = await saveTalentFormTranslations({
     form_id: formId,
     locale,
     labels,
@@ -114,6 +108,6 @@ export async function saveFormWithTranslations(
   });
   if ('error' in transResult && transResult.error) return transResult;
 
-  revalidatePath('/[locale]/(admin)/admin/services', 'layout');
+  revalidatePath('/[locale]/(admin)/admin/talent-forms', 'layout');
   return { data: { id: formId } };
 }
