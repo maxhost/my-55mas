@@ -60,7 +60,7 @@ Tab "Configuración" en la edición del servicio. Aquí el admin gestiona:
 
 ### Formularios y ciudades
 
-Los formularios siguen siendo por **país**, no por ciudad. Las ciudades solo afectan a la disponibilidad y el precio. El Form Builder muestra variantes por país.
+Los formularios de contratación son por **ciudad** (`service_forms.city_id` FK a `cities`). La tab Configuración determina qué ciudades están disponibles en el Form Builder: el selector jerárquico muestra las ciudades configuradas aquí como destinos para crear variantes de formulario.
 
 ### Estado del servicio
 
@@ -139,5 +139,5 @@ Nota: `country_id` se deriva de `cities.country_id` — sin denormalización.
 - [ ] No se puede publicar sin al menos 1 ciudad activa con precio > 0
 - [ ] El admin puede cambiar el estado del servicio
 - [ ] Archivar = soft delete (estado 'archived')
-- [ ] Los formularios siguen mostrando variantes por país (sin cambios)
+- [ ] Los formularios muestran variantes por ciudad (selector jerárquico País → Ciudad)
 - [ ] Build pasa sin errores

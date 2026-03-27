@@ -10,6 +10,7 @@ import type { FormStep, FormField, FormTranslationData } from '@/shared/lib/form
 import { sanitizeKey } from '@/shared/lib/forms/utils';
 import { FieldEditor } from './field-editor';
 import type { SubtypeGroupOption } from './subtype-field-config';
+import type { SurveyQuestionOption } from './survey-field-config';
 
 type Props = {
   step: FormStep;
@@ -17,6 +18,7 @@ type Props = {
   totalSteps: number;
   translations: FormTranslationData;
   subtypeGroups: SubtypeGroupOption[];
+  surveyQuestions: SurveyQuestionOption[];
   onChange: (step: FormStep) => void;
   onRemove: () => void;
   onMoveUp: () => void;
@@ -38,6 +40,7 @@ export function StepCard({
   totalSteps,
   translations,
   subtypeGroups,
+  surveyQuestions,
   onChange,
   onRemove,
   onMoveUp,
@@ -115,6 +118,7 @@ export function StepCard({
             placeholder={translations.placeholders[field.key] ?? ''}
             optionLabels={translations.option_labels}
             subtypeGroups={subtypeGroups}
+            surveyQuestions={surveyQuestions}
             onChange={(f) => updateField(fieldIndex, f)}
             onRemove={() => removeField(fieldIndex)}
             onMoveUp={() => onChange({ ...step, fields: swap(step.fields, fieldIndex, fieldIndex - 1) })}

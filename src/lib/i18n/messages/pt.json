@@ -30,6 +30,7 @@
     "services": "Serviços",
     "dashboard": "Dashboard",
     "talentServices": "Serviços Talento",
+    "talentRegistration": "Talento Formulário",
     "surveyQuestions": "Perguntas Estatísticas",
     "payments": "Pagamentos",
     "notifications": "Notificações"
@@ -131,7 +132,11 @@
     "noCitiesForCountry": "Não há cidades configuradas para este país",
     "saveError": "Erro ao salvar. Verifique as chaves dos campos.",
     "subtypeGroup": "Grupo de sub-tipo",
-    "selectGroup": "Selecionar grupo..."
+    "selectGroup": "Selecionar grupo...",
+    "survey": "Pergunta estatística",
+    "surveyFieldInfo": "Selecione uma pergunta estatística. Crie-as primeiro em Perguntas Estatísticas.",
+    "surveyQuestion": "Pergunta",
+    "selectQuestion": "Selecionar pergunta..."
   },
   "AdminTalentServices": {
     "title": "Serviços Talento",
@@ -173,6 +178,30 @@
     "scale_1_10": "Escala 1-10",
     "single_select": "Seleção única",
     "yes_no": "Sim / Não"
+  },
+  "AdminRegistration": {
+    "title": "Talento Formulário",
+    "description": "Crie e gerencie formulários de registro para talentos.",
+    "createForm": "Criar formulário",
+    "namePlaceholder": "Nome do formulário",
+    "noForms": "Nenhum formulário de registro criado.",
+    "formName": "Nome",
+    "variants": "Variantes",
+    "variantCount": "{count} variantes",
+    "generalOnly": "Apenas geral",
+    "created": "Criado",
+    "updated": "Atualizado",
+    "editForm": "Editar formulário",
+    "tabConfig": "Configuração",
+    "tabForm": "Formulário",
+    "configTitle": "Países e cidades",
+    "configDesc": "Configure em quais países e cidades este formulário estará disponível.",
+    "selectCountry": "Selecionar país",
+    "addCountry": "Adicionar país",
+    "active": "Ativo",
+    "noVariant": "Sem variante — crie a partir do designer",
+    "save": "Salvar",
+    "saving": "Salvando..."
   },
   "AdminSubtypes": {
     "title": "Sub-tipos",

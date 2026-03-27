@@ -62,7 +62,7 @@ Los nombres de los roles de staff (admin, manager, viewer) son editables desde e
 | 5 | Acceso del equipo interno | #1 | Login admin; middleware protege rutas `(admin)`; rol `admin` en DB |
 | 5.5 | Gestión de miembros | #5 | CRUD de miembros staff desde admin: invitar por email, asignar rol (`manager`/`viewer`), configurar país/ciudad; renombrar roles; trigger DB bloquea auto-asignación de roles staff |
 | 6 | Administración de servicios | #2, #5 | CRUD de servicios con país, precio orientativo, estado draft/publicado |
-| 7 | Constructor de formularios | #6 | Editor drag-and-drop de campos (text, select, date, file); schema JSON guardado por servicio |
+| 7 | Constructor de formularios | #6 | Editor de pasos y campos con flechas ↑↓ para reordenar (text, number, select, file); schema JSON guardado por servicio; variantes por ciudad con cascade |
 | 8 | Catálogo de servicios | #2, #6 | Lista pública filtrable por país; paginación; SSR |
 | 9 | Página de cada servicio | #8 | Detalle con descripción, precio, incluye, botón "Contratar"; SEO meta tags |
 | 10 | Formulario de contratación | #7, #9 | Renderiza formulario dinámico del servicio; captura contacto (email, nombre, teléfono, dirección); soporta guest (anon auth) y cliente registrado; fecha, horario, frecuencia; crea pedido en DB |

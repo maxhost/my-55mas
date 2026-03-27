@@ -1,26 +1,28 @@
-# Feature: Formularios de Talento
+# Feature: Formularios de Talento (talent-services)
 
 ## Resumen
 
-Sistema de formularios dinámicos para talentos, paralelo al sistema existente de formularios de servicio (cliente). Cuando un talento se registra para ofrecer un servicio, completa un formulario específico definido por el admin.
+Sistema de formularios dinámicos para talentos, paralelo al sistema de formularios de servicio (cliente). Cuando un talento se registra para ofrecer un servicio, completa un formulario específico definido por el admin. La lógica de cascade es idéntica a `features/forms/`: General + variantes por ciudad.
 
 ## Requisitos
 
 ### Funcionales
 
 1. **Formulario por servicio**: Cada servicio tiene un formulario de talento (separado del formulario del cliente)
-2. **Variantes por ciudad**: Misma lógica que service_forms — General + variantes por ciudad con cascade
+2. **Variantes por ciudad**: Igual que service_forms — General + variantes por ciudad con cascade
 3. **Traducciones**: Labels, placeholders, opciones por locale (es, pt, en, fr, ca)
-4. **Auto-creación**: Al publicar un servicio, se crea automáticamente un talent_form vacío
-5. **Creación manual**: El admin puede crear talent forms desde el panel
-6. **Campo sub-tipo**: Nuevo field type "subtype" que carga opciones de `service_subtypes`
-7. **Respuestas**: Se guardan en `talent_services.form_data` (JSONB) + `form_id` (snapshot)
+4. **Creación manual**: El admin crea talent forms desde `/admin/talent-services/`
+5. **Activación/desactivación**: El admin puede activar o desactivar un formulario
+6. **Respuestas**: Se guardan en `talent_services.form_data` (JSONB) + `form_id` (snapshot)
+7. **Campo sub-tipo**: Field type "subtype" que carga opciones de `service_subtypes` — **pendiente de implementar**
 
 ### No funcionales
 
-- Reutilizar componentes del form builder existente (movidos a `shared/`)
-- Aislar features: `features/talent-forms/` NO importa de `features/forms/`
+- Feature aislado en `features/talent-services/`
+- NO importa de `features/forms/` (cada feature tiene sus propios componentes)
 - Cada archivo < 300 LOC, feature total < 1500 LOC
+
+> **Auto-creación al publicar servicio: pendiente.** La spec original decía auto-crear un talent_form vacío al publicar un servicio. Esto NO está implementado: no existe trigger ni acción en `update-service.ts` para ello. La creación es manual desde `/admin/talent-services/`.
 
 ## Esquema DB
 
@@ -55,51 +57,51 @@ CREATE TABLE talent_form_translations (
 );
 ```
 
-### Cambios en talent_services
+### Columnas en talent_services (pendiente de migración)
+
+Las siguientes columnas están especificadas pero **aún no se han ejecutado en la DB**:
 
 ```sql
+-- PENDIENTE: ejecutar este ALTER TABLE
 ALTER TABLE talent_services ADD COLUMN form_data jsonb;
 ALTER TABLE talent_services ADD COLUMN form_id uuid
   REFERENCES talent_forms(id) ON DELETE SET NULL;
 ```
 
+Las tablas `talent_forms` y `talent_form_translations` SÍ existen en la DB. Los campos `form_data` y `form_id` en `talent_services` aún no.
+
 ## Arquitectura
 
-### Componentes compartidos (shared/)
-
-Los componentes del form builder se mueven de `features/forms/components/` a `shared/components/form-builder/` usando **callback injection** — reciben server actions como props:
+### Feature structure
 
 ```
-shared/components/form-builder/
-├── form-builder.tsx, form-builder-panel.tsx, step-card.tsx,
-├── field-editor.tsx, field-type-picker.tsx, field-options-editor.tsx,
-├── variant-selector.tsx, subtype-field-config.tsx
-
-shared/lib/forms/
-├── types.ts, schemas.ts, utils.ts, cascade-helpers.ts
-```
-
-### Feature talent-forms
-
-```
-features/talent-forms/
+features/talent-services/
 ├── index.ts
 ├── components/
-│   └── talent-form-builder.tsx    ← wrapper con talent actions
+│   ├── talent-service-builder.tsx    — Form builder para talent forms (usa misma lógica que FormBuilder)
+│   ├── talent-service-renderer.tsx   — Renderizado del formulario en el portal del talento
+│   └── talent-service-config.tsx     — Configuración del talent form (activar/desactivar, metadata)
 ├── actions/
-│   ├── get-talent-form.ts
-│   ├── save-talent-form.ts
-│   ├── list-talent-form-variants.ts
-│   ├── clone-talent-form-variant.ts
-│   └── cascade-talent-general-save.ts
+│   ├── get-talent-form.ts            — Carga talent form + traducciones
+│   ├── save-talent-form.ts           — Guarda schema y traducciones
+│   ├── list-talent-form-variants.ts  — Lista variantes activas con metadata ciudad/país
+│   ├── clone-talent-form-variant.ts  — Clona schema + traducciones de ciudad origen a destino
+│   ├── cascade-talent-general-save.ts— Guarda General + propaga cascade a todas las variantes
+│   ├── get-talent-service-form.ts    — Portal talento: carga el form correcto para un servicio
+│   ├── list-talent-services.ts       — Lista admin de servicios con talent forms
+│   ├── create-talent-service.ts      — Crea un talent form vacío para un servicio
+│   ├── save-talent-form-activation.ts— Toggle activo/inactivo de un talent form
+│   └── submit-talent-service.ts      — Submit del formulario desde el portal del talento
 └── __tests__/
 ```
 
 ### Admin UI
 
-- Lista: `/admin/talent-forms/` — tabla con servicio, estado, variantes
-- Editor: `/admin/talent-forms/[id]/` — 2 tabs: Configuración + Formulario
-- Auto-creación orquestada desde `services/[id]/page.tsx`
+- Lista: `/admin/talent-services/` — tabla con servicio, estado, variantes
+- Editor: `/admin/talent-services/[id]/` — 2 tabs: Configuración + Formulario
+- Creación manual desde la lista (no auto-creación al publicar servicio)
+
+**Distinción crítica (igual que `features/forms/`):** el componente `TalentServiceBuilder` llama a `cascadeTalentGeneralSave` si `cityId === null` y a `saveTalentFormWithTranslations` si `cityId !== null`.
 
 ## Cascade behavior
 
@@ -114,10 +116,11 @@ features/talent-forms/
 - [ ] Admin puede crear/editar talent form con pasos y campos
 - [ ] Variantes por ciudad funcionan con cascade (General → ciudades)
 - [ ] Traducciones por locale funcionan
-- [ ] Al publicar servicio, se auto-crea talent form vacío
-- [ ] Campo tipo "subtype" muestra opciones de service_subtypes
-- [ ] Talento puede completar el formulario desde su portal
-- [ ] Respuestas se guardan en talent_services.form_data
+- [ ] Admin puede activar/desactivar talent forms
+- [ ] Talento puede completar el formulario desde su portal (portal renderer)
+- [ ] Respuestas se guardan en talent_services.form_data (tras ejecutar ALTER TABLE)
 - [ ] Sub-tipos seleccionados se guardan en talent_service_subtypes
 - [ ] Build pasa: `NODE_ENV=production pnpm build`
 - [ ] Tests escritos y pasando
+- [ ] Auto-creación al publicar: pendiente de implementar
+- [ ] Field type "subtype": pendiente de implementar

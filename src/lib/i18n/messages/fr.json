@@ -30,6 +30,7 @@
     "services": "Services",
     "dashboard": "Tableau de bord",
     "talentServices": "Services Talent",
+    "talentRegistration": "Formulaire Talent",
     "surveyQuestions": "Questions Statistiques",
     "payments": "Paiements",
     "notifications": "Notifications"
@@ -131,7 +132,11 @@
     "noCitiesForCountry": "Aucune ville configurée pour ce pays",
     "saveError": "Erreur lors de la sauvegarde. Vérifiez les clés des champs.",
     "subtypeGroup": "Groupe de sous-type",
-    "selectGroup": "Sélectionner un groupe..."
+    "selectGroup": "Sélectionner un groupe...",
+    "survey": "Question statistique",
+    "surveyFieldInfo": "Sélectionnez une question statistique. Créez-les d'abord dans Questions Statistiques.",
+    "surveyQuestion": "Question",
+    "selectQuestion": "Sélectionner une question..."
   },
   "AdminTalentServices": {
     "title": "Services Talent",
@@ -173,6 +178,30 @@
     "scale_1_10": "Échelle 1-10",
     "single_select": "Sélection unique",
     "yes_no": "Oui / Non"
+  },
+  "AdminRegistration": {
+    "title": "Formulaire Talent",
+    "description": "Créez et gérez des formulaires d'inscription pour les talents.",
+    "createForm": "Créer un formulaire",
+    "namePlaceholder": "Nom du formulaire",
+    "noForms": "Aucun formulaire d'inscription créé.",
+    "formName": "Nom",
+    "variants": "Variantes",
+    "variantCount": "{count} variantes",
+    "generalOnly": "Général uniquement",
+    "created": "Créé",
+    "updated": "Mis à jour",
+    "editForm": "Modifier le formulaire",
+    "tabConfig": "Configuration",
+    "tabForm": "Formulaire",
+    "configTitle": "Pays et villes",
+    "configDesc": "Configurez dans quels pays et villes ce formulaire est disponible.",
+    "selectCountry": "Sélectionner un pays",
+    "addCountry": "Ajouter un pays",
+    "active": "Actif",
+    "noVariant": "Pas de variante — créez-en depuis le concepteur",
+    "save": "Enregistrer",
+    "saving": "Enregistrement..."
   },
   "AdminSubtypes": {
     "title": "Sous-types",

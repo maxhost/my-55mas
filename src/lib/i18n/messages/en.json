@@ -30,6 +30,7 @@
     "services": "Services",
     "dashboard": "Dashboard",
     "talentServices": "Talent Services",
+    "talentRegistration": "Talent Form",
     "surveyQuestions": "Survey Questions",
     "payments": "Payments",
     "notifications": "Notifications"
@@ -131,7 +132,11 @@
     "noCitiesForCountry": "No cities configured for this country",
     "saveError": "Error saving. Check field keys.",
     "subtypeGroup": "Subtype group",
-    "selectGroup": "Select group..."
+    "selectGroup": "Select group...",
+    "survey": "Survey question",
+    "surveyFieldInfo": "Select a survey question. Create them first in Survey Questions.",
+    "surveyQuestion": "Question",
+    "selectQuestion": "Select question..."
   },
   "AdminTalentServices": {
     "title": "Talent Services",
@@ -173,6 +178,30 @@
     "scale_1_10": "Scale 1-10",
     "single_select": "Single select",
     "yes_no": "Yes / No"
+  },
+  "AdminRegistration": {
+    "title": "Talent Form",
+    "description": "Create and manage registration forms for talents.",
+    "createForm": "Create form",
+    "namePlaceholder": "Form name",
+    "noForms": "No registration forms created.",
+    "formName": "Name",
+    "variants": "Variants",
+    "variantCount": "{count} variants",
+    "generalOnly": "General only",
+    "created": "Created",
+    "updated": "Updated",
+    "editForm": "Edit form",
+    "tabConfig": "Configuration",
+    "tabForm": "Form",
+    "configTitle": "Countries and cities",
+    "configDesc": "Configure which countries and cities this form is available in.",
+    "selectCountry": "Select country",
+    "addCountry": "Add country",
+    "active": "Active",
+    "noVariant": "No variant — create from the designer",
+    "save": "Save",
+    "saving": "Saving..."
   },
   "AdminSubtypes": {
     "title": "Subtypes",

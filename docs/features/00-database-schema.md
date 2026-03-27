@@ -35,6 +35,7 @@ Las tablas deben crearse en este orden para respetar dependencias de FK:
 8. `service_forms` + `service_form_translations` — depende de `services`, `countries`, `languages`
 9. `talent_profiles` + `talent_services` + `talent_analytics` + `service_subtype_groups` + `service_subtype_group_translations` + `service_subtypes` + `talent_service_subtypes` — depende de `profiles`, `countries`, `cities`, `services`, `languages`
 9.5. `talent_forms` + `talent_form_translations` — depende de `services`, `cities`, `languages`
+9.6. `registration_forms` + `registration_form_translations` + `registration_form_countries` + `registration_form_cities` — depende de `cities`, `countries`, `languages`
 10. `orders` + tablas relacionadas — depende de `profiles`, `services`, `countries`, `cities`, `service_forms`
 11. Triggers
 12. `ENABLE ROW LEVEL SECURITY`
@@ -647,6 +648,54 @@ CREATE TABLE talent_form_translations (
 ```
 
 Resolución del formulario: misma lógica que service_forms (city_id específico → fallback a NULL).
+
+---
+
+## Capa 6.7 — Formularios de registro de talentos
+
+Formularios dinámicos para el registro/onboarding de talentos. No atados a un servicio.
+Agrupados por slug, con variantes por ciudad (parent_id → General).
+
+```sql
+CREATE TABLE registration_forms (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug        text NOT NULL,
+  name        text NOT NULL,
+  city_id     uuid REFERENCES cities(id),
+  parent_id   uuid REFERENCES registration_forms(id) ON DELETE CASCADE,
+  schema      jsonb NOT NULL DEFAULT '{"steps": []}',
+  version     int NOT NULL DEFAULT 1,
+  is_active   boolean NOT NULL DEFAULT true,
+  created_at  timestamptz DEFAULT now(),
+  updated_at  timestamptz DEFAULT now(),
+  UNIQUE NULLS NOT DISTINCT (slug, city_id, version)
+);
+
+CREATE TABLE registration_form_translations (
+  form_id      uuid NOT NULL REFERENCES registration_forms(id) ON DELETE CASCADE,
+  locale       text NOT NULL REFERENCES languages(code),
+  labels       jsonb NOT NULL DEFAULT '{}',
+  placeholders jsonb NOT NULL DEFAULT '{}',
+  option_labels jsonb,
+  created_at   timestamptz DEFAULT now(),
+  updated_at   timestamptz DEFAULT now(),
+  PRIMARY KEY (form_id, locale)
+);
+
+CREATE TABLE registration_form_countries (
+  form_id     uuid NOT NULL REFERENCES registration_forms(id) ON DELETE CASCADE,
+  country_id  uuid NOT NULL REFERENCES countries(id) ON DELETE CASCADE,
+  created_at  timestamptz DEFAULT now(),
+  PRIMARY KEY (form_id, country_id)
+);
+
+CREATE TABLE registration_form_cities (
+  form_id     uuid NOT NULL REFERENCES registration_forms(id) ON DELETE CASCADE,
+  city_id     uuid NOT NULL REFERENCES cities(id) ON DELETE CASCADE,
+  created_at  timestamptz DEFAULT now(),
+  PRIMARY KEY (form_id, city_id)
+);
+```
 
 ---
 

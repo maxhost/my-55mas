@@ -16,6 +16,7 @@ import type {
 import type { SaveFormWithTranslationsInput } from '@/shared/lib/forms/schemas';
 import { StepCard } from './step-card';
 import type { SubtypeGroupOption } from './subtype-field-config';
+import type { SurveyQuestionOption } from './survey-field-config';
 
 type Props = {
   serviceId: string;
@@ -23,6 +24,7 @@ type Props = {
   form: FormWithTranslations | null;
   activeLocale: string;
   subtypeGroups: SubtypeGroupOption[];
+  surveyQuestions: SurveyQuestionOption[];
   onSaved?: (form: FormWithTranslations) => void;
   // Callbacks — injected by feature wrapper
   onSave: (input: SaveFormWithTranslationsInput) => Promise<SaveFormResult>;
@@ -50,7 +52,7 @@ function initTranslations(
 }
 
 export function FormBuilder({
-  serviceId, cityId, form, activeLocale, subtypeGroups, onSaved, onSave, onGetForm,
+  serviceId, cityId, form, activeLocale, subtypeGroups, surveyQuestions, onSaved, onSave, onGetForm,
 }: Props) {
   const t = useTranslations('AdminFormBuilder');
   const tc = useTranslations('Common');
@@ -148,6 +150,7 @@ export function FormBuilder({
           totalSteps={schema.steps.length}
           translations={current}
           subtypeGroups={subtypeGroups}
+          surveyQuestions={surveyQuestions}
           onChange={(s) => updateStep(index, s)}
           onRemove={() => removeStep(index)}
           onMoveUp={() => setSchema({ steps: swap(schema.steps, index, index - 1) })}

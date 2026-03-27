@@ -656,6 +656,192 @@ export type Database = {
           },
         ]
       }
+      registration_form_cities: {
+        Row: {
+          city_id: string
+          created_at: string | null
+          form_id: string
+        }
+        Insert: {
+          city_id: string
+          created_at?: string | null
+          form_id: string
+        }
+        Update: {
+          city_id?: string
+          created_at?: string | null
+          form_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registration_form_cities_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registration_form_cities_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities_localized"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registration_form_cities_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "registration_forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      registration_form_countries: {
+        Row: {
+          country_id: string
+          created_at: string | null
+          form_id: string
+        }
+        Insert: {
+          country_id: string
+          created_at?: string | null
+          form_id: string
+        }
+        Update: {
+          country_id?: string
+          created_at?: string | null
+          form_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registration_form_countries_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registration_form_countries_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries_localized"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registration_form_countries_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "registration_forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      registration_form_translations: {
+        Row: {
+          created_at: string | null
+          form_id: string
+          labels: Json
+          locale: string
+          option_labels: Json | null
+          placeholders: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          form_id: string
+          labels?: Json
+          locale: string
+          option_labels?: Json | null
+          placeholders?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          form_id?: string
+          labels?: Json
+          locale?: string
+          option_labels?: Json | null
+          placeholders?: Json
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registration_form_translations_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "registration_forms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registration_form_translations_locale_fkey"
+            columns: ["locale"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      registration_forms: {
+        Row: {
+          city_id: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean
+          name: string
+          parent_id: string | null
+          schema: Json
+          slug: string
+          updated_at: string | null
+          version: number
+        }
+        Insert: {
+          city_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          parent_id?: string | null
+          schema?: Json
+          slug: string
+          updated_at?: string | null
+          version?: number
+        }
+        Update: {
+          city_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          parent_id?: string | null
+          schema?: Json
+          slug?: string
+          updated_at?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registration_forms_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registration_forms_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities_localized"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registration_forms_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "registration_forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_cities: {
         Row: {
           base_price: number

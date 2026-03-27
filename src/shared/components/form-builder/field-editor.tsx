@@ -10,6 +10,7 @@ import { sanitizeKey } from '@/shared/lib/forms/utils';
 import { FieldTypePicker } from './field-type-picker';
 import { FieldOptionsEditor } from './field-options-editor';
 import { SubtypeFieldConfig, type SubtypeGroupOption } from './subtype-field-config';
+import { SurveyFieldConfig, type SurveyQuestionOption } from './survey-field-config';
 
 type Props = {
   field: FormField;
@@ -19,6 +20,7 @@ type Props = {
   placeholder: string;
   optionLabels: Record<string, string>;
   subtypeGroups: SubtypeGroupOption[];
+  surveyQuestions: SurveyQuestionOption[];
   onChange: (field: FormField) => void;
   onRemove: () => void;
   onMoveUp: () => void;
@@ -36,6 +38,7 @@ export function FieldEditor({
   placeholder,
   optionLabels,
   subtypeGroups,
+  surveyQuestions,
   onChange,
   onRemove,
   onMoveUp,
@@ -142,6 +145,13 @@ export function FieldEditor({
           subtypeGroups={subtypeGroups}
           selectedGroup={field.subtype_group}
           onGroupChange={(slug) => onChange({ ...field, subtype_group: slug || undefined })}
+        />
+      )}
+      {field.type === 'survey' && (
+        <SurveyFieldConfig
+          surveyQuestions={surveyQuestions}
+          selectedQuestion={field.survey_question_key}
+          onQuestionChange={(key) => onChange({ ...field, survey_question_key: key || undefined })}
         />
       )}
     </div>

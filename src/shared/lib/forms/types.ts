@@ -9,6 +9,7 @@ export const FIELD_TYPES = [
   'multiselect',
   'file',
   'subtype',
+  'survey',
 ] as const;
 
 export type FieldType = (typeof FIELD_TYPES)[number];
@@ -26,6 +27,7 @@ export type FormField = {
   required: boolean;
   options?: string[];
   subtype_group?: string; // slug del grupo (solo para type === 'subtype')
+  survey_question_key?: string; // key de survey_questions (solo para type === 'survey')
 };
 
 export type FormStep = {

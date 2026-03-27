@@ -17,6 +17,8 @@ export const formFieldSchema = z
     type: z.enum(FIELD_TYPES),
     required: z.boolean().default(false),
     options: z.array(z.string().min(1).max(100)).optional(),
+    subtype_group: z.string().optional(),
+    survey_question_key: z.string().optional(),
   })
   .refine(
     (field) => {

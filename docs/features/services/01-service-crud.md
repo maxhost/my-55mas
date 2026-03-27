@@ -44,11 +44,12 @@ Al guardar: se crea `services` + `service_translations` (locale 'es') + redirect
 
 ### Editar servicio (`/admin/services/[id]`)
 
-Tres tabs:
+Cuatro tabs:
 
 1. **Contenido** — Datos multi-idioma (ver campos abajo)
-2. **Formulario** — Form builder (spec en `02-form-builder.md`)
-3. **Configuración** — Países y precios (spec en `03-configuration.md`)
+2. **Configuración** — Países, precios por ciudad, estado (spec en `03-configuration.md`)
+3. **Formulario** — Form builder (spec en `02-form-builder.md`)
+4. **Sub-tipos** — Grupos e ítems de sub-tipos (spec en `../../subtypes.md`)
 
 ### Archivar servicio
 

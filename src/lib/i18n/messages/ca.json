@@ -30,6 +30,7 @@
     "services": "Serveis",
     "dashboard": "Tauler",
     "talentServices": "Serveis Talent",
+    "talentRegistration": "Formulari Talent",
     "surveyQuestions": "Preguntes Estadístiques",
     "payments": "Pagaments",
     "notifications": "Notificacions"
@@ -131,7 +132,11 @@
     "noCitiesForCountry": "No hi ha ciutats configurades per a aquest país",
     "saveError": "Error en desar. Verifiqueu les claus dels camps.",
     "subtypeGroup": "Grup de subtipus",
-    "selectGroup": "Seleccionar grup..."
+    "selectGroup": "Seleccionar grup...",
+    "survey": "Pregunta estadística",
+    "surveyFieldInfo": "Seleccioneu una pregunta estadística. Creeu-les primer a Preguntes Estadístiques.",
+    "surveyQuestion": "Pregunta",
+    "selectQuestion": "Seleccionar pregunta..."
   },
   "AdminTalentServices": {
     "title": "Serveis Talent",
@@ -173,6 +178,30 @@
     "scale_1_10": "Escala 1-10",
     "single_select": "Selecció única",
     "yes_no": "Sí / No"
+  },
+  "AdminRegistration": {
+    "title": "Formulari Talent",
+    "description": "Creeu i gestioneu formularis de registre per a talents.",
+    "createForm": "Crear formulari",
+    "namePlaceholder": "Nom del formulari",
+    "noForms": "No hi ha formularis de registre creats.",
+    "formName": "Nom",
+    "variants": "Variants",
+    "variantCount": "{count} variants",
+    "generalOnly": "Només general",
+    "created": "Creat",
+    "updated": "Actualitzat",
+    "editForm": "Editar formulari",
+    "tabConfig": "Configuració",
+    "tabForm": "Formulari",
+    "configTitle": "Països i ciutats",
+    "configDesc": "Configureu en quins països i ciutats estarà disponible aquest formulari.",
+    "selectCountry": "Seleccionar país",
+    "addCountry": "Afegir país",
+    "active": "Actiu",
+    "noVariant": "Sense variant — creeu-la des del dissenyador",
+    "save": "Desar",
+    "saving": "Desant..."
   },
   "AdminSubtypes": {
     "title": "Subtipus",

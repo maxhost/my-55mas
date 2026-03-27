@@ -16,6 +16,7 @@ import type { SaveFormWithTranslationsInput } from '@/shared/lib/forms/schemas';
 import { VariantSelector } from './variant-selector';
 import { FormBuilder } from './form-builder';
 import type { SubtypeGroupOption } from './subtype-field-config';
+import type { SurveyQuestionOption } from './survey-field-config';
 
 type Props = {
   serviceId: string;
@@ -24,6 +25,7 @@ type Props = {
   serviceCountries: FormCountryOption[];
   serviceCities: FormCityOption[];
   subtypeGroups?: SubtypeGroupOption[];
+  surveyQuestions?: SurveyQuestionOption[];
   // Callbacks — injected by feature wrapper
   onGetForm: (serviceId: string, cityId: string | null, fallback?: boolean) => Promise<FormWithTranslations | null>;
   onCloneVariant: (input: { service_id: string; source_city_id: string | null; target_city_id: string }) => Promise<CloneFormResult>;
@@ -37,6 +39,7 @@ export function FormBuilderPanel({
   serviceCountries,
   serviceCities,
   subtypeGroups,
+  surveyQuestions,
   onGetForm,
   onCloneVariant,
   onSave,
@@ -149,6 +152,7 @@ export function FormBuilderPanel({
           form={formData}
           activeLocale={activeLocale}
           subtypeGroups={subtypeGroups ?? []}
+          surveyQuestions={surveyQuestions ?? []}
           onSaved={setFormData}
           onSave={onSave}
           onGetForm={handleGetForm}
