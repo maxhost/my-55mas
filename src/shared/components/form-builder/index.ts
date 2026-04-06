@@ -6,3 +6,4 @@ export { FieldTypePicker } from './field-type-picker';
 export { FieldOptionsEditor } from './field-options-editor';
 export { VariantSelector } from './variant-selector';
 export { SubtypeFieldConfig } from './subtype-field-config';
+export { DbColumnFieldConfig } from './db-column-field-config';

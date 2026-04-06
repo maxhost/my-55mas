@@ -24,6 +24,7 @@ function toSharedForm(form: RegistrationFormWithTranslations): FormWithTranslati
 
 type Props = {
   formSlug: string;
+  targetRole: 'talent' | 'client';
   form: RegistrationFormWithTranslations | null;
   formVariants: FormVariantSummary[];
   serviceCountries: FormCountryOption[];
@@ -32,8 +33,11 @@ type Props = {
 };
 
 export function RegistrationFormBuilder({
-  formSlug, form, formVariants, serviceCountries, serviceCities, surveyQuestions,
+  formSlug, targetRole, form, formVariants, serviceCountries, serviceCities, surveyQuestions,
 }: Props) {
+  const allowedTables = targetRole === 'client'
+    ? ['profiles', 'client_profiles', 'auth']
+    : ['profiles', 'talent_profiles', 'auth'];
   const handleGetForm = async (
     slug: string, cityId: string | null, fallback?: boolean
   ): Promise<FormWithTranslations | null> => {
@@ -77,6 +81,7 @@ export function RegistrationFormBuilder({
       serviceCountries={serviceCountries}
       serviceCities={serviceCities}
       surveyQuestions={surveyQuestions}
+      allowedTables={allowedTables}
       onGetForm={handleGetForm}
       onCloneVariant={handleClone}
       onSave={handleSave}

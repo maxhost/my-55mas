@@ -17,7 +17,7 @@ export function FieldTypePicker({ value, onChange }: Props) {
       onChange={(e) => onChange(e.target.value as FieldType)}
       className="border-border bg-background h-8 rounded-md border px-2 text-sm"
     >
-      {FIELD_TYPES.map((type) => (
+      {FIELD_TYPES.filter((type) => type !== 'password').map((type) => (
         <option key={type} value={type}>
           {t(type)}
         </option>

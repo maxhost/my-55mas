@@ -6,6 +6,7 @@ export type RegistrationForm = {
   id: string;
   slug: string;
   name: string;
+  target_role: 'talent' | 'client';
   city_id: string | null;
   parent_id: string | null;
   schema: FormSchema;
@@ -23,6 +24,7 @@ export type RegistrationFormListItem = {
   id: string;
   name: string;
   slug: string;
+  target_role: 'talent' | 'client';
   variant_count: number;
   created_at: string | null;
   updated_at: string | null;

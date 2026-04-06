@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ArrowUp, ArrowDown, X, Plus } from 'lucide-react';
 import type { FormStep, FormField, FormTranslationData } from '@/shared/lib/forms/types';
-import { sanitizeKey } from '@/shared/lib/forms/utils';
 import { FieldEditor } from './field-editor';
 import { StepActionEditor } from './step-action-editor';
 import type { SubtypeGroupOption } from './subtype-field-config';
@@ -20,6 +19,7 @@ type Props = {
   translations: FormTranslationData;
   subtypeGroups: SubtypeGroupOption[];
   surveyQuestions: SurveyQuestionOption[];
+  allowedTables?: string[];
   onChange: (step: FormStep) => void;
   onRemove: () => void;
   onMoveUp: () => void;
@@ -42,6 +42,7 @@ export function StepCard({
   translations,
   subtypeGroups,
   surveyQuestions,
+  allowedTables,
   onChange,
   onRemove,
   onMoveUp,
@@ -55,8 +56,8 @@ export function StepCard({
   const addField = () => {
     const existingKeys = new Set(step.fields.map((f) => f.key));
     let idx = step.fields.length + 1;
-    while (existingKeys.has(`field_${idx}`)) idx++;
-    const newField: FormField = { key: `field_${idx}`, type: 'text', required: false };
+    while (existingKeys.has(`${step.key}_field_${idx}`)) idx++;
+    const newField: FormField = { key: `${step.key}_field_${idx}`, type: 'text', required: false };
     onChange({ ...step, fields: [...step.fields, newField] });
   };
 
@@ -74,12 +75,9 @@ export function StepCard({
         <span className="text-muted-foreground text-sm font-medium">
           {t('stepTitle', { number: stepIndex + 1 })}
         </span>
-        <Input
-          value={step.key}
-          onChange={(e) => onChange({ ...step, key: sanitizeKey(e.target.value) })}
-          placeholder={t('stepKey')}
-          className="h-8 w-40 text-sm"
-        />
+        <span className="text-muted-foreground rounded bg-muted px-2 py-1 font-mono text-xs">
+          {step.key}
+        </span>
         <div className="ml-auto flex gap-0.5">
           <Button type="button" variant="ghost" size="icon-xs" onClick={onMoveUp} disabled={stepIndex === 0}>
             <ArrowUp />
@@ -120,6 +118,7 @@ export function StepCard({
             optionLabels={translations.option_labels}
             subtypeGroups={subtypeGroups}
             surveyQuestions={surveyQuestions}
+            allowedTables={allowedTables}
             onChange={(f) => updateField(fieldIndex, f)}
             onRemove={() => removeField(fieldIndex)}
             onMoveUp={() => onChange({ ...step, fields: swap(step.fields, fieldIndex, fieldIndex - 1) })}
@@ -139,6 +138,7 @@ export function StepCard({
         <StepActionEditor
           actions={step.actions ?? []}
           stepIndex={stepIndex}
+          stepKey={step.key}
           translations={translations}
           onChange={(actions) => onChange({ ...step, actions })}
           onLabelChange={onLabelChange}

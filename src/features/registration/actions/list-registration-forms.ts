@@ -13,7 +13,7 @@ export async function listRegistrationForms(): Promise<RegistrationFormListItem[
   // Only General forms (city_id IS NULL, parent_id IS NULL)
   const { data: forms, error } = await supabase
     .from('registration_forms')
-    .select('id, name, slug, created_at, updated_at')
+    .select('id, name, slug, target_role, created_at, updated_at')
     .is('city_id', null)
     .is('parent_id', null)
     .order('created_at', { ascending: false });
@@ -39,6 +39,7 @@ export async function listRegistrationForms(): Promise<RegistrationFormListItem[
     id: f.id,
     name: f.name,
     slug: f.slug,
+    target_role: (f.target_role as 'talent' | 'client') ?? 'talent',
     variant_count: variantCountMap.get(f.slug) ?? 0,
     created_at: f.created_at,
     updated_at: f.updated_at,

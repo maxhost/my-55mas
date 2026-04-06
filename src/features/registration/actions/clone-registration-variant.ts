@@ -32,6 +32,7 @@ export async function cloneRegistrationVariant(
     .insert({
       slug,
       name: source.name,
+      target_role: source.target_role,
       city_id: target_city_id,
       parent_id: generalId,
       schema: JSON.parse(JSON.stringify(source.schema)),

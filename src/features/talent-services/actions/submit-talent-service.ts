@@ -3,6 +3,9 @@
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import type { Json } from '@/lib/supabase/database.types';
+import { extractMappedFields } from '@/shared/lib/forms/extract-mapped-fields';
+
+import type { FormSchema } from '@/shared/lib/forms/types';
 
 type SubmitInput = {
   talent_id: string;
@@ -10,6 +13,7 @@ type SubmitInput = {
   country_id: string;
   form_id: string;
   form_data: Record<string, unknown>;
+  form_schema: FormSchema;
   subtype_ids: string[];
 };
 
@@ -19,7 +23,7 @@ type SubmitInput = {
  * 2. Syncs talent_service_subtypes (delete old + insert new)
  */
 export async function submitTalentService(input: SubmitInput) {
-  const { talent_id, service_id, country_id, form_id, form_data, subtype_ids } = input;
+  const { talent_id, service_id, country_id, form_id, form_data, form_schema, subtype_ids } = input;
   const supabase = createClient();
 
   // 1. Update talent_services with form data
@@ -35,7 +39,19 @@ export async function submitTalentService(input: SubmitInput) {
 
   if (updateError) return { error: { _db: [updateError.message] } };
 
-  // 2. Sync subtypes: delete existing + insert new
+  // 2. Extract db_column mapped fields and update talent_profiles if any
+  const mapped = extractMappedFields(form_schema, form_data);
+  const tpData = mapped.talent_profiles;
+  if (tpData && Object.keys(tpData).length > 0) {
+    const { error: tpError } = await supabase
+      .from('talent_profiles')
+      .update(tpData)
+      .eq('user_id', talent_id);
+
+    if (tpError) return { error: { _db: [tpError.message] } };
+  }
+
+  // 3. Sync subtypes: delete existing + insert new
   const { error: deleteError } = await supabase
     .from('talent_service_subtypes')
     .delete()

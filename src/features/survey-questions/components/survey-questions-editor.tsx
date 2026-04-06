@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus } from 'lucide-react';
 import { locales } from '@/lib/i18n/config';
 import { saveSurveyQuestions } from '../actions/save-survey-questions';
+import { sanitizeSurveyOptionLabels } from '../sanitize-option-labels';
 import type { SurveyQuestionWithTranslations, SurveyQuestionInput } from '../types';
 import { SurveyQuestionCard } from './survey-question-card';
 
@@ -16,7 +17,7 @@ type Props = {
 };
 
 function toInput(q: SurveyQuestionWithTranslations): SurveyQuestionInput {
-  return {
+  return sanitizeSurveyOptionLabels({
     id: q.id,
     key: q.key,
     response_type: q.response_type,
@@ -26,7 +27,7 @@ function toInput(q: SurveyQuestionWithTranslations): SurveyQuestionInput {
     translations: Object.fromEntries(
       Object.entries(q.translations).map(([locale, t]) => [locale, { ...t }])
     ),
-  };
+  });
 }
 
 export function SurveyQuestionsEditor({ initialQuestions }: Props) {
@@ -40,7 +41,9 @@ export function SurveyQuestionsEditor({ initialQuestions }: Props) {
   const primaryLocale = locales[0];
 
   const addQuestion = () => {
-    const idx = questions.length + 1;
+    const existingKeys = new Set(questions.map((q) => q.key));
+    let idx = questions.length + 1;
+    while (existingKeys.has(`question_${idx}`)) idx++;
     setQuestions([
       ...questions,
       {
@@ -55,7 +58,7 @@ export function SurveyQuestionsEditor({ initialQuestions }: Props) {
   };
 
   const updateQuestion = (index: number, question: SurveyQuestionInput) => {
-    setQuestions(questions.map((q, i) => (i === index ? question : q)));
+    setQuestions(questions.map((q, i) => (i === index ? sanitizeSurveyOptionLabels(question) : q)));
   };
 
   const removeQuestion = (index: number) => {
@@ -63,7 +66,10 @@ export function SurveyQuestionsEditor({ initialQuestions }: Props) {
   };
 
   const handleSave = () => {
-    const normalized = questions.map((q, i) => ({ ...q, sort_order: i }));
+    const normalized = questions.map((q, i) =>
+      sanitizeSurveyOptionLabels({ ...q, sort_order: i })
+    );
+    setQuestions(normalized);
 
     startTransition(async () => {
       const result = await saveSurveyQuestions({ questions: normalized });

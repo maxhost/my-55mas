@@ -33,7 +33,7 @@ Las tablas deben crearse en este orden para respetar dependencias de FK:
 6. `categories` + `category_translations` — depende de `languages`
 7. `services` + `service_translations` + `service_countries` — depende de `countries`, `languages`
 8. `service_forms` + `service_form_translations` — depende de `services`, `countries`, `languages`
-9. `talent_profiles` + `talent_services` + `talent_analytics` + `service_subtype_groups` + `service_subtype_group_translations` + `service_subtypes` + `talent_service_subtypes` — depende de `profiles`, `countries`, `cities`, `services`, `languages`
+9. `talent_profiles` + `client_profiles` + `talent_services` + `talent_analytics` + `service_subtype_groups` + `service_subtype_group_translations` + `service_subtypes` + `talent_service_subtypes` — depende de `profiles`, `countries`, `cities`, `services`, `languages`
 9.5. `talent_forms` + `talent_form_translations` — depende de `services`, `cities`, `languages`
 9.6. `registration_forms` + `registration_form_translations` + `registration_form_countries` + `registration_form_cities` — depende de `cities`, `countries`, `languages`
 10. `orders` + tablas relacionadas — depende de `profiles`, `services`, `countries`, `cities`, `service_forms`
@@ -211,6 +211,7 @@ CREATE TABLE profiles (
   avatar_url        text,
   preferred_locale  text DEFAULT 'es' REFERENCES languages(code),
   preferred_country uuid REFERENCES countries(id),
+  preferred_city    uuid REFERENCES cities(id),
   active_role       text NOT NULL DEFAULT 'client'
                     CHECK (active_role IN ('client', 'talent', 'admin', 'manager', 'viewer')),
   nif               text,                  -- Tax ID (NIF en PT, DNI/CIF en ES). Compartido: clientes y talentos
@@ -263,6 +264,62 @@ Consistencia enforceada por:
 > - Managers/Viewers: chequear `user_roles` + JOIN `staff_role_scopes` para filtrar por scope
 > - Clients: `client_id = auth.uid()`
 > - Talents: `talent_id` via `talent_profiles.user_id = auth.uid()`
+
+---
+
+## Capa 2a — Perfiles de staff
+
+Datos específicos del rol staff (nombre/apellido separados). Análogo a `talent_profiles` y `client_profiles`.
+
+```sql
+CREATE TABLE staff_profiles (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     uuid NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
+  first_name  text NOT NULL,
+  last_name   text NOT NULL,
+  created_at  timestamptz DEFAULT now(),
+  updated_at  timestamptz DEFAULT now()
+);
+```
+
+Trigger `sync_full_name`: auto-actualiza `profiles.full_name = first_name || ' ' || last_name` en cada INSERT/UPDATE.
+
+---
+
+## Capa 2b — Equipos de trabajo
+
+Agrupación organizativa de miembros del staff. Un equipo (ej: "Marketing", "Customer Success") puede tener múltiples miembros, y un miembro puede pertenecer a múltiples equipos. Solo usuarios con rol staff (admin/manager/viewer) pueden ser miembros.
+
+```sql
+CREATE TABLE teams (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        text NOT NULL UNIQUE,
+  description text,
+  is_active   boolean NOT NULL DEFAULT true,
+  created_by  uuid REFERENCES profiles(id) ON DELETE SET NULL,
+  created_at  timestamptz DEFAULT now(),
+  updated_at  timestamptz DEFAULT now()
+);
+
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON teams
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+CREATE TABLE team_members (
+  team_id    uuid NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+  user_id    uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  added_by   uuid REFERENCES profiles(id) ON DELETE SET NULL,
+  created_at timestamptz DEFAULT now(),
+  PRIMARY KEY (team_id, user_id)
+);
+
+CREATE INDEX idx_team_members_user_id ON team_members(user_id);
+```
+
+Triggers de integridad:
+- `ensure_team_member_is_staff` — BEFORE INSERT/UPDATE en team_members: valida que user_id tenga rol staff en user_roles
+- `cleanup_team_members_on_role_loss` — AFTER DELETE en user_roles: elimina de team_members si el usuario pierde su último rol staff
+
+Nombres de equipo sin traducción (fijos en todos los idiomas). Auditoría via `created_by` (equipo) y `added_by` (membresía).
 
 ---
 
@@ -464,6 +521,27 @@ CREATE TABLE talent_profiles (
     OR (country_id IS NOT NULL AND city_id IS NOT NULL)
   )
 );
+
+--- 
+
+## Capa 6b — Cliente
+
+```sql
+CREATE TABLE client_profiles (
+  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id        uuid NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
+  company_name   text,                  -- Nombre de la empresa (si aplica)
+  company_tax_id text,                  -- CIF/NIF de la empresa
+  status         text NOT NULL DEFAULT 'active'
+                 CHECK (status IN ('active', 'suspended')),
+  created_at     timestamptz DEFAULT now(),
+  updated_at     timestamptz DEFAULT now()
+);
+```
+
+`client_profiles` es análogo a `talent_profiles`: datos específicos del rol cliente. Se crea automáticamente al registrar un usuario con `target_role = 'client'` desde un formulario de registro. Un cliente puede representar a una empresa con identificadores propios.
+
+---
 
 CREATE TABLE talent_profile_translations (
   talent_id   uuid NOT NULL REFERENCES talent_profiles(id) ON DELETE CASCADE,
@@ -902,9 +980,9 @@ DECLARE
 BEGIN
   _role := COALESCE(NEW.raw_user_meta_data->>'role', 'client');
 
-  -- Solo client y talent pueden auto-registrarse.
-  -- admin/manager/viewer se otorgan manualmente desde el panel de gestión de miembros.
-  IF _role NOT IN ('client', 'talent') THEN
+  -- Acepta los 5 roles válidos. Solo fuerza 'client' si el rol es inválido.
+  -- Staff (admin/manager/viewer) se crea vía inviteUserByEmail desde el admin panel.
+  IF _role NOT IN ('client', 'talent', 'admin', 'manager', 'viewer') THEN
     _role := 'client';
   END IF;
 

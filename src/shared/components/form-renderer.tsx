@@ -1,16 +1,23 @@
 'use client';
 
 import { type ReactNode, useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import type {
-  FormWithTranslations,
+  FormSchema,
   FormField,
   FormTranslationData,
   StepAction,
+  SurveyQuestionRenderData,
 } from '@/shared/lib/forms/types';
+import {
+  renderBoolean,
+  renderMultilineText,
+  renderSingleSelect,
+  renderMultiselect,
+  renderSurveyField,
+  renderDbColumn,
+  renderDefaultInput,
+} from './field-renderers';
 
 // ── Types ────────────────────────────────────────────
 
@@ -19,14 +26,20 @@ export type SubmitMeta = {
   redirect_url?: string;
 };
 
+type FormLike = {
+  schema: FormSchema;
+  translations: Record<string, FormTranslationData>;
+};
+
 type Props = {
-  form: FormWithTranslations;
+  form: FormLike;
   locale: string;
   initialData?: Record<string, unknown>;
   onSubmit: (formData: Record<string, unknown>, meta?: SubmitMeta) => void;
   submitLabel?: string;
   isPending?: boolean;
   selectPlaceholder?: string;
+  surveyQuestions?: Record<string, SurveyQuestionRenderData>;
   renderCustomField?: (
     field: FormField,
     trans: FormTranslationData,
@@ -43,6 +56,7 @@ export function FormRenderer({
   submitLabel,
   isPending = false,
   selectPlaceholder = '',
+  surveyQuestions,
   renderCustomField,
 }: Props) {
   const [data, setData] = useState<Record<string, unknown>>(initialData ?? {});
@@ -63,8 +77,6 @@ export function FormRenderer({
     });
   };
 
-  // ── Validation ───────────────────────────────────
-
   const validateStep = (step: (typeof steps)[number]): boolean => {
     const missing = new Set<string>();
     for (const field of step.fields) {
@@ -77,8 +89,6 @@ export function FormRenderer({
     setErrors(missing);
     return missing.size === 0;
   };
-
-  // ── Action handlers ──────────────────────────────
 
   const handleAction = (action: StepAction) => {
     if (action.type === 'back') {
@@ -95,15 +105,12 @@ export function FormRenderer({
       return;
     }
 
-    // submit or register
     const meta: SubmitMeta = {
       action: action.type === 'register' ? 'register' : 'save',
       redirect_url: action.redirect_url,
     };
     onSubmit(data, meta);
   };
-
-  // ── Field rendering ──────────────────────────────
 
   const renderField = (field: FormField) => {
     if (renderCustomField) {
@@ -115,108 +122,21 @@ export function FormRenderer({
     const placeholder = trans.placeholders[field.key] ?? '';
     const hasError = errors.has(field.key);
     const errorClass = hasError ? 'border-destructive' : '';
+    const base = { field, value: data[field.key], label, placeholder, errorClass, isRequired: field.required, onChange: setValue };
+    const selectBase = { ...base, optionLabels: trans.option_labels, selectPlaceholder };
 
-    if (field.type === 'boolean') {
-      return (
-        <div key={field.key} className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={!!data[field.key]}
-            onChange={(e) => setValue(field.key, e.target.checked)}
-            className="h-4 w-4"
-          />
-          <Label>{label}{field.required && ' *'}</Label>
-        </div>
-      );
+    if (field.type === 'boolean') return renderBoolean(base);
+    if (field.type === 'multiline_text') return renderMultilineText(base);
+    if (field.type === 'single_select') return renderSingleSelect(selectBase);
+    if (field.type === 'multiselect') return renderMultiselect(selectBase);
+    if (field.type === 'survey' && field.survey_question_key) {
+      return renderSurveyField({ ...base, surveyQuestions });
     }
-
-    if (field.type === 'multiline_text') {
-      return (
-        <div key={field.key} className="space-y-1">
-          <Label>{label}{field.required && ' *'}</Label>
-          <Textarea
-            value={(data[field.key] as string) ?? ''}
-            onChange={(e) => setValue(field.key, e.target.value)}
-            placeholder={placeholder}
-            rows={3}
-            className={errorClass}
-          />
-        </div>
-      );
+    if (field.type === 'db_column') {
+      return renderDbColumn(selectBase);
     }
-
-    if (field.type === 'single_select') {
-      return (
-        <div key={field.key} className="space-y-1">
-          <Label>{label}{field.required && ' *'}</Label>
-          <select
-            value={(data[field.key] as string) ?? ''}
-            onChange={(e) => setValue(field.key, e.target.value)}
-            className={`border-border bg-background h-9 w-full rounded-md border px-3 text-sm ${errorClass}`}
-          >
-            <option value="">{placeholder || selectPlaceholder}</option>
-            {(field.options ?? []).map((opt) => (
-              <option key={opt} value={opt}>
-                {trans.option_labels[`${field.key}.${opt}`] ?? opt}
-              </option>
-            ))}
-          </select>
-        </div>
-      );
-    }
-
-    if (field.type === 'multiselect') {
-      const selected = (data[field.key] as string[]) ?? [];
-      return (
-        <div key={field.key} className="space-y-1">
-          <Label>{label}{field.required && ' *'}</Label>
-          <div className="flex flex-wrap gap-2">
-            {(field.options ?? []).map((opt) => {
-              const optLabel = trans.option_labels[`${field.key}.${opt}`] ?? opt;
-              return (
-                <label key={opt} className="flex items-center gap-1.5 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(opt)}
-                    onChange={(e) => {
-                      const next = e.target.checked
-                        ? [...selected, opt]
-                        : selected.filter((s) => s !== opt);
-                      setValue(field.key, next);
-                    }}
-                    className="h-4 w-4"
-                  />
-                  {optLabel}
-                </label>
-              );
-            })}
-          </div>
-        </div>
-      );
-    }
-
-    // text, number, email, password, file (fallback)
-    const inputType =
-      field.type === 'number' ? 'number'
-        : field.type === 'email' ? 'email'
-          : field.type === 'password' ? 'password'
-            : 'text';
-
-    return (
-      <div key={field.key} className="space-y-1">
-        <Label>{label}{field.required && ' *'}</Label>
-        <Input
-          type={inputType}
-          value={(data[field.key] as string) ?? ''}
-          onChange={(e) => setValue(field.key, field.type === 'number' ? Number(e.target.value) : e.target.value)}
-          placeholder={placeholder}
-          className={errorClass}
-        />
-      </div>
-    );
+    return renderDefaultInput(base);
   };
-
-  // ── Step rendering ───────────────────────────────
 
   const renderStep = (step: (typeof steps)[number]) => (
     <div key={step.key} className="space-y-4">
@@ -246,8 +166,6 @@ export function FormRenderer({
     </div>
   );
 
-  // ── Wizard mode ──────────────────────────────────
-
   if (isWizard) {
     const currentStep = steps[stepIndex];
     const actions = currentStep.actions ?? (
@@ -266,8 +184,6 @@ export function FormRenderer({
       </div>
     );
   }
-
-  // ── Legacy mode (all steps + single submit) ──────
 
   return (
     <div className="space-y-6">

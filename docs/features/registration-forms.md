@@ -16,9 +16,46 @@ Formularios dinámicos de registro para talentos. El admin crea formularios con 
 - `registration_form_countries` — Países configurados para el formulario.
 - `registration_form_cities` — Ciudades configuradas.
 
+## Target Role
+
+Cada formulario de registro tiene un `target_role` que define qué tipo de usuario se crea al completar el formulario.
+
+- **Columna:** `registration_forms.target_role` — `'talent'` | `'client'`, default `'talent'`
+- **Inmutable:** Se define al crear el formulario. No se puede cambiar después (se muestra read-only en Config).
+- **Se copia en clone:** Al clonar una variante, hereda el `target_role` del formulario fuente.
+
+### Flujo de registro
+
+1. Admin crea formulario → selecciona target_role (Talento o Cliente)
+2. `allowedTables` del form builder cambia según target_role:
+   - talent: `profiles`, `talent_profiles`, `auth`
+   - client: `profiles`, `client_profiles`, `auth`
+3. Al registrar, `registerUser` pasa `role: target_role` en el metadata de `signUp`
+4. El trigger `handle_new_user` crea `profiles` + `user_roles` con el rol correcto
+5. `registerUser` hace UPDATE (no INSERT) de `profiles` con campos mapeados adicionales
+6. Crea `talent_profiles` si `target_role === 'talent'`, o `client_profiles` si `target_role === 'client'`
+
 ## Campo tipo 'survey'
 
 Nuevo tipo de campo en el form builder que referencia una pregunta de `survey_questions`. Al renderizar, muestra el tipo de input definido en la pregunta. La respuesta se guarda en `talent_analytics`.
+
+### Rendering de survey fields
+
+El `FormRenderer` renderiza campos `survey` usando `SurveyFieldRenderer` (`shared/components/survey-field-renderer.tsx`). La página orquesta la carga de datos:
+
+1. **Page** (route) carga `listSurveyQuestions()` de `features/survey-questions/`
+2. **Page** transforma a `Record<string, SurveyQuestionRenderData>` para el locale actual
+3. **Page** pasa al embed → embed pasa al renderer via prop `surveyQuestions`
+
+Rendering por `response_type`:
+- `text` → Textarea
+- `scale_1_5` / `scale_1_10` → Radio buttons con labels opcionales
+- `single_select` → Select dropdown con option_labels
+- `yes_no` → Radio buttons Sí/No
+
+Degradación: si `surveyQuestions` no se pasa o la pregunta no existe, muestra "Pregunta no disponible".
+
+Este patrón respeta `architecture.md`: `shared/` no importa de `features/`, la página orquesta datos de múltiples features.
 
 ## Admin UI
 
@@ -33,6 +70,7 @@ Nuevo tipo de campo en el form builder que referencia una pregunta de `survey_qu
 - parent_id FK con CASCADE para limpiar variantes al eliminar General
 - countries/cities FK al General form con CASCADE
 - Key de survey question inmutable después de creación
+- Keys auto-generadas y read-only en todos los editores (form builder, survey questions, subtypes). Patrón: `step_X_field_Y` para campos, `step_X_btn_Y` para acciones, `question_X` para survey, `group_X`/`item_X` para subtypes. Uniqueness check con `while (existingKeys.has(...)) idx++` para evitar colisiones al borrar y re-agregar
 
 ## Eliminación
 
@@ -123,9 +161,15 @@ type FormStep = {
 
 ### Register Action
 
-- Server action: `supabase.auth.signUp` + insert `profiles` + insert `talent_profiles`
-- Campos email/password detectados por `field.type` (no por key)
-- Password nunca se incluye en form_data guardado — se extrae y descarta
+- Server action: `supabase.auth.signUp` con `role: target_role` en metadata + UPDATE `profiles` + condicional INSERT `talent_profiles`
+- El trigger `handle_new_user` crea automáticamente `profiles` y `user_roles` con el rol del metadata
+- `registerUser` hace UPDATE (no INSERT) de `profiles` para agregar campos mapeados (preferred_locale, etc.)
+- Solo crea `talent_profiles` cuando `target_role === 'talent'`
+- Credenciales de auth detectadas por `db_column` con `db_table='auth'`: auth.email y auth.password
+- Si el form incluye auth.confirm_password, se valida server-side que coincide con auth.password
+- Auth fields se stripean de form_data (nunca persistir passwords)
+- Campos `db_column` de otras tablas (profiles, talent_profiles) se extraen via `extractMappedFields()` y se escriben a columnas tipadas
+- El tipo standalone `password` se oculta del picker; `email` queda como input genérico sin relación con auth
 - Supabase maneja email de verificación automáticamente
 - Si signUp falla, error en paso actual sin redirigir
 

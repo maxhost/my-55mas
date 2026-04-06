@@ -15,4 +15,5 @@ export { saveRegistrationConfig } from './actions/save-registration-config';
 export { saveRegistrationActivation } from './actions/save-registration-activation';
 export { deleteRegistrationForm } from './actions/delete-registration-form';
 export { registerUser } from './actions/register-user';
+export { getEmbeddableForm } from './actions/get-embeddable-form';
 export { RegistrationFormEmbed } from './components/registration-form-embed';

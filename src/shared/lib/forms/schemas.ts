@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { FIELD_TYPES, STEP_ACTION_TYPES } from './types';
+import { isValidMapping } from './db-column-registry';
 
 // ── Key validation ────────────────────────────────────
 
@@ -19,6 +20,8 @@ export const formFieldSchema = z
     options: z.array(z.string().min(1).max(100)).optional(),
     subtype_group: z.string().optional(),
     survey_question_key: z.string().optional(),
+    db_table: z.string().optional(),
+    db_column: z.string().optional(),
   })
   .refine(
     (field) => {
@@ -28,6 +31,14 @@ export const formFieldSchema = z
       return true;
     },
     { message: 'Select fields must have at least one option' }
+  )
+  .refine(
+    (field) => {
+      if (field.type !== 'db_column') return true;
+      if (!field.db_table || !field.db_column) return false;
+      return isValidMapping(field.db_table, field.db_column);
+    },
+    { message: 'db_column fields require a valid db_table and db_column from the registry' }
   );
 
 // ── Step Action ───────────────────────────────────────
@@ -52,9 +63,26 @@ export const formStepSchema = z.object({
 
 // ── Form Schema ───────────────────────────────────────
 
-export const formSchemaSchema = z.object({
-  steps: z.array(formStepSchema).min(1),
-});
+export const formSchemaSchema = z
+  .object({
+    steps: z.array(formStepSchema).min(1),
+  })
+  .refine(
+    (schema) => {
+      const seen = new Set<string>();
+      for (const step of schema.steps) {
+        for (const field of step.fields) {
+          if (field.type === 'db_column' && field.db_table && field.db_column) {
+            const key = `${field.db_table}.${field.db_column}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+          }
+        }
+      }
+      return true;
+    },
+    { message: 'Duplicate db_column mapping: each table.column can only be mapped once per form' }
+  );
 
 // ── Save Form Input ───────────────────────────────────
 

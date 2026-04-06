@@ -6,11 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { ArrowUp, ArrowDown, X } from 'lucide-react';
 import { FIELD_TYPES_WITH_OPTIONS, type FormField } from '@/shared/lib/forms/types';
-import { sanitizeKey } from '@/shared/lib/forms/utils';
 import { FieldTypePicker } from './field-type-picker';
 import { FieldOptionsEditor } from './field-options-editor';
 import { SubtypeFieldConfig, type SubtypeGroupOption } from './subtype-field-config';
 import { SurveyFieldConfig, type SurveyQuestionOption } from './survey-field-config';
+import { DbColumnFieldConfig } from './db-column-field-config';
 
 type Props = {
   field: FormField;
@@ -21,6 +21,7 @@ type Props = {
   optionLabels: Record<string, string>;
   subtypeGroups: SubtypeGroupOption[];
   surveyQuestions: SurveyQuestionOption[];
+  allowedTables?: string[];
   onChange: (field: FormField) => void;
   onRemove: () => void;
   onMoveUp: () => void;
@@ -39,6 +40,7 @@ export function FieldEditor({
   optionLabels,
   subtypeGroups,
   surveyQuestions,
+  allowedTables,
   onChange,
   onRemove,
   onMoveUp,
@@ -53,12 +55,9 @@ export function FieldEditor({
   return (
     <div className="space-y-1">
       <div className="flex items-center gap-2">
-        <Input
-          value={field.key}
-          onChange={(e) => onChange({ ...field, key: sanitizeKey(e.target.value) })}
-          placeholder={t('fieldKey')}
-          className="h-8 w-40 text-sm"
-        />
+        <span className="text-muted-foreground rounded bg-muted px-2 py-1 font-mono text-xs">
+          {field.key}
+        </span>
         <FieldTypePicker
           value={field.type}
           onChange={(type) => {
@@ -152,6 +151,15 @@ export function FieldEditor({
           surveyQuestions={surveyQuestions}
           selectedQuestion={field.survey_question_key}
           onQuestionChange={(key) => onChange({ ...field, survey_question_key: key || undefined })}
+        />
+      )}
+      {field.type === 'db_column' && (
+        <DbColumnFieldConfig
+          field={field}
+          allowedTables={allowedTables ?? []}
+          optionLabels={optionLabels}
+          onChange={onChange}
+          onOptionLabelChange={onOptionLabelChange}
         />
       )}
     </div>

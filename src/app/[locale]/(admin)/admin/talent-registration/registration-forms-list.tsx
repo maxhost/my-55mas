@@ -58,6 +58,7 @@ export function RegistrationFormsList({ forms }: Props) {
           <thead>
             <tr className="border-border border-b text-left">
               <th className="py-2 font-medium">{t('formName')}</th>
+              <th className="py-2 font-medium">{t('role')}</th>
               <th className="py-2 font-medium">{t('variants')}</th>
               <th className="py-2 font-medium">{t('created')}</th>
               <th className="py-2 font-medium">{t('updated')}</th>
@@ -74,6 +75,15 @@ export function RegistrationFormsList({ forms }: Props) {
                   >
                     {form.name}
                   </Link>
+                </td>
+                <td className="py-2">
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                    form.target_role === 'talent'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-green-100 text-green-800'
+                  }`}>
+                    {form.target_role === 'talent' ? t('targetRoleTalent') : t('targetRoleClient')}
+                  </span>
                 </td>
                 <td className="py-2">
                   {form.variant_count > 0

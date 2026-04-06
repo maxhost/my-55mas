@@ -14,26 +14,14 @@ type Props = {
   onRemove: () => void;
 };
 
-function sanitizeSlug(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9_]/g, '_')
-    .replace(/^[^a-z]+/, '');
-}
-
 export function SubtypeItemRow({ item, locale, isPrimary, onChange, onRemove }: Props) {
   const t = useTranslations('AdminSubtypes');
 
   return (
     <div className="flex items-center gap-2">
-      <Input
-        value={item.slug}
-        onChange={(e) => onChange({ ...item, slug: sanitizeSlug(e.target.value) })}
-        placeholder={t('itemSlug')}
-        className="h-7 w-32 text-xs"
-        readOnly={!isPrimary}
-        tabIndex={isPrimary ? undefined : -1}
-      />
+      <span className="text-muted-foreground rounded bg-muted px-2 py-0.5 font-mono text-xs">
+        {item.slug}
+      </span>
       <Input
         value={item.translations[locale] ?? ''}
         onChange={(e) =>

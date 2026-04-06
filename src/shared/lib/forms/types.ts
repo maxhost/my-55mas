@@ -12,6 +12,7 @@ export const FIELD_TYPES = [
   'survey',
   'email',
   'password',
+  'db_column',
 ] as const;
 
 export type FieldType = (typeof FIELD_TYPES)[number];
@@ -42,6 +43,8 @@ export type FormField = {
   options?: string[];
   subtype_group?: string; // slug del grupo (solo para type === 'subtype')
   survey_question_key?: string; // key de survey_questions (solo para type === 'survey')
+  db_table?: string; // tabla destino (solo para type === 'db_column')
+  db_column?: string; // columna destino (solo para type === 'db_column')
 };
 
 export type FormStep = {
@@ -112,6 +115,17 @@ export type SaveFormResult =
 export type CloneFormResult = {
   data?: FormWithTranslations;
   error?: string;
+};
+
+// ── Survey question render data (for FormRenderer) ───
+
+export type SurveyQuestionRenderData = {
+  key: string;
+  response_type: string;
+  options: string[] | null;
+  label: string;
+  description?: string;
+  option_labels?: Record<string, string>;
 };
 
 // ── Helpers ───────────────────────────────────────────

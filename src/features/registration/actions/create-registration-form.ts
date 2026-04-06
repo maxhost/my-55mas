@@ -9,7 +9,7 @@ import { createRegistrationFormSchema } from '../schemas';
  * Handles duplicate slug error (UNIQUE constraint 23505).
  */
 export async function createRegistrationForm(
-  input: { name: string; slug: string }
+  input: { name: string; slug: string; target_role?: 'talent' | 'client' }
 ): Promise<{ id: string } | { error: Record<string, string[]> }> {
   const parsed = createRegistrationFormSchema.safeParse(input);
   if (!parsed.success) {
@@ -23,6 +23,7 @@ export async function createRegistrationForm(
     .insert({
       slug: parsed.data.slug,
       name: parsed.data.name,
+      target_role: parsed.data.target_role,
     })
     .select('id')
     .single();

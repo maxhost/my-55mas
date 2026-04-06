@@ -9,6 +9,7 @@ import { deleteService } from '../actions/delete-service';
 import type { ServiceListItem } from '../types';
 import { ServicesToolbar } from './services-toolbar';
 import { ServicesTable } from './services-table';
+import { CreateServiceSheet } from './create-service-form';
 
 type Props = {
   services: ServiceListItem[];
@@ -48,7 +49,10 @@ export function ServicesList({ services }: Props) {
 
   return (
     <div className="space-y-6">
-      <ServicesToolbar search={search} onSearchChange={setSearch} />
+      <div className="flex items-center justify-between gap-4">
+        <ServicesToolbar search={search} onSearchChange={setSearch} />
+        <CreateServiceSheet />
+      </div>
       <ServicesTable
         services={filtered}
         onDelete={(id) => {

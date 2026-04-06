@@ -6,11 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Plus, X } from 'lucide-react';
 import { STEP_ACTION_TYPES, type StepAction } from '@/shared/lib/forms/types';
-import { sanitizeKey } from '@/shared/lib/forms/utils';
 
 type Props = {
   actions: StepAction[];
   stepIndex: number;
+  stepKey: string;
   translations: { labels: Record<string, string> };
   onChange: (actions: StepAction[]) => void;
   onLabelChange: (key: string, value: string) => void;
@@ -19,6 +19,7 @@ type Props = {
 export function StepActionEditor({
   actions,
   stepIndex,
+  stepKey,
   translations,
   onChange,
   onLabelChange,
@@ -28,8 +29,10 @@ export function StepActionEditor({
   const hasSubmitType = actions.some((a) => a.type === 'submit' || a.type === 'register');
 
   const addAction = () => {
-    const idx = actions.length + 1;
-    const newAction: StepAction = { key: `btn_${idx}`, type: 'next' };
+    const existingKeys = new Set(actions.map((a) => a.key));
+    let idx = actions.length + 1;
+    while (existingKeys.has(`${stepKey}_btn_${idx}`)) idx++;
+    const newAction: StepAction = { key: `${stepKey}_btn_${idx}`, type: 'next' };
     onChange([...actions, newAction]);
   };
 
@@ -50,13 +53,10 @@ export function StepActionEditor({
         return (
           <div key={i} className="bg-muted/50 space-y-2 rounded-md border p-2">
             <div className="flex items-center gap-2">
-              {/* Key */}
-              <Input
-                value={action.key}
-                onChange={(e) => updateAction(i, { key: sanitizeKey(e.target.value) })}
-                className="h-7 w-28 text-xs"
-                placeholder="key"
-              />
+              {/* Key (read-only) */}
+              <span className="text-muted-foreground rounded bg-muted px-2 py-0.5 font-mono text-xs">
+                {action.key}
+              </span>
 
               {/* Type selector */}
               <select

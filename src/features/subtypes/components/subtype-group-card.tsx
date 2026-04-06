@@ -20,13 +20,6 @@ type Props = {
   onMoveDown: () => void;
 };
 
-function sanitizeSlug(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9_]/g, '_')
-    .replace(/^[^a-z]+/, '');
-}
-
 export function SubtypeGroupCard({
   group,
   locale,
@@ -51,7 +44,9 @@ export function SubtypeGroupCard({
   };
 
   const addItem = () => {
-    const idx = group.items.length + 1;
+    const existingSlugs = new Set(group.items.map((i) => i.slug));
+    let idx = group.items.length + 1;
+    while (existingSlugs.has(`item_${idx}`)) idx++;
     onChange({
       ...group,
       items: [
@@ -79,14 +74,9 @@ export function SubtypeGroupCard({
           {collapsed ? <ChevronRight /> : <ChevronDown />}
         </Button>
 
-        <Input
-          value={group.slug}
-          onChange={(e) => onChange({ ...group, slug: sanitizeSlug(e.target.value) })}
-          placeholder={t('groupSlug')}
-          className="h-7 w-36 text-xs"
-          readOnly={!isPrimary}
-          tabIndex={isPrimary ? undefined : -1}
-        />
+        <span className="text-muted-foreground rounded bg-muted px-2 py-0.5 font-mono text-xs">
+          {group.slug}
+        </span>
 
         <Input
           value={group.translations[locale] ?? ''}

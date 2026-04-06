@@ -12,6 +12,7 @@ import type { FormVariantSummary, FormCountryOption, FormCityOption } from '@/sh
 
 type Props = {
   formId: string;
+  targetRole: 'talent' | 'client';
   allCountries: FormCountryOption[];
   allCities: FormCityOption[];
   configuredCountryIds: string[];
@@ -20,7 +21,7 @@ type Props = {
 };
 
 export function RegistrationFormConfig({
-  formId, allCountries, allCities,
+  formId, targetRole, allCountries, allCities,
   configuredCountryIds: initialCountryIds,
   configuredCityIds: initialCityIds,
   formVariants: initialVariants,
@@ -97,7 +98,16 @@ export function RegistrationFormConfig({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium">{t('configTitle')}</h3>
+      <div className="flex items-center gap-3">
+        <h3 className="text-lg font-medium">{t('configTitle')}</h3>
+        <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+          targetRole === 'talent'
+            ? 'bg-blue-100 text-blue-800'
+            : 'bg-green-100 text-green-800'
+        }`}>
+          {t('targetRole')}: {targetRole === 'talent' ? t('targetRoleTalent') : t('targetRoleClient')}
+        </span>
+      </div>
       <p className="text-muted-foreground text-sm">{t('configDesc')}</p>
 
       {/* Add country */}

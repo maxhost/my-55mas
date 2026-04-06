@@ -1,0 +1,49 @@
+'use server';
+
+import { createClient } from '@/lib/supabase/server';
+import { getRegistrationForm } from './get-registration-form';
+import type { RegistrationFormWithTranslations } from '../types';
+
+type EmbeddableFormResult =
+  | { available: false }
+  | { available: true; form: RegistrationFormWithTranslations };
+
+/**
+ * Canonical action for loading a registration form for embedding.
+ * Checks city availability via registration_form_cities, then loads
+ * the form with fallback to General if no city variant exists.
+ */
+export async function getEmbeddableForm(
+  slug: string,
+  cityId: string
+): Promise<EmbeddableFormResult> {
+  const supabase = createClient();
+
+  // 1. Find General form by slug to get form_id
+  const { data: generalForm } = await supabase
+    .from('registration_forms')
+    .select('id')
+    .eq('slug', slug)
+    .is('city_id', null)
+    .is('parent_id', null)
+    .single();
+
+  if (!generalForm) return { available: false };
+
+  // 2. Check if city is configured as available
+  const { data: cityConfig } = await supabase
+    .from('registration_form_cities')
+    .select('city_id')
+    .eq('form_id', generalForm.id)
+    .eq('city_id', cityId)
+    .limit(1)
+    .maybeSingle();
+
+  if (!cityConfig) return { available: false };
+
+  // 3. Load form with fallback to General
+  const form = await getRegistrationForm(slug, cityId, true);
+  if (!form) return { available: false };
+
+  return { available: true, form };
+}

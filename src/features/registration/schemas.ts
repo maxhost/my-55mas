@@ -30,6 +30,7 @@ export const createRegistrationFormSchema = z.object({
     .min(2)
     .max(100)
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be kebab-case'),
+  target_role: z.enum(['talent', 'client']).default('talent'),
 });
 
 // ── Save config (countries + cities) ─────────────────

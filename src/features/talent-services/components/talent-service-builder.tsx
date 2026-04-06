@@ -46,6 +46,7 @@ export function TalentServiceBuilder({
       serviceCountries={serviceCountries}
       serviceCities={serviceCities}
       subtypeGroups={subtypeGroups}
+      allowedTables={['profiles', 'talent_profiles']}
       onGetForm={getTalentForm}
       onCloneVariant={cloneTalentFormVariant}
       onSave={handleSave}

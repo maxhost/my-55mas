@@ -18,6 +18,7 @@ import type { RegistrationFormWithTranslations } from '@/features/registration/t
 type Props = {
   formId: string;
   formSlug: string;
+  targetRole: 'talent' | 'client';
   form: RegistrationFormWithTranslations | null;
   formVariants: FormVariantSummary[];
   allCountries: FormCountryOption[];
@@ -28,7 +29,7 @@ type Props = {
 };
 
 export function RegistrationFormEditor({
-  formId, formSlug, form, formVariants,
+  formId, formSlug, targetRole, form, formVariants,
   allCountries, allCities,
   configuredCountryIds, configuredCityIds,
   surveyQuestions,
@@ -74,6 +75,7 @@ export function RegistrationFormEditor({
 
         <RegistrationFormConfig
           formId={formId}
+          targetRole={targetRole}
           allCountries={allCountries}
           allCities={allCities}
           configuredCountryIds={configuredCountryIds}
@@ -85,6 +87,7 @@ export function RegistrationFormEditor({
       <TabsContent value="form" className="pt-6">
         <RegistrationFormBuilder
           formSlug={formSlug}
+          targetRole={targetRole}
           form={form}
           formVariants={formVariants}
           serviceCountries={serviceCountries}

@@ -7,6 +7,14 @@ import { useRouter } from '@/lib/i18n/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import { Plus } from 'lucide-react';
 import { createService } from '../actions/create-service';
 
 function toSlug(text: string): string {
@@ -18,10 +26,11 @@ function toSlug(text: string): string {
     .replace(/^-|-$/g, '');
 }
 
-export function CreateServiceForm() {
+export function CreateServiceSheet() {
   const t = useTranslations('AdminServices');
   const tc = useTranslations('Common');
   const router = useRouter();
+  const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
@@ -31,6 +40,13 @@ export function CreateServiceForm() {
   const handleNameChange = (value: string) => {
     setName(value);
     if (!slugEdited) setSlug(toSlug(value));
+  };
+
+  const resetForm = () => {
+    setName('');
+    setSlug('');
+    setSlugEdited(false);
+    setError(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -48,36 +64,51 @@ export function CreateServiceForm() {
       }
       if ('data' in result && result.data) {
         toast.success(tc('createdSuccess'));
+        setOpen(false);
+        resetForm();
         router.push(`/admin/services/${result.data.id}`);
       }
     });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-lg space-y-4">
-      <div className="space-y-2">
-        <Label>{t('name')} *</Label>
-        <Input
-          value={name}
-          onChange={(e) => handleNameChange(e.target.value)}
-          required
-        />
-      </div>
-      <div className="space-y-2">
-        <Label>{t('slug')}</Label>
-        <Input
-          value={slug}
-          onChange={(e) => {
-            setSlug(e.target.value);
-            setSlugEdited(true);
-          }}
-          required
-        />
-      </div>
-      {error && <p className="text-destructive text-sm">{error}</p>}
-      <Button type="submit" disabled={isPending}>
-        {isPending ? t('saving') : t('createService')}
-      </Button>
-    </form>
+    <Sheet open={open} onOpenChange={(o) => { setOpen(o); if (!o) resetForm(); }}>
+      <SheetTrigger render={
+        <Button variant="default">
+          <Plus className="mr-2 h-4 w-4" />
+          {t('createService')}
+        </Button>
+      } />
+      <SheetContent side="right">
+        <SheetHeader>
+          <SheetTitle>{t('createService')}</SheetTitle>
+        </SheetHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 p-4">
+          <div className="space-y-2">
+            <Label>{t('name')} *</Label>
+            <Input
+              value={name}
+              onChange={(e) => handleNameChange(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>{t('slug')}</Label>
+            <Input
+              value={slug}
+              onChange={(e) => {
+                setSlug(e.target.value);
+                setSlugEdited(true);
+              }}
+              required
+            />
+          </div>
+          {error && <p className="text-destructive text-sm">{error}</p>}
+          <Button type="submit" disabled={isPending} className="w-full">
+            {isPending ? t('saving') : t('createService')}
+          </Button>
+        </form>
+      </SheetContent>
+    </Sheet>
   );
 }

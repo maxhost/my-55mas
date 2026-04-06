@@ -91,7 +91,7 @@ features/talent-services/
 │   ├── list-talent-services.ts       — Lista admin de servicios con talent forms
 │   ├── create-talent-service.ts      — Crea un talent form vacío para un servicio
 │   ├── save-talent-form-activation.ts— Toggle activo/inactivo de un talent form
-│   └── submit-talent-service.ts      — Submit del formulario desde el portal del talento
+│   └── submit-talent-service.ts      — Submit del formulario desde el portal del talento (usa extractMappedFields para escribir a talent_profiles)
 └── __tests__/
 ```
 

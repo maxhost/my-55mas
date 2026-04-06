@@ -26,6 +26,7 @@ type Props = {
   serviceCities: FormCityOption[];
   subtypeGroups?: SubtypeGroupOption[];
   surveyQuestions?: SurveyQuestionOption[];
+  allowedTables?: string[];
   // Callbacks — injected by feature wrapper
   onGetForm: (serviceId: string, cityId: string | null, fallback?: boolean) => Promise<FormWithTranslations | null>;
   onCloneVariant: (input: { service_id: string; source_city_id: string | null; target_city_id: string }) => Promise<CloneFormResult>;
@@ -40,6 +41,7 @@ export function FormBuilderPanel({
   serviceCities,
   subtypeGroups,
   surveyQuestions,
+  allowedTables,
   onGetForm,
   onCloneVariant,
   onSave,
@@ -153,6 +155,7 @@ export function FormBuilderPanel({
           activeLocale={activeLocale}
           subtypeGroups={subtypeGroups ?? []}
           surveyQuestions={surveyQuestions ?? []}
+          allowedTables={allowedTables}
           onSaved={setFormData}
           onSave={onSave}
           onGetForm={handleGetForm}

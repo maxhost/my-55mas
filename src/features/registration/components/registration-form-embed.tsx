@@ -5,15 +5,17 @@ import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { FormRenderer, type SubmitMeta } from '@/shared/components/form-renderer';
-import type { FormWithTranslations } from '@/shared/lib/forms/types';
+import type { SurveyQuestionRenderData } from '@/shared/lib/forms/types';
+import type { RegistrationFormWithTranslations } from '../types';
 import { registerUser } from '../actions/register-user';
 
 type Props = {
-  form: FormWithTranslations;
+  form: RegistrationFormWithTranslations;
   locale: string;
   initialData?: Record<string, unknown>;
   onSubmit?: (formData: Record<string, unknown>) => Promise<void> | void;
   submitLabel?: string;
+  surveyQuestions?: Record<string, SurveyQuestionRenderData>;
 };
 
 export function RegistrationFormEmbed({
@@ -22,6 +24,7 @@ export function RegistrationFormEmbed({
   initialData,
   onSubmit,
   submitLabel,
+  surveyQuestions,
 }: Props) {
   const tc = useTranslations('Common');
   const currentLocale = useLocale();
@@ -44,6 +47,7 @@ export function RegistrationFormEmbed({
             form_data: formData,
             form_schema: form.schema,
             locale: currentLocale,
+            target_role: form.target_role,
           });
 
           if ('error' in result && result.error) {
@@ -87,6 +91,7 @@ export function RegistrationFormEmbed({
         onSubmit={handleSubmit}
         submitLabel={submitLabel ?? (isPending ? tc('saving') : tc('save'))}
         isPending={isPending}
+        surveyQuestions={surveyQuestions}
       />
     </div>
   );

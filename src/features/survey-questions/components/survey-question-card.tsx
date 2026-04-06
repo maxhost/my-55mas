@@ -60,14 +60,9 @@ export function SurveyQuestionCard({ question, locale, isPrimary, onChange, onRe
     <div className="border-border space-y-3 rounded-md border p-4">
       {/* Header: key + type + active + delete */}
       <div className="flex items-center gap-2">
-        <Input
-          value={question.key}
-          onChange={(e) => onChange({ ...question, key: sanitizeKey(e.target.value) })}
-          placeholder={t('keyPlaceholder')}
-          className="h-8 w-40 text-sm"
-          readOnly={!!question.id}
-          tabIndex={question.id ? -1 : undefined}
-        />
+        <span className="text-muted-foreground rounded bg-muted px-2 py-1 font-mono text-xs">
+          {question.key}
+        </span>
         <select
           value={question.response_type}
           onChange={(e) => onChange({ ...question, response_type: e.target.value as ResponseType })}

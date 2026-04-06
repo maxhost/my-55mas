@@ -56,6 +56,7 @@ export async function getRegistrationForm(
     id: data.id,
     slug: data.slug,
     name: data.name,
+    target_role: (data.target_role as 'talent' | 'client') ?? 'talent',
     city_id: data.city_id,
     parent_id: data.parent_id,
     schema: normalizeSchema(data.schema),

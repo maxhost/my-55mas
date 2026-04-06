@@ -46,6 +46,7 @@ export function ServiceFormBuilder({
       serviceCountries={serviceCountries}
       serviceCities={serviceCities}
       subtypeGroups={subtypeGroups}
+      allowedTables={['orders']}
       onGetForm={getForm}
       onCloneVariant={cloneFormVariant}
       onSave={handleSave}

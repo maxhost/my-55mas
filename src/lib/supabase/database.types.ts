@@ -184,6 +184,44 @@ export type Database = {
           },
         ]
       }
+      client_profiles: {
+        Row: {
+          company_name: string | null
+          company_tax_id: string | null
+          created_at: string | null
+          id: string
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          company_name?: string | null
+          company_tax_id?: string | null
+          created_at?: string | null
+          id?: string
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          company_name?: string | null
+          company_tax_id?: string | null
+          created_at?: string | null
+          id?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       countries: {
         Row: {
           code: string
@@ -599,6 +637,7 @@ export type Database = {
           id: string
           nif: string | null
           phone: string | null
+          preferred_city: string | null
           preferred_contact: string | null
           preferred_country: string | null
           preferred_locale: string | null
@@ -613,6 +652,7 @@ export type Database = {
           id: string
           nif?: string | null
           phone?: string | null
+          preferred_city?: string | null
           preferred_contact?: string | null
           preferred_country?: string | null
           preferred_locale?: string | null
@@ -627,12 +667,27 @@ export type Database = {
           id?: string
           nif?: string | null
           phone?: string | null
+          preferred_city?: string | null
           preferred_contact?: string | null
           preferred_country?: string | null
           preferred_locale?: string | null
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "profiles_preferred_city_fkey"
+            columns: ["preferred_city"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_preferred_city_fkey"
+            columns: ["preferred_city"]
+            isOneToOne: false
+            referencedRelation: "cities_localized"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "profiles_preferred_country_fkey"
             columns: ["preferred_country"]
@@ -791,6 +846,7 @@ export type Database = {
           parent_id: string | null
           schema: Json
           slug: string
+          target_role: string
           updated_at: string | null
           version: number
         }
@@ -803,6 +859,7 @@ export type Database = {
           parent_id?: string | null
           schema?: Json
           slug: string
+          target_role?: string
           updated_at?: string | null
           version?: number
         }
@@ -815,6 +872,7 @@ export type Database = {
           parent_id?: string | null
           schema?: Json
           slug?: string
+          target_role?: string
           updated_at?: string | null
           version?: number
         }
@@ -1445,6 +1503,41 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories_localized"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_profiles: {
+        Row: {
+          created_at: string | null
+          first_name: string
+          id: string
+          last_name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          first_name: string
+          id?: string
+          last_name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -2102,6 +2195,87 @@ export type Database = {
             columns: ["talent_id"]
             isOneToOne: false
             referencedRelation: "talent_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_members: {
+        Row: {
+          added_by: string | null
+          created_at: string | null
+          team_id: string
+          user_id: string
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string | null
+          team_id: string
+          user_id: string
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string | null
+          team_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_added_by_fkey"
+            columns: ["added_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teams_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

@@ -50,6 +50,7 @@ export function TalentServiceRenderer({
         country_id: countryId,
         form_id: form.id,
         form_data: formData,
+        form_schema: form.schema,
         subtype_ids: subtypes,
       });
 

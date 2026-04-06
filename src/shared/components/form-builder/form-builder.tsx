@@ -14,6 +14,7 @@ import type {
   SaveFormResult,
 } from '@/shared/lib/forms/types';
 import type { SaveFormWithTranslationsInput } from '@/shared/lib/forms/schemas';
+import { sanitizeTranslations } from '@/shared/lib/forms/sanitize-translations';
 import { StepCard } from './step-card';
 import type { SubtypeGroupOption } from './subtype-field-config';
 import type { SurveyQuestionOption } from './survey-field-config';
@@ -25,6 +26,7 @@ type Props = {
   activeLocale: string;
   subtypeGroups: SubtypeGroupOption[];
   surveyQuestions: SurveyQuestionOption[];
+  allowedTables?: string[];
   onSaved?: (form: FormWithTranslations) => void;
   // Callbacks — injected by feature wrapper
   onSave: (input: SaveFormWithTranslationsInput) => Promise<SaveFormResult>;
@@ -48,11 +50,11 @@ function initTranslations(
   for (const locale of locales) {
     init[locale] = form?.translations[locale] ?? emptyTranslation();
   }
-  return init;
+  return form ? sanitizeTranslations(form.schema, init) : init;
 }
 
 export function FormBuilder({
-  serviceId, cityId, form, activeLocale, subtypeGroups, surveyQuestions, onSaved, onSave, onGetForm,
+  serviceId, cityId, form, activeLocale, subtypeGroups, surveyQuestions, allowedTables, onSaved, onSave, onGetForm,
 }: Props) {
   const t = useTranslations('AdminFormBuilder');
   const tc = useTranslations('Common');
@@ -95,26 +97,37 @@ export function FormBuilder({
     }));
   };
 
+  const setSchemaClean = (newSchema: FormSchema) => {
+    setSchema(newSchema);
+    setTranslations((prev) => sanitizeTranslations(newSchema, prev));
+  };
+
   const addStep = () => {
-    const key = `step_${schema.steps.length + 1}`;
-    setSchema({ steps: [...schema.steps, { key, fields: [] }] });
+    const existingKeys = new Set(schema.steps.map((s) => s.key));
+    let idx = schema.steps.length + 1;
+    while (existingKeys.has(`step_${idx}`)) idx++;
+    setSchemaClean({ steps: [...schema.steps, { key: `step_${idx}`, fields: [] }] });
   };
 
   const updateStep = (index: number, step: FormStep) => {
-    setSchema({ steps: schema.steps.map((s, i) => (i === index ? step : s)) });
+    setSchemaClean({ steps: schema.steps.map((s, i) => (i === index ? step : s)) });
   };
 
   const removeStep = (index: number) => {
-    setSchema({ steps: schema.steps.filter((_, i) => i !== index) });
+    setSchemaClean({ steps: schema.steps.filter((_, i) => i !== index) });
   };
 
   const handleSave = () => {
+    const cleanTranslations = sanitizeTranslations(schema, translations);
+    setTranslations(cleanTranslations);
+    const cleanCurrent = cleanTranslations[activeLocale] ?? emptyTranslation();
+
     const payload = {
       service_id: serviceId,
       city_id: cityId,
       schema,
       locale: activeLocale,
-      ...current,
+      ...cleanCurrent,
     };
     startTransition(async () => {
       const result = await onSave(payload);
@@ -151,6 +164,7 @@ export function FormBuilder({
           translations={current}
           subtypeGroups={subtypeGroups}
           surveyQuestions={surveyQuestions}
+          allowedTables={allowedTables}
           onChange={(s) => updateStep(index, s)}
           onRemove={() => removeStep(index)}
           onMoveUp={() => setSchema({ steps: swap(schema.steps, index, index - 1) })}

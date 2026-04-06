@@ -50,7 +50,9 @@ export function SubtypesEditor({ serviceId, initialSubtypes }: Props) {
   const primaryLocale = locales[0]; // 'es'
 
   const addGroup = () => {
-    const idx = groups.length + 1;
+    const existingSlugs = new Set(groups.map((g) => g.slug));
+    let idx = groups.length + 1;
+    while (existingSlugs.has(`group_${idx}`)) idx++;
     setGroups([
       ...groups,
       {

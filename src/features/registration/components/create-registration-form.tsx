@@ -26,6 +26,7 @@ export function CreateRegistrationForm() {
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [slugEdited, setSlugEdited] = useState(false);
+  const [targetRole, setTargetRole] = useState<'talent' | 'client'>('talent');
   const [error, setError] = useState<string | null>(null);
 
   const handleNameChange = (value: string) => {
@@ -37,7 +38,7 @@ export function CreateRegistrationForm() {
     e.preventDefault();
     setError(null);
     startTransition(async () => {
-      const result = await createRegistrationForm({ name, slug });
+      const result = await createRegistrationForm({ name, slug, target_role: targetRole });
       if ('error' in result && result.error) {
         const msg = Object.values(result.error).flat().join(', ');
         setError(msg);
@@ -70,6 +71,34 @@ export function CreateRegistrationForm() {
           }}
           required
         />
+      </div>
+      <div className="space-y-2">
+        <Label>{t('targetRole')}</Label>
+        <div className="flex gap-4">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="radio"
+              name="target_role"
+              value="talent"
+              checked={targetRole === 'talent'}
+              onChange={() => setTargetRole('talent')}
+              className="h-4 w-4"
+            />
+            {t('targetRoleTalent')}
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="radio"
+              name="target_role"
+              value="client"
+              checked={targetRole === 'client'}
+              onChange={() => setTargetRole('client')}
+              className="h-4 w-4"
+            />
+            {t('targetRoleClient')}
+          </label>
+        </div>
+        <p className="text-muted-foreground text-xs">{t('targetRoleHelp')}</p>
       </div>
       {error && <p className="text-destructive text-sm">{error}</p>}
       <Button type="submit" disabled={isPending}>

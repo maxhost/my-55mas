@@ -128,6 +128,32 @@ describe('cascadeSchema', () => {
     expect(result.steps).toHaveLength(1);
     expect(result.steps[0].key).toBe('s1');
   });
+
+  it('preserves db_table and db_column properties on cascaded fields', () => {
+    const dbField = {
+      key: 'birth',
+      type: 'db_column' as const,
+      required: true,
+      db_table: 'talent_profiles',
+      db_column: 'birth_date',
+    };
+    const oldGen: FormSchema = {
+      steps: [{ key: 's1', fields: [{ key: 'a', type: 'text' as const, required: false }] }],
+    };
+    const newGen: FormSchema = {
+      steps: [{ key: 's1', fields: [{ key: 'a', type: 'text' as const, required: false }, dbField] }],
+    };
+    const country: FormSchema = {
+      steps: [{ key: 's1', fields: [{ key: 'a', type: 'text' as const, required: false }] }],
+    };
+
+    const result = cascadeSchema(oldGen, newGen, country);
+    const birthField = result.steps[0].fields.find((f) => f.key === 'birth');
+    expect(birthField).toBeDefined();
+    expect(birthField!.type).toBe('db_column');
+    expect(birthField!.db_table).toBe('talent_profiles');
+    expect(birthField!.db_column).toBe('birth_date');
+  });
 });
 
 // ── cascadeTranslations ──────────────────────────────────

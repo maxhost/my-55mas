@@ -1,17 +1,9 @@
-import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
-import { CreateServiceForm } from '@/features/services/components/create-service-form';
-import { PageHeader } from '@/shared/components/page-header';
+import { redirect } from 'next/navigation';
+import { unstable_setRequestLocale } from 'next-intl/server';
 
 type Props = { params: { locale: string } };
 
-export default async function NewServicePage({ params: { locale } }: Props) {
+export default function NewServicePage({ params: { locale } }: Props) {
   unstable_setRequestLocale(locale);
-  const t = await getTranslations('AdminServices');
-
-  return (
-    <div className="p-8">
-      <PageHeader title={t('createService')} backHref="/admin/services" />
-      <CreateServiceForm />
-    </div>
-  );
+  redirect(`/${locale}/admin/services`);
 }

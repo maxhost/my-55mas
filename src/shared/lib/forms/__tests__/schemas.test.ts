@@ -157,6 +157,7 @@ describe('formStepSchema — with actions', () => {
 });
 
 // ── Full form schema ─────────────────────────────────
+// Note: db_column validation tests are in db-column-schemas.test.ts
 
 describe('formSchemaSchema — wizard form', () => {
   it('accepts a multi-step wizard form', () => {

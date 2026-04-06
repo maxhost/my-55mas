@@ -19,7 +19,7 @@ export default async function EditRegistrationFormPage({ params: { locale, id } 
   // Phase 1: get form row to extract slug
   const { data: formRow } = await supabase
     .from('registration_forms')
-    .select('id, slug, name, city_id')
+    .select('id, slug, name, city_id, target_role')
     .eq('id', id)
     .single();
 
@@ -76,6 +76,7 @@ export default async function EditRegistrationFormPage({ params: { locale, id } 
       <RegistrationFormEditor
         formId={formRow.id}
         formSlug={formRow.slug}
+        targetRole={(formRow.target_role as 'talent' | 'client') ?? 'talent'}
         form={form}
         formVariants={formVariants}
         allCountries={allCountryOptions}
