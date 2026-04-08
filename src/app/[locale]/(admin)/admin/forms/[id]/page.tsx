@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
-import { getRegistrationForm } from '@/features/registration/actions/get-registration-form';
-import { listRegistrationVariants } from '@/features/registration/actions/list-registration-variants';
+import { getRegistrationForm } from '@/features/general-forms/actions/get-registration-form';
+import { listRegistrationVariants } from '@/features/general-forms/actions/list-registration-variants';
 import { listSurveyQuestions } from '@/features/survey-questions/actions/list-survey-questions';
 import { getCountries } from '@/features/services/actions/get-countries';
 import { getCities } from '@/features/services/actions/get-cities';
@@ -13,7 +13,7 @@ type Props = { params: { locale: string; id: string } };
 
 export default async function EditRegistrationFormPage({ params: { locale, id } }: Props) {
   unstable_setRequestLocale(locale);
-  const t = await getTranslations('AdminRegistration');
+  const t = await getTranslations('AdminForms');
   const supabase = createClient();
 
   // Phase 1: get form row to extract slug
@@ -71,7 +71,7 @@ export default async function EditRegistrationFormPage({ params: { locale, id } 
     <div className="p-8">
       <PageHeader
         title={`${t('editForm')}: ${formRow.name}`}
-        backHref="/admin/talent-registration"
+        backHref="/admin/forms"
       />
       <RegistrationFormEditor
         formId={formRow.id}

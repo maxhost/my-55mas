@@ -19,7 +19,7 @@ function toSlug(text: string): string {
 }
 
 export function CreateRegistrationForm() {
-  const t = useTranslations('AdminRegistration');
+  const t = useTranslations('AdminForms');
   const tc = useTranslations('Common');
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -46,7 +46,7 @@ export function CreateRegistrationForm() {
       }
       if ('id' in result) {
         toast.success(tc('createdSuccess'));
-        router.push(`/admin/talent-registration/${result.id}`);
+        router.push(`/admin/forms/${result.id}`);
       }
     });
   };

@@ -44,6 +44,6 @@ export async function saveRegistrationConfig(input: SaveRegistrationConfigInput)
     if (error) return { error: { _db: [error.message] } };
   }
 
-  revalidatePath('/[locale]/(admin)/admin/talent-registration', 'layout');
+  revalidatePath('/[locale]/(admin)/admin/forms', 'layout');
   return { data: true };
 }

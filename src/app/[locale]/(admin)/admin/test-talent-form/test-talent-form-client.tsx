@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { Label } from '@/components/ui/label';
-import { getEmbeddableForm } from '@/features/registration/actions/get-embeddable-form';
-import { RegistrationFormEmbed } from '@/features/registration/components/registration-form-embed';
-import type { RegistrationFormListItem, RegistrationFormWithTranslations } from '@/features/registration/types';
+import { getEmbeddableForm } from '@/features/general-forms/actions/get-embeddable-form';
+import { RegistrationFormEmbed } from '@/features/general-forms/components/registration-form-embed';
+import type { RegistrationFormListItem, RegistrationFormWithTranslations } from '@/features/general-forms/types';
 import type { SurveyQuestionRenderData } from '@/shared/lib/forms/types';
 
 type CountryOption = { id: string; name: string };

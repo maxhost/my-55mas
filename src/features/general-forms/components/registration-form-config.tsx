@@ -26,7 +26,7 @@ export function RegistrationFormConfig({
   configuredCityIds: initialCityIds,
   formVariants: initialVariants,
 }: Props) {
-  const t = useTranslations('AdminRegistration');
+  const t = useTranslations('AdminForms');
   const tc = useTranslations('Common');
   const [countryIds, setCountryIds] = useState(initialCountryIds);
   const [cityIds, setCityIds] = useState(initialCityIds);

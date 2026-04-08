@@ -5,15 +5,15 @@ import { toast } from 'sonner';
 import { Copy } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { RegistrationFormBuilder } from '@/features/registration/components/registration-form-builder';
-import { RegistrationFormConfig } from '@/features/registration/components/registration-form-config';
+import { RegistrationFormBuilder } from '@/features/general-forms/components/registration-form-builder';
+import { RegistrationFormConfig } from '@/features/general-forms/components/registration-form-config';
 import type {
   FormVariantSummary,
   FormCountryOption,
   FormCityOption,
 } from '@/shared/lib/forms/types';
 import type { SurveyQuestionOption } from '@/shared/components/form-builder/survey-field-config';
-import type { RegistrationFormWithTranslations } from '@/features/registration/types';
+import type { RegistrationFormWithTranslations } from '@/features/general-forms/types';
 
 type Props = {
   formId: string;
@@ -34,7 +34,7 @@ export function RegistrationFormEditor({
   configuredCountryIds, configuredCityIds,
   surveyQuestions,
 }: Props) {
-  const t = useTranslations('AdminRegistration');
+  const t = useTranslations('AdminForms');
   const tc = useTranslations('Common');
 
   const embedSnippet = `<RegistrationFormEmbed\n  slug="${formSlug}"\n  locale={locale}\n  onSubmit={handleSubmit}\n/>`;

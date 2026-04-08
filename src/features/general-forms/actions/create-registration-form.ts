@@ -36,6 +36,6 @@ export async function createRegistrationForm(
     return { error: { _db: [error.message] } };
   }
 
-  revalidatePath('/[locale]/(admin)/admin/talent-registration', 'layout');
+  revalidatePath('/[locale]/(admin)/admin/forms', 'layout');
   return { id: newForm.id };
 }

@@ -98,6 +98,6 @@ export async function saveRegistrationFormWithTranslations(
   });
   if ('error' in transResult && transResult.error) return transResult;
 
-  revalidatePath('/[locale]/(admin)/admin/talent-registration', 'layout');
+  revalidatePath('/[locale]/(admin)/admin/forms', 'layout');
   return { data: { id: formId } };
 }

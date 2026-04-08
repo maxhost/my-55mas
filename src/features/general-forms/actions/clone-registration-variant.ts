@@ -60,6 +60,6 @@ export async function cloneRegistrationVariant(
     if (transError) throw transError;
   }
 
-  revalidatePath('/[locale]/(admin)/admin/talent-registration', 'layout');
+  revalidatePath('/[locale]/(admin)/admin/forms', 'layout');
   return { data: await getRegistrationForm(slug, target_city_id, false) ?? undefined };
 }

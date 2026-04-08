@@ -33,7 +33,7 @@
     "services": "Services",
     "dashboard": "Dashboard",
     "talentServices": "Talent Services",
-    "talentRegistration": "Talent Form",
+    "forms": "Forms",
     "surveyQuestions": "Survey Questions",
     "payments": "Payments",
     "notifications": "Notifications"
@@ -249,9 +249,9 @@
     "single_select": "Single select",
     "yes_no": "Yes / No"
   },
-  "AdminRegistration": {
-    "title": "Talent Form",
-    "description": "Create and manage registration forms for talents.",
+  "AdminForms": {
+    "title": "Forms",
+    "description": "Create and manage registration forms.",
     "createForm": "Create form",
     "name": "Name",
     "slug": "Slug",

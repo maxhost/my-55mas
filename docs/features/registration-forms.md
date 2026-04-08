@@ -1,4 +1,4 @@
-# Feature: Talento Formulario (Registration Forms)
+# Feature: Formularios (general-forms)
 
 ## Propósito
 
@@ -60,7 +60,7 @@ Este patrón respeta `architecture.md`: `shared/` no importa de `features/`, la 
 ## Admin UI
 
 - Lista: tabla con nombre, variantes, fecha creación, última actualización
-- Crear: página `/admin/talent-registration/new` con nombre + slug (kebab-case, auto-generado, editable). Mismo patrón que Servicios.
+- Crear: página `/admin/forms/new` con nombre + slug (kebab-case, auto-generado, editable). Mismo patrón que Servicios.
 - Editor: tabs Config (países/ciudades) + Formulario (form builder)
 - Config: add/remove países/ciudades (como ServiceConfig pero sin precios)
 

@@ -7,16 +7,16 @@ import { toast } from 'sonner';
 import { Link } from '@/lib/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/shared/components/confirm-dialog';
-import { deleteRegistrationForm } from '@/features/registration';
+import { deleteRegistrationForm } from '@/features/general-forms';
 import { Plus, Trash2 } from 'lucide-react';
-import type { RegistrationFormListItem } from '@/features/registration/types';
+import type { RegistrationFormListItem } from '@/features/general-forms/types';
 
 type Props = {
   forms: RegistrationFormListItem[];
 };
 
 export function RegistrationFormsList({ forms }: Props) {
-  const t = useTranslations('AdminRegistration');
+  const t = useTranslations('AdminForms');
   const tc = useTranslations('Common');
   const router = useRouter();
   const [deleteTarget, setDeleteTarget] = useState<RegistrationFormListItem | null>(null);
@@ -44,7 +44,7 @@ export function RegistrationFormsList({ forms }: Props) {
     <div className="space-y-6">
       <p className="text-muted-foreground text-sm">{t('description')}</p>
 
-      <Link href="/admin/talent-registration/new">
+      <Link href="/admin/forms/new">
         <Button variant="outline" size="sm">
           <Plus className="mr-1 h-3 w-3" />
           {t('createForm')}
@@ -70,7 +70,7 @@ export function RegistrationFormsList({ forms }: Props) {
               <tr key={form.id} className="border-border border-b">
                 <td className="py-2">
                   <Link
-                    href={`/admin/talent-registration/${form.id}`}
+                    href={`/admin/forms/${form.id}`}
                     className="text-primary hover:underline"
                   >
                     {form.name}

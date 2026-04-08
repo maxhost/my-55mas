@@ -28,6 +28,6 @@ export async function deleteRegistrationForm(id: string) {
     return { error: { _notFound: ['Form not found'] } };
   }
 
-  revalidatePath('/[locale]/(admin)/admin/talent-registration', 'layout');
+  revalidatePath('/[locale]/(admin)/admin/forms', 'layout');
   return { data: { id: parsed.data.id } };
 }

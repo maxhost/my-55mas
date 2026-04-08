@@ -33,7 +33,7 @@
     "services": "Serveis",
     "dashboard": "Tauler",
     "talentServices": "Serveis Talent",
-    "talentRegistration": "Formulari Talent",
+    "forms": "Formularis",
     "surveyQuestions": "Preguntes Estadístiques",
     "payments": "Pagaments",
     "notifications": "Notificacions"
@@ -249,9 +249,9 @@
     "single_select": "Selecció única",
     "yes_no": "Sí / No"
   },
-  "AdminRegistration": {
-    "title": "Formulari Talent",
-    "description": "Creeu i gestioneu formularis de registre per a talents.",
+  "AdminForms": {
+    "title": "Formularis",
+    "description": "Creeu i gestioneu formularis de registre.",
     "createForm": "Crear formulari",
     "name": "Nom",
     "slug": "Slug",

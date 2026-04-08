@@ -1,7 +1,7 @@
 import { unstable_setRequestLocale } from 'next-intl/server';
 import { getCountries } from '@/features/services/actions/get-countries';
 import { getCities } from '@/features/services/actions/get-cities';
-import { listRegistrationForms } from '@/features/registration/actions/list-registration-forms';
+import { listRegistrationForms } from '@/features/general-forms/actions/list-registration-forms';
 import { listSurveyQuestions } from '@/features/survey-questions/actions/list-survey-questions';
 import type { SurveyQuestionRenderData } from '@/shared/lib/forms/types';
 import { TestTalentFormClient } from './test-talent-form-client';

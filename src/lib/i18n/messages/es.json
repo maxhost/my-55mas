@@ -33,7 +33,7 @@
     "services": "Servicios",
     "dashboard": "Dashboard",
     "talentServices": "Servicios Talento",
-    "talentRegistration": "Talento Formulario",
+    "forms": "Formularios",
     "surveyQuestions": "Preguntas Estadísticas",
     "payments": "Pagos",
     "notifications": "Notificaciones"
@@ -249,9 +249,9 @@
     "single_select": "Selección única",
     "yes_no": "Sí / No"
   },
-  "AdminRegistration": {
-    "title": "Talento Formulario",
-    "description": "Crea y gestiona formularios de registro para talentos.",
+  "AdminForms": {
+    "title": "Formularios",
+    "description": "Crea y gestiona formularios de registro.",
     "createForm": "Crear formulario",
     "name": "Nombre",
     "slug": "Slug",

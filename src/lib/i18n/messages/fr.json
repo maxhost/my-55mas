@@ -33,7 +33,7 @@
     "services": "Services",
     "dashboard": "Tableau de bord",
     "talentServices": "Services Talent",
-    "talentRegistration": "Formulaire Talent",
+    "forms": "Formulaires",
     "surveyQuestions": "Questions Statistiques",
     "payments": "Paiements",
     "notifications": "Notifications"
@@ -249,9 +249,9 @@
     "single_select": "Sélection unique",
     "yes_no": "Oui / Non"
   },
-  "AdminRegistration": {
-    "title": "Formulaire Talent",
-    "description": "Créez et gérez des formulaires d'inscription pour les talents.",
+  "AdminForms": {
+    "title": "Formulaires",
+    "description": "Créez et gérez des formulaires d'inscription.",
     "createForm": "Créer un formulaire",
     "name": "Nom",
     "slug": "Slug",
