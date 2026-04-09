@@ -26,7 +26,7 @@ const CLIENT_COLUMNS: DbColumn[] = [
 const TALENT_COLUMNS: DbColumn[] = [
   { name: 'full_name', required: true, description: 'Full name' },
   { name: 'email', required: true, description: 'Email address' },
-  { name: 'birth_date', required: true, description: 'Date of birth (YYYY-MM-DD)' },
+  { name: 'birth_date', required: false, description: 'Date of birth (various formats supported)' },
   { name: 'phone', required: false, description: 'Phone number' },
   { name: 'preferred_contact', required: false, description: 'phone/whatsapp/email/messenger' },
   { name: 'gender', required: false, description: 'male/female' },
@@ -43,6 +43,8 @@ const TALENT_COLUMNS: DbColumn[] = [
   { name: 'city', required: false, description: 'City name (for lookup)' },
   { name: 'country', required: false, description: 'Country name (for lookup)' },
   { name: 'survey_question', required: false, description: 'Statistical question' },
+  { name: 'service_column', required: false, description: 'Service offered (select service)' },
+  { name: 'service_subtype_column', required: false, description: 'Service subtype (select group)' },
   { name: 'created_at', required: false, description: 'Registration date' },
 ];
 

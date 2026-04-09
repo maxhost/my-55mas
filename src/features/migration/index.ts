@@ -6,4 +6,10 @@ export { transformTalents } from './lib/transformers/transform-talents';
 export { transformOrders } from './lib/transformers/transform-orders';
 export { executeBatch } from './actions/execute-batch';
 export { getTableColumns } from './actions/get-table-columns';
-export { getImportLookups, getOrderLookups, getSurveyQuestions } from './actions/get-lookup-data';
+export {
+  getImportLookups,
+  getOrderLookups,
+  getSurveyQuestions,
+  getServiceOptions,
+  getSubtypeGroupOptions,
+} from './actions/get-lookup-data';

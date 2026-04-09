@@ -413,7 +413,10 @@
     "back": "Retour",
     "next": "Suivant",
     "shared": "Partagé",
-    "selectQuestion": "Sélectionner question"
+    "selectQuestion": "Sélectionner question",
+    "selectService": "Sélectionner service",
+    "selectSubtypeGroup": "Sélectionner groupe de sous-types",
+    "csvLanguage": "Dans quelle langue est le CSV ?"
   },
   "Placeholder": {
     "comingSoon": "Prochainement",

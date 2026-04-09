@@ -23,13 +23,14 @@ type Props = {
   rows: Record<string, string>[];
   mappings: ColumnMapping[];
   locale: string;
+  csvLocale: string;
   orderLookups?: OrderLookups;
 };
 
 const BATCH_SIZE_AUTH = 50;
 const BATCH_SIZE_BULK = 500;
 
-export function ImportExecutor({ target, rows, mappings, locale, orderLookups }: Props) {
+export function ImportExecutor({ target, rows, mappings, locale, csvLocale, orderLookups }: Props) {
   const t = useTranslations('AdminMigration');
   const [processed, setProcessed] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -45,7 +46,7 @@ export function ImportExecutor({ target, rows, mappings, locale, orderLookups }:
     // Load lookups for city/country resolution
     let lookups: ImportLookups | undefined;
     if (target === 'clients' || target === 'talents') {
-      lookups = await getImportLookups(locale);
+      lookups = await getImportLookups(csvLocale);
     }
 
     let totalInserted = 0;
@@ -74,7 +75,7 @@ export function ImportExecutor({ target, rows, mappings, locale, orderLookups }:
       allErrors.push(...transformErrors);
 
       if (transformedData.length > 0) {
-        const batchResult = await executeBatch(target, transformedData, offset, lookups);
+        const batchResult = await executeBatch(target, transformedData, offset, lookups, csvLocale);
         totalInserted += batchResult.inserted;
         allErrors.push(...batchResult.errors);
       }

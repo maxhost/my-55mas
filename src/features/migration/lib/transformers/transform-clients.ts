@@ -48,9 +48,10 @@ function applyMapping(
   for (const m of mappings) {
     if (!m.dbColumn || !row[m.csvColumn]?.trim()) continue;
     const val = row[m.csvColumn].trim();
+    if (val === '-' || val === '–' || val === '—') continue;
 
-    if (m.dbColumn === 'survey_question' && m.surveyQuestionId) {
-      surveys.push({ questionId: m.surveyQuestionId, value: val });
+    if (m.dbColumn === 'survey_question' && m.secondaryId) {
+      surveys.push({ questionId: m.secondaryId, value: val });
     } else if (!mapped[m.dbColumn]) {
       // First non-empty wins (multi-map merge)
       mapped[m.dbColumn] = val;
@@ -94,7 +95,7 @@ export function transformClients(
     const termsVal = mapped.terms_accepted?.toLowerCase();
     const termsAccepted = termsVal === 'aceite' || termsVal === 'aceptado' || termsVal === 'accepted' || termsVal === 'yes' || termsVal === 'true' || termsVal === '1';
 
-    const legacyId = mapped.legacy_id ? parseInt(mapped.legacy_id, 10) : null;
+    const legacyId = mapped.legacy_id ? Number(mapped.legacy_id) : null;
 
     const gender = mapped.gender
       ? GENDER_MAP[mapped.gender.toLowerCase()] ?? null

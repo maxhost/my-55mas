@@ -5,18 +5,20 @@ import type { MigrationTarget, BatchResult, RowError, ImportLookups } from '../t
 import type { TransformedClient } from '../lib/transformers/transform-clients';
 import type { TransformedTalent } from '../lib/transformers/transform-talents';
 import type { TransformedOrder } from '../lib/transformers/transform-orders';
+import { insertTalentServices } from './insert-talent-services';
 
 export async function executeBatch(
   target: MigrationTarget,
   rows: unknown[],
   startIndex: number,
-  lookups?: ImportLookups
+  lookups?: ImportLookups,
+  csvLocale?: string
 ): Promise<BatchResult> {
   switch (target) {
     case 'clients':
       return insertClients(rows as TransformedClient[], startIndex, lookups);
     case 'talents':
-      return insertTalents(rows as TransformedTalent[], startIndex, lookups);
+      return insertTalents(rows as TransformedTalent[], startIndex, lookups, csvLocale);
     case 'orders':
       return insertOrders(rows as TransformedOrder[], startIndex);
     default:
@@ -52,13 +54,13 @@ async function insertClients(
 
       const userId = authData.user.id;
 
-      // Resolve city/country names → UUIDs
+      // Resolve city/country names → UUIDs, fallback to default country from CSV locale
       const cityId = row.city_name && lookups?.citiesByName
         ? lookups.citiesByName.get(row.city_name.toLowerCase()) ?? null
         : null;
       const countryId = row.country_name && lookups?.countriesByName
         ? lookups.countriesByName.get(row.country_name.toLowerCase()) ?? null
-        : null;
+        : lookups?.defaultCountryId ?? null;
 
       // Update profile (shared fields)
       await admin.from('profiles').update({
@@ -113,7 +115,8 @@ async function insertClients(
 async function insertTalents(
   rows: TransformedTalent[],
   startIndex: number,
-  lookups?: ImportLookups
+  lookups?: ImportLookups,
+  csvLocale?: string
 ): Promise<BatchResult> {
   const admin = createAdminClient();
   let inserted = 0;
@@ -138,13 +141,13 @@ async function insertTalents(
 
       const userId = authData.user.id;
 
-      // Resolve city/country names → UUIDs
+      // Resolve city/country names → UUIDs, fallback to default country from CSV locale
       const cityId = row.city_name && lookups?.citiesByName
         ? lookups.citiesByName.get(row.city_name.toLowerCase()) ?? null
         : null;
       const countryId = row.country_name && lookups?.countriesByName
         ? lookups.countriesByName.get(row.country_name.toLowerCase()) ?? null
-        : null;
+        : lookups?.defaultCountryId ?? null;
 
       // Update profile (shared fields: phone, nif, gender, birth_date)
       await admin.from('profiles').update({
@@ -187,6 +190,25 @@ async function insertTalents(
           value: a.value,
         }));
         await admin.from('survey_responses').insert(surveyRows);
+      }
+
+      // Insert talent services + subtypes
+      if (row.services.length > 0 || row.subtypeEntries.length > 0) {
+        const tpRes = await admin
+          .from('talent_profiles')
+          .select('id')
+          .eq('user_id', userId)
+          .single();
+
+        if (tpRes.data) {
+          const svcCountryId = countryId || lookups?.defaultCountryId || 'a1000000-0000-0000-0000-000000000002';
+          const svcResult = await insertTalentServices(
+            admin, tpRes.data.id, svcCountryId, row.services, row.subtypeEntries, csvLocale ?? 'es'
+          );
+          for (const w of svcResult.warnings) {
+            errors.push({ rowIndex, message: `[warning] ${w}` });
+          }
+        }
       }
 
       inserted++;
