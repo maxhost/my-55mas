@@ -9,7 +9,7 @@ describe('formFieldSchema — db_column type', () => {
       key: 'step_1_field_1',
       type: 'db_column',
       required: true,
-      db_table: 'talent_profiles',
+      db_table: 'profiles',
       db_column: 'birth_date',
     });
     expect(result.success).toBe(true);
@@ -20,7 +20,7 @@ describe('formFieldSchema — db_column type', () => {
       key: 'step_1_field_2',
       type: 'db_column',
       required: false,
-      db_table: 'talent_profiles',
+      db_table: 'profiles',
       db_column: 'gender',
       options: ['male', 'female', 'other', 'prefer_not_to_say'],
     });
@@ -88,8 +88,8 @@ describe('formSchemaSchema — db_column duplicate detection', () => {
         {
           key: 'step_1',
           fields: [
-            { key: 'field_1', type: 'db_column', required: true, db_table: 'talent_profiles', db_column: 'birth_date' },
-            { key: 'field_2', type: 'db_column', required: false, db_table: 'talent_profiles', db_column: 'birth_date' },
+            { key: 'field_1', type: 'db_column', required: true, db_table: 'profiles', db_column: 'birth_date' },
+            { key: 'field_2', type: 'db_column', required: false, db_table: 'profiles', db_column: 'birth_date' },
           ],
         },
       ],

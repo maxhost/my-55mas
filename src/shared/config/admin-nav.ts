@@ -25,6 +25,7 @@ export const adminNavGroups: NavGroup[] = [
       { labelKey: 'surveyQuestions', href: '/admin/survey-questions', icon: 'bar-chart-2' },
       { labelKey: 'payments', href: '/admin/payments', icon: 'credit-card' },
       { labelKey: 'notifications', href: '/admin/notifications', icon: 'bell' },
+      { labelKey: 'migration', href: '/admin/migration', icon: 'upload' },
     ],
   },
 ];

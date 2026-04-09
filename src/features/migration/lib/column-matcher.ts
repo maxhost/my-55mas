@@ -1,0 +1,89 @@
+import type { ColumnMapping, DbColumn } from '../types';
+
+/**
+ * Normalize a string for comparison: lowercase, remove accents, trim.
+ */
+function normalize(str: string): string {
+  return str
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]/g, '')
+    .trim();
+}
+
+/**
+ * Score how well a CSV column name matches a DB column name.
+ * Returns 0 (no match) to 1 (exact match).
+ */
+function matchScore(csvCol: string, dbCol: string): number {
+  const a = normalize(csvCol);
+  const b = normalize(dbCol);
+
+  if (a === b) return 1;
+  if (a.includes(b) || b.includes(a)) return 0.7;
+
+  // Check for common aliases
+  const aliases: Record<string, string[]> = {
+    name: ['nombre', 'nom', 'nome', 'fullname', 'full_name'],
+    email: ['correo', 'mail', 'emailaddress'],
+    phone: ['telefone', 'telefono', 'tel'],
+    city: ['ciudad', 'cidade', 'ville', 'ciutat'],
+    country: ['pais', 'pays'],
+    status: ['estado', 'estat', 'statut', 'candidatestatus'],
+    nif: ['nie', 'taxid', 'dni', 'cif', 'identificacion'],
+    is_business: ['clienttype', 'type', 'tipo'],
+    legacy_id: ['client', 'specialist', 'numero'],
+    created_at: ['joinedat', 'registeredat', 'fecha', 'createdat'],
+    terms_accepted: ['termsofconditions', 'terms', 'terminos', 'condiciones'],
+    billing_state: ['stateprovince', 'state', 'province', 'estado', 'provincia'],
+    gender: ['genero', 'sexo'],
+    birth_date: ['dateofbirth', 'fechanacimiento', 'datanascimento'],
+    has_car: ['havecar', 'coche', 'carro'],
+    preferred_payment: ['preferredpayment', 'pago', 'pagamento'],
+    professional_status: ['professionalstatus', 'situacionprofesional'],
+    address: ['billingaddress', 'direccion', 'endereco', 'morada'],
+    postal_code: ['postalcode', 'codigopostal', 'zip', 'cep'],
+  };
+
+  for (const [key, synonyms] of Object.entries(aliases)) {
+    const allTerms = [normalize(key), ...synonyms];
+    if (allTerms.includes(a) && allTerms.includes(b)) return 0.6;
+  }
+
+  return 0;
+}
+
+/**
+ * Auto-match CSV columns to DB columns by name similarity.
+ * Each CSV column gets the best-scoring DB column (or null if no match > threshold).
+ */
+export function autoMatchColumns(
+  csvHeaders: string[],
+  dbColumns: DbColumn[]
+): ColumnMapping[] {
+  const usedDbColumns = new Set<string>();
+  const threshold = 0.5;
+
+  return csvHeaders.map((csvCol) => {
+    let bestMatch: string | null = null;
+    let bestScore = 0;
+
+    for (const dbCol of dbColumns) {
+      if (usedDbColumns.has(dbCol.name)) continue;
+
+      const score = matchScore(csvCol, dbCol.name);
+      if (score > bestScore && score >= threshold) {
+        bestScore = score;
+        bestMatch = dbCol.name;
+      }
+    }
+
+    if (bestMatch) usedDbColumns.add(bestMatch);
+
+    return {
+      csvColumn: csvCol,
+      dbColumn: bestMatch,
+    };
+  });
+}

@@ -36,7 +36,8 @@
     "forms": "Formularios",
     "surveyQuestions": "Preguntas Estadísticas",
     "payments": "Pagos",
-    "notifications": "Notificaciones"
+    "notifications": "Notificaciones",
+    "migration": "Migración"
   },
   "AdminServices": {
     "title": "Servicios",
@@ -171,7 +172,7 @@
   "DbColumns": {
     "fullName": "Nombre completo",
     "phone": "Teléfono",
-    "nif": "NIF / DNI",
+    "nif": "Tax ID (NIF/NIE)",
     "preferredContact": "Contacto preferido",
     "birthDate": "Fecha de nacimiento",
     "gender": "Género",
@@ -382,6 +383,37 @@
     "allCities": "Todas las ciudades",
     "filterByCountry": "Filtrar por país",
     "filterByCity": "Filtrar por ciudad"
+  },
+  "AdminMigration": {
+    "title": "Migración de datos",
+    "selectTarget": "Seleccionar destino",
+    "clients": "Clientes",
+    "talents": "Talentos",
+    "orders": "Pedidos",
+    "uploadCsv": "Subir CSV",
+    "dropFile": "Arrastra un archivo CSV o haz clic para seleccionar",
+    "preview": "Vista previa",
+    "rowsDetected": "{count} filas detectadas",
+    "delimiter": "Separador: {delimiter}",
+    "mapColumns": "Mapear columnas",
+    "csvColumn": "Columna CSV",
+    "dbColumn": "Columna destino",
+    "required": "Requerido",
+    "unmapped": "Sin mapear",
+    "autoMatched": "Auto-detectado",
+    "import": "Importar",
+    "importing": "Importando...",
+    "progress": "{processed} de {total}",
+    "summary": "Resumen",
+    "inserted": "Insertados",
+    "errors": "Errores",
+    "skipped": "Omitidos",
+    "noErrors": "Sin errores",
+    "prerequisite": "Prerequisito: {items} deben existir antes de importar.",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "shared": "Compartido",
+    "selectQuestion": "Seleccionar pregunta"
   },
   "Placeholder": {
     "comingSoon": "Próximamente",

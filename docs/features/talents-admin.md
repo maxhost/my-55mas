@@ -35,6 +35,7 @@ CREATE TABLE talent_profiles (
   gender              text,
   address             text,
   postal_code         text,
+  state               text,
   city_id             uuid REFERENCES cities(id),
   country_id          uuid REFERENCES countries(id),
   photo_url           text,
@@ -47,6 +48,8 @@ CREATE TABLE talent_profiles (
   approved_at         timestamptz,
   approved_by         uuid REFERENCES profiles(id),
   internal_notes      text,
+  legacy_id           integer UNIQUE,
+  terms_accepted      boolean NOT NULL DEFAULT false,
   created_at          timestamptz DEFAULT now(),
   updated_at          timestamptz DEFAULT now()
 );

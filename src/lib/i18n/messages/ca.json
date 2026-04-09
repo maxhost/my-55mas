@@ -36,7 +36,8 @@
     "forms": "Formularis",
     "surveyQuestions": "Preguntes Estadístiques",
     "payments": "Pagaments",
-    "notifications": "Notificacions"
+    "notifications": "Notificacions",
+    "migration": "Migració"
   },
   "AdminServices": {
     "title": "Serveis",
@@ -171,7 +172,7 @@
   "DbColumns": {
     "fullName": "Nom complet",
     "phone": "Telèfon",
-    "nif": "NIF / DNI",
+    "nif": "Tax ID (NIF/NIE)",
     "preferredContact": "Contacte preferit",
     "birthDate": "Data de naixement",
     "gender": "Gènere",
@@ -382,6 +383,37 @@
     "allCities": "Totes les ciutats",
     "filterByCountry": "Filtrar per país",
     "filterByCity": "Filtrar per ciutat"
+  },
+  "AdminMigration": {
+    "title": "Migració de dades",
+    "selectTarget": "Seleccionar destí",
+    "clients": "Clients",
+    "talents": "Talents",
+    "orders": "Comandes",
+    "uploadCsv": "Carregar CSV",
+    "dropFile": "Arrossega un arxiu CSV o fes clic per seleccionar",
+    "preview": "Vista prèvia",
+    "rowsDetected": "{count} files detectades",
+    "delimiter": "Separador: {delimiter}",
+    "mapColumns": "Mapejar columnes",
+    "csvColumn": "Columna CSV",
+    "dbColumn": "Columna destí",
+    "required": "Requerit",
+    "unmapped": "Sense mapeig",
+    "autoMatched": "Auto-detectat",
+    "import": "Importar",
+    "importing": "Important...",
+    "progress": "{processed} de {total}",
+    "summary": "Resum",
+    "inserted": "Inserits",
+    "errors": "Errors",
+    "skipped": "Omesos",
+    "noErrors": "Sense errors",
+    "prerequisite": "Prerequisit: {items} han d'existir abans d'importar.",
+    "back": "Enrere",
+    "next": "Següent",
+    "shared": "Compartit",
+    "selectQuestion": "Seleccionar pregunta"
   },
   "Placeholder": {
     "comingSoon": "Properament",

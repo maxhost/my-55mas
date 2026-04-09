@@ -31,14 +31,20 @@ Panel de administración para visualizar los clientes registrados en la platafor
 
 ```sql
 CREATE TABLE client_profiles (
-  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id        uuid NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
-  company_name   text,
-  company_tax_id text,
-  status         text NOT NULL DEFAULT 'active'
-                 CHECK (status IN ('active', 'suspended')),
-  created_at     timestamptz DEFAULT now(),
-  updated_at     timestamptz DEFAULT now()
+  id                   uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id              uuid NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
+  company_name         text,
+  company_tax_id       text,
+  is_business          boolean NOT NULL DEFAULT false,
+  legacy_id            integer UNIQUE,
+  terms_accepted       boolean NOT NULL DEFAULT false,
+  billing_address      text,
+  billing_state        text,
+  billing_postal_code  text,
+  status               text NOT NULL DEFAULT 'active'
+                       CHECK (status IN ('active', 'suspended')),
+  created_at           timestamptz DEFAULT now(),
+  updated_at           timestamptz DEFAULT now()
 );
 ```
 

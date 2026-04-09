@@ -22,7 +22,7 @@ describe('extractMappedFields', () => {
           key: 'step_1',
           fields: [
             dbField('f1', 'profiles', 'full_name'),
-            dbField('f2', 'talent_profiles', 'birth_date'),
+            dbField('f2', 'profiles', 'birth_date'),
             dbField('f3', 'profiles', 'phone'),
           ],
         },
@@ -32,8 +32,7 @@ describe('extractMappedFields', () => {
     const formData = { f1: 'Juan García', f2: '1965-03-15', f3: '+34600111222' };
     const result = extractMappedFields(schema, formData);
 
-    expect(result.profiles).toEqual({ full_name: 'Juan García', phone: '+34600111222' });
-    expect(result.talent_profiles).toEqual({ birth_date: '1965-03-15' });
+    expect(result.profiles).toEqual({ full_name: 'Juan García', birth_date: '1965-03-15', phone: '+34600111222' });
   });
 
   it('puts non-db_column fields into unmapped', () => {

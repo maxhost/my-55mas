@@ -510,10 +510,12 @@ CREATE TABLE talent_profiles (
   preferred_payment   text CHECK (preferred_payment IN ('acumulate', 'per_service', 'other')),
   professional_status text CHECK (professional_status IN ('unemployed', 'retired', 'employed', 'self_employed', 'other')),
   handler_id  uuid REFERENCES profiles(id) ON DELETE SET NULL,  -- staff member que gestiona/reclutó al talento
-  internal_notes text,                    -- notas internas del equipo (solo admin/staff)
-  legacy_id   integer UNIQUE,             -- ID del sistema legacy (CSV import)
-  created_at  timestamptz DEFAULT now(),
-  updated_at  timestamptz DEFAULT now(),
+  internal_notes   text,                    -- notas internas del equipo (solo admin/staff)
+  legacy_id        integer UNIQUE,             -- ID del sistema legacy (CSV import)
+  terms_accepted   boolean NOT NULL DEFAULT false,  -- Aceptación de T&C
+  state            text,                       -- Estado/provincia de residencia
+  created_at       timestamptz DEFAULT now(),
+  updated_at       timestamptz DEFAULT now(),
   -- Onboarding multi-step: pending/rejected permiten NULL (perfil incompleto).
   -- Para ser aprobado o suspendido, país y ciudad son obligatorios (matching de proximidad).
   CHECK (
@@ -528,14 +530,20 @@ CREATE TABLE talent_profiles (
 
 ```sql
 CREATE TABLE client_profiles (
-  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id        uuid NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
-  company_name   text,                  -- Nombre de la empresa (si aplica)
-  company_tax_id text,                  -- CIF/NIF de la empresa
-  status         text NOT NULL DEFAULT 'active'
-                 CHECK (status IN ('active', 'suspended')),
-  created_at     timestamptz DEFAULT now(),
-  updated_at     timestamptz DEFAULT now()
+  id                   uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id              uuid NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
+  company_name         text,                  -- Nombre de la empresa (si aplica)
+  company_tax_id       text,                  -- CIF/NIF de la empresa
+  is_business          boolean NOT NULL DEFAULT false,  -- true si es empresa
+  legacy_id            integer UNIQUE,        -- ID del sistema legacy
+  terms_accepted       boolean NOT NULL DEFAULT false,  -- Aceptación de T&C
+  billing_address      text,                  -- Dirección de facturación (calle)
+  billing_state        text,                  -- Estado/provincia de facturación
+  billing_postal_code  text,                  -- Código postal de facturación
+  status               text NOT NULL DEFAULT 'active'
+                       CHECK (status IN ('active', 'suspended')),
+  created_at           timestamptz DEFAULT now(),
+  updated_at           timestamptz DEFAULT now()
 );
 ```
 

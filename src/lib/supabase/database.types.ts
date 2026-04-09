@@ -186,29 +186,47 @@ export type Database = {
       }
       client_profiles: {
         Row: {
+          billing_address: string | null
+          billing_postal_code: string | null
+          billing_state: string | null
           company_name: string | null
           company_tax_id: string | null
           created_at: string | null
           id: string
+          is_business: boolean
+          legacy_id: number | null
           status: string
+          terms_accepted: boolean
           updated_at: string | null
           user_id: string
         }
         Insert: {
+          billing_address?: string | null
+          billing_postal_code?: string | null
+          billing_state?: string | null
           company_name?: string | null
           company_tax_id?: string | null
           created_at?: string | null
           id?: string
+          is_business?: boolean
+          legacy_id?: number | null
           status?: string
+          terms_accepted?: boolean
           updated_at?: string | null
           user_id: string
         }
         Update: {
+          billing_address?: string | null
+          billing_postal_code?: string | null
+          billing_state?: string | null
           company_name?: string | null
           company_tax_id?: string | null
           created_at?: string | null
           id?: string
+          is_business?: boolean
+          legacy_id?: number | null
           status?: string
+          terms_accepted?: boolean
           updated_at?: string | null
           user_id?: string
         }
@@ -631,9 +649,11 @@ export type Database = {
         Row: {
           active_role: string
           avatar_url: string | null
+          birth_date: string | null
           created_at: string | null
           email: string | null
           full_name: string | null
+          gender: string | null
           id: string
           nif: string | null
           phone: string | null
@@ -646,9 +666,11 @@ export type Database = {
         Insert: {
           active_role?: string
           avatar_url?: string | null
+          birth_date?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
+          gender?: string | null
           id: string
           nif?: string | null
           phone?: string | null
@@ -661,9 +683,11 @@ export type Database = {
         Update: {
           active_role?: string
           avatar_url?: string | null
+          birth_date?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
+          gender?: string | null
           id?: string
           nif?: string | null
           phone?: string | null
@@ -1730,6 +1754,38 @@ export type Database = {
         }
         Relationships: []
       }
+      survey_responses: {
+        Row: {
+          created_at: string | null
+          id: string
+          key: string
+          user_id: string
+          value: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          key: string
+          user_id: string
+          value?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          key?: string
+          user_id?: string
+          value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "survey_responses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       talent_analytics: {
         Row: {
           created_at: string | null
@@ -1970,11 +2026,9 @@ export type Database = {
           address: string | null
           approved_at: string | null
           approved_by: string | null
-          birth_date: string
           city_id: string | null
           country_id: string | null
           created_at: string | null
-          gender: string | null
           handler_id: string | null
           has_car: boolean | null
           id: string
@@ -1984,7 +2038,9 @@ export type Database = {
           postal_code: string | null
           preferred_payment: string | null
           professional_status: string | null
+          state: string | null
           status: string
+          terms_accepted: boolean
           updated_at: string | null
           user_id: string
         }
@@ -1992,11 +2048,9 @@ export type Database = {
           address?: string | null
           approved_at?: string | null
           approved_by?: string | null
-          birth_date: string
           city_id?: string | null
           country_id?: string | null
           created_at?: string | null
-          gender?: string | null
           handler_id?: string | null
           has_car?: boolean | null
           id?: string
@@ -2006,7 +2060,9 @@ export type Database = {
           postal_code?: string | null
           preferred_payment?: string | null
           professional_status?: string | null
+          state?: string | null
           status?: string
+          terms_accepted?: boolean
           updated_at?: string | null
           user_id: string
         }
@@ -2014,11 +2070,9 @@ export type Database = {
           address?: string | null
           approved_at?: string | null
           approved_by?: string | null
-          birth_date?: string
           city_id?: string | null
           country_id?: string | null
           created_at?: string | null
-          gender?: string | null
           handler_id?: string | null
           has_car?: boolean | null
           id?: string
@@ -2028,7 +2082,9 @@ export type Database = {
           postal_code?: string | null
           preferred_payment?: string | null
           professional_status?: string | null
+          state?: string | null
           status?: string
+          terms_accepted?: boolean
           updated_at?: string | null
           user_id?: string
         }

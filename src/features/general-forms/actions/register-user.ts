@@ -104,7 +104,6 @@ export async function registerUser(input: RegisterInput) {
     console.log('[registerUser] INSERT talent_profiles:', talentData);
     const { error: talentError } = await supabase.from('talent_profiles').insert({
       user_id: userId,
-      birth_date: (talentData.birth_date as string) || '1970-01-01',
       status: 'pending',
       ...talentData,
     });

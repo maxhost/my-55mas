@@ -38,17 +38,17 @@ export const DB_COLUMN_REGISTRY: Record<string, TableDef> = {
         labelKey: 'DbColumns.preferredContact',
         options: ['email', 'phone', 'whatsapp'],
       },
-    },
-  },
-  talent_profiles: {
-    labelKey: 'DbTables.talentProfiles',
-    columns: {
       birth_date: { inputType: 'date', labelKey: 'DbColumns.birthDate' },
       gender: {
         inputType: 'select',
         labelKey: 'DbColumns.gender',
         options: ['male', 'female', 'other', 'prefer_not_to_say'],
       },
+    },
+  },
+  talent_profiles: {
+    labelKey: 'DbTables.talentProfiles',
+    columns: {
       address: { inputType: 'text', labelKey: 'DbColumns.address' },
       postal_code: { inputType: 'text', labelKey: 'DbColumns.postalCode' },
       has_car: { inputType: 'boolean', labelKey: 'DbColumns.hasCar' },
