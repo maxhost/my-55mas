@@ -49,17 +49,28 @@ export type ServiceOption = {
 
 export type SubtypeGroupOption = {
   id: string;
-  serviceSlug: string;
+  serviceSlugs: string[];
   groupName: string;
   items: { id: string; name: string }[];
 };
 
+// ── Talent Tags (local; no import from @/features/talent-tags — feature isolation) ──
+
+export type TalentTagOption = {
+  id: string;
+  name: string;
+};
+
 // ── Lookups (for resolving names → UUIDs) ───────────
+
+import type { SpokenLanguageAliasMap } from '@/shared/lib/spoken-languages/types';
 
 export type ImportLookups = {
   citiesByName: Map<string, string>;
   countriesByName: Map<string, string>;
   defaultCountryId: string | null;
+  tagIdsByName?: Map<string, string>;
+  spokenLanguageAliases?: SpokenLanguageAliasMap;
 };
 
 // ── Batch Processing ────────────────────────────────

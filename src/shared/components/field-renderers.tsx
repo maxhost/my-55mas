@@ -80,29 +80,34 @@ export function renderSingleSelect({ field, value, label, placeholder, errorClas
 
 export function renderMultiselect({ field, value, label, isRequired, onChange, optionLabels }: SelectRenderProps) {
   const selected = (value as string[]) ?? [];
+  const pairs: Array<{ value: string; label: string }> =
+    field.options_snapshot && field.options_snapshot.length > 0
+      ? field.options_snapshot
+      : (field.options ?? []).map((opt) => ({
+          value: opt,
+          label: optionLabels[`${field.key}.${opt}`] ?? opt,
+        }));
+
   return (
     <div key={field.key} className="space-y-1">
       <Label>{label}{isRequired && ' *'}</Label>
       <div className="flex flex-wrap gap-2">
-        {(field.options ?? []).map((opt) => {
-          const optLabel = optionLabels[`${field.key}.${opt}`] ?? opt;
-          return (
-            <label key={opt} className="flex items-center gap-1.5 text-sm">
-              <input
-                type="checkbox"
-                checked={selected.includes(opt)}
-                onChange={(e) => {
-                  const next = e.target.checked
-                    ? [...selected, opt]
-                    : selected.filter((s) => s !== opt);
-                  onChange(field.key, next);
-                }}
-                className="h-4 w-4"
-              />
-              {optLabel}
-            </label>
-          );
-        })}
+        {pairs.map((pair) => (
+          <label key={pair.value} className="flex items-center gap-1.5 text-sm">
+            <input
+              type="checkbox"
+              checked={selected.includes(pair.value)}
+              onChange={(e) => {
+                const next = e.target.checked
+                  ? [...selected, pair.value]
+                  : selected.filter((s) => s !== pair.value);
+                onChange(field.key, next);
+              }}
+              className="h-4 w-4"
+            />
+            {pair.label}
+          </label>
+        ))}
       </div>
     </div>
   );
@@ -160,6 +165,10 @@ export function renderDbColumn({ field, value, label, placeholder, errorClass, i
 
   if (colDef.inputType === 'select') {
     return renderSingleSelect({ field, value, label, placeholder, errorClass, isRequired, onChange, optionLabels, selectPlaceholder });
+  }
+
+  if (colDef.inputType === 'multiselect') {
+    return renderMultiselect({ field, value, label, placeholder, errorClass, isRequired, onChange, optionLabels, selectPlaceholder });
   }
 
   // text, email, date, number, password — use HTML input type

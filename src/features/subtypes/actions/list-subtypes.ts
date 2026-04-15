@@ -4,27 +4,37 @@ import { createClient } from '@/lib/supabase/server';
 import type { SubtypeGroupWithTranslations } from '../types';
 
 /**
- * Lists all subtype groups for a service, with nested items and translations.
- * Returns groups sorted by sort_order, each with items sorted by sort_order.
+ * Lists subtype groups assigned to a service, with nested items and translations.
+ * Queries through the junction table service_subtype_group_assignments.
  */
 export async function listSubtypes(
   serviceId: string
 ): Promise<SubtypeGroupWithTranslations[]> {
   const supabase = createClient();
 
-  // 1. Fetch groups with translations (JOIN)
-  const { data: groups, error: groupsError } = await supabase
-    .from('service_subtype_groups')
-    .select('id, service_id, slug, sort_order, is_active, service_subtype_group_translations(locale, name)')
+  // 1. Get group IDs assigned to this service via junction
+  const { data: assignments, error: aError } = await supabase
+    .from('service_subtype_group_assignments')
+    .select('group_id, sort_order')
     .eq('service_id', serviceId)
     .order('sort_order', { ascending: true });
+
+  if (aError) throw aError;
+  if (!assignments || assignments.length === 0) return [];
+
+  const groupIds = assignments.map((a) => a.group_id);
+  const sortByGroupId = new Map(assignments.map((a) => [a.group_id, a.sort_order]));
+
+  // 2. Fetch groups with translations
+  const { data: groups, error: groupsError } = await supabase
+    .from('service_subtype_groups')
+    .select('id, slug, sort_order, is_active, service_subtype_group_translations(locale, name)')
+    .in('id', groupIds);
 
   if (groupsError) throw groupsError;
   if (!groups || groups.length === 0) return [];
 
-  const groupIds = groups.map((g) => g.id);
-
-  // 2. Fetch all items for these groups with translations (JOIN)
+  // 3. Fetch all items for these groups with translations
   const { data: items, error: itemsError } = await supabase
     .from('service_subtypes')
     .select('id, group_id, slug, sort_order, is_active, service_subtype_translations(locale, name)')
@@ -33,14 +43,12 @@ export async function listSubtypes(
 
   if (itemsError) throw itemsError;
 
-  // 3. Build items map grouped by group_id
+  // 4. Build items map grouped by group_id
   const itemsByGroup = new Map<string, SubtypeGroupWithTranslations['items']>();
   for (const item of items ?? []) {
     const trans: Record<string, string> = {};
     const rawTrans = item.service_subtype_translations as unknown as { locale: string; name: string }[];
-    for (const t of rawTrans) {
-      trans[t.locale] = t.name;
-    }
+    for (const t of rawTrans) trans[t.locale] = t.name;
 
     if (!itemsByGroup.has(item.group_id)) itemsByGroup.set(item.group_id, []);
     itemsByGroup.get(item.group_id)!.push({
@@ -53,22 +61,23 @@ export async function listSubtypes(
     });
   }
 
-  // 4. Assemble groups with translations + items
-  return groups.map((g) => {
+  // 5. Assemble groups with translations + items, sorted by assignment sort_order
+  const result = groups.map((g) => {
     const trans: Record<string, string> = {};
     const rawTrans = g.service_subtype_group_translations as unknown as { locale: string; name: string }[];
-    for (const t of rawTrans) {
-      trans[t.locale] = t.name;
-    }
+    for (const t of rawTrans) trans[t.locale] = t.name;
 
     return {
       id: g.id,
-      service_id: g.service_id,
       slug: g.slug,
-      sort_order: g.sort_order ?? 0,
+      sort_order: sortByGroupId.get(g.id) ?? g.sort_order,
       is_active: g.is_active,
       translations: trans,
       items: itemsByGroup.get(g.id) ?? [],
     };
   });
+
+  // Sort by junction sort_order
+  result.sort((a, b) => a.sort_order - b.sort_order);
+  return result;
 }

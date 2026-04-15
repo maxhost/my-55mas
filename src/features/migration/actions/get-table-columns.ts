@@ -19,6 +19,7 @@ const CLIENT_COLUMNS: DbColumn[] = [
   { name: 'birth_date', required: false, description: 'Date of birth (YYYY-MM-DD)' },
   { name: 'city', required: false, description: 'City name (for lookup)' },
   { name: 'country', required: false, description: 'Country name (for lookup)' },
+  { name: 'other_language', required: false, description: 'Other spoken languages (multi-value)' },
   { name: 'survey_question', required: false, description: 'Statistical question' },
   { name: 'created_at', required: false, description: 'Registration date' },
 ];
@@ -42,9 +43,12 @@ const TALENT_COLUMNS: DbColumn[] = [
   { name: 'postal_code', required: false, description: 'Postal code' },
   { name: 'city', required: false, description: 'City name (for lookup)' },
   { name: 'country', required: false, description: 'Country name (for lookup)' },
+  { name: 'other_language', required: false, description: 'Other spoken languages (multi-value)' },
   { name: 'survey_question', required: false, description: 'Statistical question' },
   { name: 'service_column', required: false, description: 'Service offered (select service)' },
   { name: 'service_subtype_column', required: false, description: 'Service subtype (select group)' },
+  { name: 'talent_tag_column', required: false, description: 'Talent tags (multi-value, comma/semicolon separated)' },
+  { name: 'internal_notes', required: false, description: 'Internal notes (admin only)' },
   { name: 'created_at', required: false, description: 'Registration date' },
 ];
 

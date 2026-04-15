@@ -656,6 +656,7 @@ export type Database = {
           gender: string | null
           id: string
           nif: string | null
+          other_language: string[] | null
           phone: string | null
           preferred_city: string | null
           preferred_contact: string | null
@@ -673,6 +674,7 @@ export type Database = {
           gender?: string | null
           id: string
           nif?: string | null
+          other_language?: string[] | null
           phone?: string | null
           preferred_city?: string | null
           preferred_contact?: string | null
@@ -690,6 +692,7 @@ export type Database = {
           gender?: string | null
           id?: string
           nif?: string | null
+          other_language?: string[] | null
           phone?: string | null
           preferred_city?: string | null
           preferred_contact?: string | null
@@ -1238,6 +1241,49 @@ export type Database = {
           },
         ]
       }
+      service_subtype_group_assignments: {
+        Row: {
+          created_at: string | null
+          group_id: string
+          service_id: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string | null
+          group_id: string
+          service_id: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string | null
+          group_id?: string
+          service_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_subtype_group_assignments_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "service_subtype_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_subtype_group_assignments_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_subtype_group_assignments_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services_localized"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_subtype_group_translations: {
         Row: {
           created_at: string | null
@@ -1282,7 +1328,6 @@ export type Database = {
           created_at: string | null
           id: string
           is_active: boolean
-          service_id: string
           slug: string
           sort_order: number
           updated_at: string | null
@@ -1291,7 +1336,6 @@ export type Database = {
           created_at?: string | null
           id?: string
           is_active?: boolean
-          service_id: string
           slug: string
           sort_order?: number
           updated_at?: string | null
@@ -1300,27 +1344,11 @@ export type Database = {
           created_at?: string | null
           id?: string
           is_active?: boolean
-          service_id?: string
           slug?: string
           sort_order?: number
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "service_subtype_groups_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_subtype_groups_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services_localized"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       service_subtype_translations: {
         Row: {
@@ -1367,7 +1395,6 @@ export type Database = {
           group_id: string
           id: string
           is_active: boolean
-          service_id: string
           slug: string
           sort_order: number | null
           updated_at: string | null
@@ -1377,7 +1404,6 @@ export type Database = {
           group_id: string
           id?: string
           is_active?: boolean
-          service_id: string
           slug: string
           sort_order?: number | null
           updated_at?: string | null
@@ -1387,7 +1413,6 @@ export type Database = {
           group_id?: string
           id?: string
           is_active?: boolean
-          service_id?: string
           slug?: string
           sort_order?: number | null
           updated_at?: string | null
@@ -1398,20 +1423,6 @@ export type Database = {
             columns: ["group_id"]
             isOneToOne: false
             referencedRelation: "service_subtype_groups"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_subtypes_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_subtypes_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services_localized"
             referencedColumns: ["id"]
           },
         ]
@@ -1530,6 +1541,79 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      spoken_language_aliases: {
+        Row: {
+          alias_normalized: string
+          language_code: string
+          original_text: string
+        }
+        Insert: {
+          alias_normalized: string
+          language_code: string
+          original_text: string
+        }
+        Update: {
+          alias_normalized?: string
+          language_code?: string
+          original_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spoken_language_aliases_language_code_fkey"
+            columns: ["language_code"]
+            isOneToOne: false
+            referencedRelation: "spoken_languages"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      spoken_language_translations: {
+        Row: {
+          language_code: string
+          locale: string
+          name: string
+        }
+        Insert: {
+          language_code: string
+          locale: string
+          name: string
+        }
+        Update: {
+          language_code?: string
+          locale?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spoken_language_translations_language_code_fkey"
+            columns: ["language_code"]
+            isOneToOne: false
+            referencedRelation: "spoken_languages"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      spoken_languages: {
+        Row: {
+          code: string
+          created_at: string
+          is_active: boolean
+          sort_order: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          is_active?: boolean
+          sort_order?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          is_active?: boolean
+          sort_order?: number
+        }
+        Relationships: []
       }
       staff_profiles: {
         Row: {
@@ -2029,7 +2113,7 @@ export type Database = {
           city_id: string | null
           country_id: string | null
           created_at: string | null
-          handler_id: string | null
+          created_by: string | null
           has_car: boolean | null
           id: string
           internal_notes: string | null
@@ -2051,7 +2135,7 @@ export type Database = {
           city_id?: string | null
           country_id?: string | null
           created_at?: string | null
-          handler_id?: string | null
+          created_by?: string | null
           has_car?: boolean | null
           id?: string
           internal_notes?: string | null
@@ -2073,7 +2157,7 @@ export type Database = {
           city_id?: string | null
           country_id?: string | null
           created_at?: string | null
-          handler_id?: string | null
+          created_by?: string | null
           has_car?: boolean | null
           id?: string
           internal_notes?: string | null
@@ -2125,8 +2209,8 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "talent_profiles_handler_id_fkey"
-            columns: ["handler_id"]
+            foreignKeyName: "talent_profiles_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -2254,6 +2338,115 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      talent_tag_assignments: {
+        Row: {
+          assigned_by: string | null
+          created_at: string
+          tag_id: string
+          talent_id: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          created_at?: string
+          tag_id: string
+          talent_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          created_at?: string
+          tag_id?: string
+          talent_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "talent_tag_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "talent_tag_assignments_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "talent_tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "talent_tag_assignments_talent_id_fkey"
+            columns: ["talent_id"]
+            isOneToOne: false
+            referencedRelation: "talent_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      talent_tag_translations: {
+        Row: {
+          created_at: string
+          locale: string
+          name: string
+          tag_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          locale: string
+          name: string
+          tag_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          locale?: string
+          name?: string
+          tag_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "talent_tag_translations_locale_fkey"
+            columns: ["locale"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "talent_tag_translations_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "talent_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      talent_tags: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       team_members: {
         Row: {
@@ -2638,4 +2831,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

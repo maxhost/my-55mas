@@ -128,7 +128,7 @@ export function ColumnMapper({
                 <SecondarySelect
                   value={mapping.secondaryId}
                   placeholder={t('selectSubtypeGroup')}
-                  options={subtypeGroupOptions.map((g) => ({ id: g.id, label: `${g.serviceSlug} — ${g.groupName}` }))}
+                  options={subtypeGroupOptions.map((g) => ({ id: g.id, label: `${g.serviceSlugs.join(', ')} — ${g.groupName}` }))}
                   usedIds={usedSecondaryIds}
                   currentId={mapping.secondaryId}
                   onChange={(id) => onMappingChange(mapping.csvColumn, dbCol, id)}

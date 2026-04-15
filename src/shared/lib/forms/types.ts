@@ -36,11 +36,17 @@ export type StepAction = {
 
 // ── Form Schema Structure ─────────────────────────────
 
+export type FormFieldOptionSnapshot = {
+  value: string;
+  label: string;
+};
+
 export type FormField = {
   key: string;
   type: FieldType;
   required: boolean;
   options?: string[];
+  options_snapshot?: FormFieldOptionSnapshot[];
   subtype_group?: string; // slug del grupo (solo para type === 'subtype')
   survey_question_key?: string; // key de survey_questions (solo para type === 'survey')
   db_table?: string; // tabla destino (solo para type === 'db_column')

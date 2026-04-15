@@ -7,13 +7,17 @@ export type InputType =
   | 'number'
   | 'boolean'
   | 'select'
+  | 'multiselect'
   | 'textarea'
   | 'password';
+
+export type OptionsSource = 'spoken_languages';
 
 export type ColumnDef = {
   inputType: InputType;
   labelKey: string;
   options?: readonly string[];
+  optionsSource?: OptionsSource;
 };
 
 export type TableDef = {
@@ -43,6 +47,11 @@ export const DB_COLUMN_REGISTRY: Record<string, TableDef> = {
         inputType: 'select',
         labelKey: 'DbColumns.gender',
         options: ['male', 'female', 'other', 'prefer_not_to_say'],
+      },
+      other_language: {
+        inputType: 'multiselect',
+        labelKey: 'DbColumns.otherLanguage',
+        optionsSource: 'spoken_languages',
       },
     },
   },

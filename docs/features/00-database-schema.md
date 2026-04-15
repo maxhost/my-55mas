@@ -509,7 +509,7 @@ CREATE TABLE talent_profiles (
   -- Operaciones
   preferred_payment   text CHECK (preferred_payment IN ('acumulate', 'per_service', 'other')),
   professional_status text CHECK (professional_status IN ('unemployed', 'retired', 'employed', 'self_employed', 'other')),
-  handler_id  uuid REFERENCES profiles(id) ON DELETE SET NULL,  -- staff member que gestiona/reclutó al talento
+  created_by  uuid REFERENCES profiles(id) ON DELETE SET NULL,  -- staff member que creó el registro (antes handler_id; renombrado en sesión talent-tags)
   internal_notes   text,                    -- notas internas del equipo (solo admin/staff)
   legacy_id        integer UNIQUE,             -- ID del sistema legacy (CSV import)
   terms_accepted   boolean NOT NULL DEFAULT false,  -- Aceptación de T&C
@@ -647,17 +647,14 @@ CREATE TABLE survey_question_translations (
   PRIMARY KEY (question_id, locale)
 );
 
--- Grupos de sub-tipos (ej: "tipo_de_mascota", "tamaño")
--- Cada servicio puede tener múltiples grupos independientes
+-- Grupos de sub-tipos (entidades independientes, reutilizables entre servicios)
 CREATE TABLE service_subtype_groups (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  service_id  uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
-  slug        text NOT NULL,              -- 'tipo_de_mascota', 'tamano'
+  slug        text NOT NULL UNIQUE,       -- globalmente único
   sort_order  int NOT NULL DEFAULT 0,
   is_active   boolean NOT NULL DEFAULT true,
   created_at  timestamptz DEFAULT now(),
-  updated_at  timestamptz DEFAULT now(),
-  UNIQUE (service_id, slug)
+  updated_at  timestamptz DEFAULT now()
 );
 
 CREATE TABLE service_subtype_group_translations (
@@ -669,12 +666,20 @@ CREATE TABLE service_subtype_group_translations (
   PRIMARY KEY (group_id, locale)
 );
 
+-- Asignación many-to-many: qué grupos aplican a cada servicio
+CREATE TABLE service_subtype_group_assignments (
+  service_id  uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
+  group_id    uuid NOT NULL REFERENCES service_subtype_groups(id) ON DELETE CASCADE,
+  sort_order  int NOT NULL DEFAULT 0,
+  created_at  timestamptz DEFAULT now(),
+  PRIMARY KEY (service_id, group_id)
+);
+
 -- Sub-tipos de servicio (items dentro de un grupo)
 -- Ej: grupo "tipo_de_mascota" → items perro, gato, pez
 CREATE TABLE service_subtypes (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   group_id    uuid NOT NULL REFERENCES service_subtype_groups(id) ON DELETE CASCADE,
-  service_id  uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
   slug        text NOT NULL,              -- 'dog', 'cat', 'fish'
   sort_order  int DEFAULT 0,
   is_active   boolean NOT NULL DEFAULT true,
@@ -700,6 +705,54 @@ CREATE TABLE talent_service_subtypes (
   PRIMARY KEY (talent_id, subtype_id)
 );
 ```
+
+---
+
+## Capa 6.4 — Etiquetas de talento (talent tags)
+
+Etiquetas categorizadoras planas aplicadas por el backoffice a los talentos (ex "55+ Handler").
+Estructura plana, sin grupos. Nombre traducible vía tabla de traducciones.
+
+```sql
+CREATE TABLE talent_tags (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug        text NOT NULL UNIQUE,
+  sort_order  int  NOT NULL DEFAULT 0,
+  is_active   boolean NOT NULL DEFAULT true,
+  created_at  timestamptz NOT NULL DEFAULT now(),
+  updated_at  timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE talent_tag_translations (
+  tag_id      uuid NOT NULL REFERENCES talent_tags(id) ON DELETE CASCADE,
+  locale      text NOT NULL REFERENCES languages(code),
+  name        text NOT NULL,
+  created_at  timestamptz NOT NULL DEFAULT now(),
+  updated_at  timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (tag_id, locale)
+);
+
+-- Asignaciones talento ↔ tag
+CREATE TABLE talent_tag_assignments (
+  talent_id   uuid NOT NULL REFERENCES talent_profiles(id) ON DELETE CASCADE,
+  tag_id      uuid NOT NULL REFERENCES talent_tags(id) ON DELETE CASCADE,
+  assigned_by uuid REFERENCES profiles(id) ON DELETE SET NULL,
+  created_at  timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (talent_id, tag_id)
+);
+CREATE INDEX idx_talent_tag_assignments_tag ON talent_tag_assignments(tag_id);
+
+-- Triggers updated_at (reutilizan handle_updated_at)
+CREATE TRIGGER talent_tags_updated_at
+  BEFORE UPDATE ON talent_tags
+  FOR EACH ROW EXECUTE FUNCTION handle_updated_at();
+
+CREATE TRIGGER talent_tag_translations_updated_at
+  BEFORE UPDATE ON talent_tag_translations
+  FOR EACH ROW EXECUTE FUNCTION handle_updated_at();
+```
+
+Borrado: soft delete (`is_active = false`) para preservar asignaciones históricas.
 
 ---
 

@@ -29,15 +29,25 @@
     "archive": "Archive",
     "talents": "Talents 55+",
     "clients": "Clients",
+    "spokenLanguages": "Spoken languages",
     "members": "Members",
     "services": "Services",
     "dashboard": "Dashboard",
     "talentServices": "Talent Services",
     "forms": "Forms",
+    "subtypes": "Subtypes",
+    "talentTags": "Talent tags",
     "surveyQuestions": "Survey Questions",
     "payments": "Payments",
     "notifications": "Notifications",
-    "migration": "Migration"
+    "migration": "Migration",
+    "groupOperations": "Operations",
+    "groupUsers": "Users",
+    "groupStaff": "Staff",
+    "groupCatalog": "Catalog",
+    "groupForms": "Forms",
+    "groupStats": "Statistics",
+    "groupSystem": "System"
   },
   "AdminServices": {
     "title": "Services",
@@ -160,7 +170,10 @@
     "selectTable": "Select table...",
     "selectColumn": "Select column...",
     "dbColumnInfo": "No tables available for mapping.",
-    "optionLabels": "Option labels"
+    "optionLabels": "Option labels",
+    "loadingOptions": "Loading options…",
+    "failedToLoadOptions": "Failed to load options.",
+    "dynamicOptionsLoaded": "{count} options loaded from catalog."
   },
   "DbTables": {
     "profiles": "Profile",
@@ -191,7 +204,8 @@
     "authPassword": "Password",
     "authConfirmPassword": "Confirm password",
     "companyName": "Company name",
-    "companyTaxId": "Company tax ID"
+    "companyTaxId": "Company tax ID",
+    "otherLanguage": "Other spoken languages"
   },
   "DbColumnOptions": {
     "gender_male": "Male",
@@ -288,7 +302,7 @@
   },
   "AdminSubtypes": {
     "title": "Subtypes",
-    "description": "Define subtype groups for this service (e.g., \"Pet type\" → dog, cat; \"Size\" → small, large).",
+    "description": "Manage reusable subtype groups. Then assign them to individual services.",
     "addGroup": "Add group",
     "addItem": "Add item",
     "noGroups": "No subtype groups defined.",
@@ -299,7 +313,48 @@
     "namePlaceholder": "Name",
     "active": "Active",
     "save": "Save",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "assignTitle": "Assigned groups",
+    "assignDescription": "Select which subtype groups apply to this service.",
+    "saveAssignments": "Save assignments",
+    "noGroupsAvailable": "No groups created. Create groups in the Subtypes section."
+  },
+  "AdminTalentTags": {
+    "title": "Talent tags",
+    "description": "Manage the tags backoffice applies to talents. Deactivating keeps historical assignments.",
+    "addTag": "Add tag",
+    "noTags": "No tags defined.",
+    "slug": "slug",
+    "namePlaceholder": "Name",
+    "sortOrder": "Order",
+    "active": "Active",
+    "save": "Save",
+    "saving": "Saving...",
+    "delete": "Delete",
+    "confirmDelete": "Deactivate this tag? Existing assignments will be preserved."
+  },
+  "AdminSpokenLanguages": {
+    "title": "Spoken languages",
+    "description": "Manage the catalog of languages spoken by talents and clients. ISO codes are immutable once created.",
+    "addLanguage": "Add language",
+    "noLanguages": "No languages defined.",
+    "code": "ISO code",
+    "codeHint": "Lowercase, 2–3 letters. E.g.: pt, en, yue.",
+    "codeReadonlyHint": "The ISO code cannot be changed. To rename, create a new language.",
+    "sortOrder": "Order",
+    "active": "Active",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "delete": "Delete",
+    "confirmDelete": "Deactivate this language? It will be hidden from dropdowns, but existing profiles with this code are preserved.",
+    "translationPlaceholder": "Translated name",
+    "loadError": "Could not load languages.",
+    "errors": {
+      "duplicateCode": "A language with that code already exists.",
+      "saveFailed": "Could not save. Please try again.",
+      "invalidCode": "The code must be lowercase and 2–3 letters (e.g.: pt, en, yue).",
+      "missingTranslation": "Missing translations in one or more languages."
+    }
   },
   "TalentPortal": {
     "save": "Save",

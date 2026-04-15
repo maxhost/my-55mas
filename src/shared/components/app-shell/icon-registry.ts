@@ -13,7 +13,11 @@ import {
   Bell,
   Briefcase,
   BarChart2,
+  Tags,
+  Upload,
+  ChevronDown,
   Circle,
+  Globe,
 } from 'lucide-react';
 
 const icons: Record<string, LucideIcon> = {
@@ -28,6 +32,10 @@ const icons: Record<string, LucideIcon> = {
   bell: Bell,
   briefcase: Briefcase,
   'bar-chart-2': BarChart2,
+  tags: Tags,
+  upload: Upload,
+  'chevron-down': ChevronDown,
+  globe: Globe,
 };
 
 export function getNavIcon(name: string): LucideIcon {

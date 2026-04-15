@@ -29,15 +29,25 @@
     "archive": "Arquivo",
     "talents": "Talentos 55+",
     "clients": "Clientes",
+    "spokenLanguages": "Línguas faladas",
     "members": "Membros",
     "services": "Serviços",
     "dashboard": "Dashboard",
     "talentServices": "Serviços Talento",
     "forms": "Formulários",
+    "subtypes": "Sub-tipos",
+    "talentTags": "Etiquetas de talento",
     "surveyQuestions": "Perguntas Estatísticas",
     "payments": "Pagamentos",
     "notifications": "Notificações",
-    "migration": "Migração"
+    "migration": "Migração",
+    "groupOperations": "Operações",
+    "groupUsers": "Utilizadores",
+    "groupStaff": "Staff",
+    "groupCatalog": "Catálogo",
+    "groupForms": "Formulários",
+    "groupStats": "Estatísticas",
+    "groupSystem": "Sistema"
   },
   "AdminServices": {
     "title": "Serviços",
@@ -160,7 +170,10 @@
     "selectTable": "Selecionar tabela...",
     "selectColumn": "Selecionar coluna...",
     "dbColumnInfo": "Nenhuma tabela disponível para mapeamento.",
-    "optionLabels": "Rótulos das opções"
+    "optionLabels": "Rótulos das opções",
+    "loadingOptions": "Carregando opções…",
+    "failedToLoadOptions": "Não foi possível carregar as opções.",
+    "dynamicOptionsLoaded": "{count} opções carregadas do catálogo."
   },
   "DbTables": {
     "profiles": "Perfil",
@@ -191,7 +204,8 @@
     "authPassword": "Senha",
     "authConfirmPassword": "Confirmar senha",
     "companyName": "Nome da empresa",
-    "companyTaxId": "NIF / CNPJ empresa"
+    "companyTaxId": "NIF / CNPJ empresa",
+    "otherLanguage": "Outras línguas faladas"
   },
   "DbColumnOptions": {
     "gender_male": "Masculino",
@@ -288,7 +302,7 @@
   },
   "AdminSubtypes": {
     "title": "Sub-tipos",
-    "description": "Defina grupos de sub-tipos para este serviço (ex: \"Tipo de animal\" → cão, gato; \"Tamanho\" → pequeno, grande).",
+    "description": "Gerencie os grupos de sub-tipos reutilizáveis. Depois atribua-os a serviços individuais.",
     "addGroup": "Adicionar grupo",
     "addItem": "Adicionar item",
     "noGroups": "Nenhum grupo de sub-tipos definido.",
@@ -299,7 +313,48 @@
     "namePlaceholder": "Nome",
     "active": "Ativo",
     "save": "Salvar",
-    "saving": "Salvando..."
+    "saving": "Salvando...",
+    "assignTitle": "Grupos atribuídos",
+    "assignDescription": "Selecione quais grupos de sub-tipos se aplicam a este serviço.",
+    "saveAssignments": "Salvar atribuições",
+    "noGroupsAvailable": "Nenhum grupo criado. Crie grupos na secção Sub-tipos."
+  },
+  "AdminTalentTags": {
+    "title": "Etiquetas de talento",
+    "description": "Gerencie as etiquetas que o backoffice aplica aos talentos. A desativação preserva as atribuições históricas.",
+    "addTag": "Adicionar etiqueta",
+    "noTags": "Nenhuma etiqueta definida.",
+    "slug": "slug",
+    "namePlaceholder": "Nome",
+    "sortOrder": "Ordem",
+    "active": "Ativo",
+    "save": "Guardar",
+    "saving": "A guardar...",
+    "delete": "Eliminar",
+    "confirmDelete": "Desativar esta etiqueta? As atribuições existentes serão preservadas."
+  },
+  "AdminSpokenLanguages": {
+    "title": "Línguas faladas",
+    "description": "Gerencie o catálogo de idiomas falados por talentos e clientes. Os códigos ISO são imutáveis após criados.",
+    "addLanguage": "Adicionar idioma",
+    "noLanguages": "Nenhum idioma definido.",
+    "code": "Código ISO",
+    "codeHint": "Minúsculas, 2–3 letras. Ex.: pt, en, yue.",
+    "codeReadonlyHint": "O código ISO não pode ser alterado. Para renomear, crie um idioma novo.",
+    "sortOrder": "Ordem",
+    "active": "Ativo",
+    "save": "Guardar alterações",
+    "saving": "A guardar…",
+    "delete": "Eliminar",
+    "confirmDelete": "Desativar este idioma? Será ocultado dos dropdowns, mas os perfis existentes com este código serão preservados.",
+    "translationPlaceholder": "Nome traduzido",
+    "loadError": "Não foi possível carregar os idiomas.",
+    "errors": {
+      "duplicateCode": "Já existe um idioma com esse código.",
+      "saveFailed": "Não foi possível guardar. Tente novamente.",
+      "invalidCode": "O código deve ser minúsculas e 2–3 letras (ex.: pt, en, yue).",
+      "missingTranslation": "Faltam traduções em um ou mais idiomas."
+    }
   },
   "TalentPortal": {
     "save": "Salvar",

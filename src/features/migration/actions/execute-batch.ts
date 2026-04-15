@@ -1,6 +1,7 @@
 'use server';
 
 import { createAdminClient } from '@/lib/supabase/admin';
+import { resolveSpokenLanguages } from '../lib/resolve-spoken-languages';
 import type { MigrationTarget, BatchResult, RowError, ImportLookups } from '../types';
 import type { TransformedClient } from '../lib/transformers/transform-clients';
 import type { TransformedTalent } from '../lib/transformers/transform-talents';
@@ -62,6 +63,13 @@ async function insertClients(
         ? lookups.countriesByName.get(row.country_name.toLowerCase()) ?? null
         : lookups?.defaultCountryId ?? null;
 
+      const otherLanguage = resolveSpokenLanguages(
+        row.profile.other_language_raw,
+        lookups,
+        rowIndex,
+        errors
+      );
+
       // Update profile (shared fields)
       await admin.from('profiles').update({
         phone: row.profile.phone,
@@ -71,6 +79,7 @@ async function insertClients(
         birth_date: row.profile.birth_date,
         preferred_city: cityId,
         preferred_country: countryId,
+        other_language: otherLanguage,
       }).eq('id', userId);
 
       // Insert client_profile (role-specific fields)
@@ -149,6 +158,13 @@ async function insertTalents(
         ? lookups.countriesByName.get(row.country_name.toLowerCase()) ?? null
         : lookups?.defaultCountryId ?? null;
 
+      const otherLanguage = resolveSpokenLanguages(
+        row.profile.other_language_raw,
+        lookups,
+        rowIndex,
+        errors
+      );
+
       // Update profile (shared fields: phone, nif, gender, birth_date)
       await admin.from('profiles').update({
         phone: row.profile.phone,
@@ -156,6 +172,7 @@ async function insertTalents(
         preferred_contact: row.profile.preferred_contact,
         gender: row.profile.gender,
         birth_date: row.profile.birth_date,
+        other_language: otherLanguage,
       }).eq('id', userId);
 
       // Insert talent_profile (role-specific fields only)
@@ -172,6 +189,7 @@ async function insertTalents(
           address: row.talent_profile.address,
           state: row.talent_profile.state,
           postal_code: row.talent_profile.postal_code,
+          internal_notes: row.internal_notes,
           city_id: cityId,
           country_id: countryId,
         });
@@ -192,21 +210,51 @@ async function insertTalents(
         await admin.from('survey_responses').insert(surveyRows);
       }
 
-      // Insert talent services + subtypes
-      if (row.services.length > 0 || row.subtypeEntries.length > 0) {
+      // Resolve talent profile id once for downstream inserts (services, tags).
+      let talentProfileId: string | null = null;
+      if (row.services.length > 0 || row.subtypeEntries.length > 0 || row.tagNames.length > 0) {
         const tpRes = await admin
           .from('talent_profiles')
           .select('id')
           .eq('user_id', userId)
           .single();
+        talentProfileId = tpRes.data?.id ?? null;
+      }
 
-        if (tpRes.data) {
-          const svcCountryId = countryId || lookups?.defaultCountryId || 'a1000000-0000-0000-0000-000000000002';
-          const svcResult = await insertTalentServices(
-            admin, tpRes.data.id, svcCountryId, row.services, row.subtypeEntries, csvLocale ?? 'es'
-          );
-          for (const w of svcResult.warnings) {
-            errors.push({ rowIndex, message: `[warning] ${w}` });
+      // Insert talent services + subtypes
+      if (talentProfileId && (row.services.length > 0 || row.subtypeEntries.length > 0)) {
+        const svcCountryId = countryId || lookups?.defaultCountryId || 'a1000000-0000-0000-0000-000000000002';
+        const svcResult = await insertTalentServices(
+          admin, talentProfileId, svcCountryId, row.services, row.subtypeEntries, csvLocale ?? 'es'
+        );
+        for (const w of svcResult.warnings) {
+          errors.push({ rowIndex, message: `[warning] ${w}` });
+        }
+      }
+
+      // Insert talent tag assignments. Unknown tags generate non-fatal warnings.
+      if (talentProfileId && row.tagNames.length > 0) {
+        const tagIdsByName = lookups?.tagIdsByName;
+        const assignments: { talent_id: string; tag_id: string }[] = [];
+        const seenTagIds = new Set<string>();
+
+        for (const name of row.tagNames) {
+          const tagId = tagIdsByName?.get(name.toLowerCase());
+          if (!tagId) {
+            errors.push({ rowIndex, message: `[warning] Tag "${name}" not found, skipped` });
+            continue;
+          }
+          if (seenTagIds.has(tagId)) continue;
+          seenTagIds.add(tagId);
+          assignments.push({ talent_id: talentProfileId, tag_id: tagId });
+        }
+
+        if (assignments.length > 0) {
+          const { error: tagError } = await admin
+            .from('talent_tag_assignments')
+            .insert(assignments);
+          if (tagError) {
+            errors.push({ rowIndex, message: `[warning] Tag assignment failed: ${tagError.message}` });
           }
         }
       }

@@ -57,4 +57,29 @@ describe('autoMatchColumns', () => {
 
     expect(result).toEqual([]);
   });
+
+  it('matches "55+ Handler" → talent_tag_column', () => {
+    const cols: DbColumn[] = [{ name: 'talent_tag_column', required: false }];
+    const result = autoMatchColumns(['55+ Handler'], cols);
+    expect(result[0].dbColumn).toBe('talent_tag_column');
+  });
+
+  it('matches "Description" → internal_notes', () => {
+    const cols: DbColumn[] = [{ name: 'internal_notes', required: false }];
+    const result = autoMatchColumns(['Description'], cols);
+    expect(result[0].dbColumn).toBe('internal_notes');
+  });
+
+  it('matches "Other Language" → other_language', () => {
+    const cols: DbColumn[] = [{ name: 'other_language', required: false }];
+    const result = autoMatchColumns(['Other Language'], cols);
+    expect(result[0].dbColumn).toBe('other_language');
+  });
+
+  it('matches multi-locale aliases → other_language', () => {
+    const cols: DbColumn[] = [{ name: 'other_language', required: false }];
+    expect(autoMatchColumns(['Otro Idioma'], cols)[0].dbColumn).toBe('other_language');
+    expect(autoMatchColumns(['Outras Línguas'], cols)[0].dbColumn).toBe('other_language');
+    expect(autoMatchColumns(['Autres Langues'], cols)[0].dbColumn).toBe('other_language');
+  });
 });

@@ -10,6 +10,7 @@ export type TransformedTalent = {
     gender: string | null;
     birth_date: string | null;
     created_at: string | null;
+    other_language_raw: string | null;
   };
   talent_profile: {
     status: string;
@@ -25,9 +26,19 @@ export type TransformedTalent = {
   analytics: { key: string; value: string }[];
   services: { serviceId: string; tier: string }[];
   subtypeEntries: { groupId: string; names: string[] }[];
+  tagNames: string[];
+  internal_notes: string | null;
   city_name: string | null;
   country_name: string | null;
 };
+
+export function parseTagList(raw: string): string[] {
+  if (!raw) return [];
+  return raw
+    .split(/[,;]/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
 
 const CONTACT_MAP: Record<string, string> = {
   whatsapp: 'whatsapp',
@@ -106,6 +117,7 @@ type MappingResult = {
   surveys: { questionId: string; value: string }[];
   services: { serviceId: string; tier: string }[];
   subtypeEntries: { groupId: string; names: string[] }[];
+  tagNames: string[];
 };
 
 function applyMapping(row: Record<string, string>, mappings: ColumnMapping[]): MappingResult {
@@ -113,6 +125,7 @@ function applyMapping(row: Record<string, string>, mappings: ColumnMapping[]): M
   const surveys: { questionId: string; value: string }[] = [];
   const services: { serviceId: string; tier: string }[] = [];
   const subtypeEntries: { groupId: string; names: string[] }[] = [];
+  const tagNames: string[] = [];
   const seenServiceIds = new Set<string>();
 
   for (const m of mappings) {
@@ -132,12 +145,14 @@ function applyMapping(row: Record<string, string>, mappings: ColumnMapping[]): M
       if (names.length > 0) {
         subtypeEntries.push({ groupId: m.secondaryId, names });
       }
+    } else if (m.dbColumn === 'talent_tag_column') {
+      tagNames.push(...parseTagList(val));
     } else if (!mapped[m.dbColumn]) {
       mapped[m.dbColumn] = val;
     }
   }
 
-  return { mapped, surveys, services, subtypeEntries };
+  return { mapped, surveys, services, subtypeEntries, tagNames };
 }
 
 export function transformTalents(
@@ -149,7 +164,7 @@ export function transformTalents(
   const errors: RowError[] = [];
 
   for (let i = 0; i < rows.length; i++) {
-    const { mapped, surveys, services, subtypeEntries } = applyMapping(rows[i], mappings);
+    const { mapped, surveys, services, subtypeEntries, tagNames } = applyMapping(rows[i], mappings);
     const rowIndex = startIndex + i;
 
     if (!mapped.email) {
@@ -195,6 +210,7 @@ export function transformTalents(
         gender,
         birth_date: parsedBirthDate,
         created_at: mapped.created_at || null,
+        other_language_raw: mapped.other_language || null,
       },
       talent_profile: {
         status,
@@ -214,6 +230,8 @@ export function transformTalents(
       analytics,
       services,
       subtypeEntries,
+      tagNames,
+      internal_notes: mapped.internal_notes || null,
       city_name: mapped.city || null,
       country_name: mapped.country || null,
     });

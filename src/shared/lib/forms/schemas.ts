@@ -18,6 +18,9 @@ export const formFieldSchema = z
     type: z.enum(FIELD_TYPES),
     required: z.boolean().default(false),
     options: z.array(z.string().min(1).max(100)).optional(),
+    options_snapshot: z
+      .array(z.object({ value: z.string().min(1), label: z.string().min(1) }))
+      .optional(),
     subtype_group: z.string().optional(),
     survey_question_key: z.string().optional(),
     db_table: z.string().optional(),
@@ -26,7 +29,9 @@ export const formFieldSchema = z
   .refine(
     (field) => {
       if (field.type === 'single_select' || field.type === 'multiselect') {
-        return field.options && field.options.length > 0;
+        const hasOptions = !!field.options && field.options.length > 0;
+        const hasSnapshot = !!field.options_snapshot && field.options_snapshot.length > 0;
+        return hasOptions || hasSnapshot;
       }
       return true;
     },

@@ -21,6 +21,38 @@ describe('formFieldSchema — email/password types', () => {
     });
     expect(result.success).toBe(true);
   });
+
+  it('accepts multiselect with static options', () => {
+    const result = formFieldSchema.safeParse({
+      key: 'topics',
+      type: 'multiselect',
+      required: false,
+      options: ['a', 'b'],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts multiselect with options_snapshot only (dynamic source)', () => {
+    const result = formFieldSchema.safeParse({
+      key: 'other_language',
+      type: 'multiselect',
+      required: false,
+      options_snapshot: [
+        { value: 'pt', label: 'Português' },
+        { value: 'en', label: 'Inglês' },
+      ],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects multiselect without options or options_snapshot', () => {
+    const result = formFieldSchema.safeParse({
+      key: 'topics',
+      type: 'multiselect',
+      required: false,
+    });
+    expect(result.success).toBe(false);
+  });
 });
 
 // ── Step actions ─────────────────────────────────────

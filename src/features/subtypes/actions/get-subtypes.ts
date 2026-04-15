@@ -11,8 +11,8 @@ export type SubtypeOption = {
 
 /**
  * Gets active subtypes for a service, translated to a specific locale.
+ * Queries through the junction table to find assigned groups.
  * Optionally filters by group slug (used when a form field targets a specific group).
- * Used at runtime when rendering forms (e.g., subtype field type).
  */
 export async function getSubtypes(
   serviceId: string,
@@ -21,15 +21,24 @@ export async function getSubtypes(
 ): Promise<SubtypeOption[]> {
   const supabase = createClient();
 
+  // 1. Get group IDs assigned to this service via junction
+  const { data: assignments } = await supabase
+    .from('service_subtype_group_assignments')
+    .select('group_id')
+    .eq('service_id', serviceId);
+
+  const groupIds = assignments?.map((a) => a.group_id) ?? [];
+  if (groupIds.length === 0) return [];
+
+  // 2. Query subtypes via group_ids
   let query = supabase
     .from('service_subtypes')
     .select(`
-      id,
-      slug,
+      id, slug,
       service_subtype_translations!inner(name),
       service_subtype_groups!inner(slug)
     `)
-    .eq('service_id', serviceId)
+    .in('group_id', groupIds)
     .eq('is_active', true)
     .eq('service_subtype_translations.locale', locale)
     .eq('service_subtype_groups.is_active', true)

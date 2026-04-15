@@ -7,7 +7,7 @@ import { ServiceFormBuilder } from '@/features/forms/components/service-form-bui
 import type { FormWithTranslations, FormVariantSummary, FormCityOption } from '@/shared/lib/forms/types';
 import { ServiceForm } from '@/features/services/components/service-form';
 import { ServiceConfig } from '@/features/services/components/service-config';
-import { SubtypesEditor } from '@/features/subtypes/components/subtypes-editor';
+import { GroupAssignmentEditor } from '@/features/subtypes/components/group-assignment-editor';
 import type { SubtypeGroupWithTranslations } from '@/features/subtypes/types';
 import type {
   ServiceDetail,
@@ -23,7 +23,8 @@ type Props = {
   allCities: CityOption[];
   form: FormWithTranslations | null;
   formVariants: FormVariantSummary[];
-  subtypes: SubtypeGroupWithTranslations[];
+  assignedSubtypes: SubtypeGroupWithTranslations[];
+  allSubtypes: SubtypeGroupWithTranslations[];
 };
 
 export function ServiceEditTabs({
@@ -32,15 +33,16 @@ export function ServiceEditTabs({
   allCities,
   form,
   formVariants,
-  subtypes,
+  assignedSubtypes,
+  allSubtypes,
 }: Props) {
   const t = useTranslations('AdminServices');
   const locale = useLocale();
 
-  // Derive subtypeGroups for form builder dropdown
+  // Derive subtypeGroups for form builder dropdown (only assigned groups)
   const subtypeGroups = useMemo(
-    () => subtypes.map((g) => ({ slug: g.slug, name: g.translations[locale] ?? g.slug })),
-    [subtypes, locale]
+    () => assignedSubtypes.map((g) => ({ slug: g.slug, name: g.translations[locale] ?? g.slug })),
+    [assignedSubtypes, locale]
   );
 
   // Lift configured countries + cities state so Config and Form tabs stay in sync
@@ -62,6 +64,8 @@ export function ServiceEditTabs({
     name: c.city_name,
     country_id: c.country_id,
   }));
+
+  const assignedGroupIds = assignedSubtypes.map((g) => g.id);
 
   return (
     <Tabs defaultValue="content">
@@ -101,9 +105,11 @@ export function ServiceEditTabs({
       </TabsContent>
 
       <TabsContent value="subtypes" className="pt-6">
-        <SubtypesEditor
+        <GroupAssignmentEditor
           serviceId={service.id}
-          initialSubtypes={subtypes}
+          assignedGroupIds={assignedGroupIds}
+          allGroups={allSubtypes}
+          locale={locale}
         />
       </TabsContent>
     </Tabs>

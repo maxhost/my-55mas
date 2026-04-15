@@ -12,7 +12,6 @@ import type { SubtypeGroupWithTranslations, SubtypeGroupInput } from '../types';
 import { SubtypeGroupCard } from './subtype-group-card';
 
 type Props = {
-  serviceId: string;
   initialSubtypes: SubtypeGroupWithTranslations[];
 };
 
@@ -39,7 +38,7 @@ function swap<T>(arr: T[], i: number, j: number): T[] {
   return copy;
 }
 
-export function SubtypesEditor({ serviceId, initialSubtypes }: Props) {
+export function SubtypesEditor({ initialSubtypes }: Props) {
   const t = useTranslations('AdminSubtypes');
   const tc = useTranslations('Common');
   const [isPending, startTransition] = useTransition();
@@ -50,13 +49,10 @@ export function SubtypesEditor({ serviceId, initialSubtypes }: Props) {
   const primaryLocale = locales[0]; // 'es'
 
   const addGroup = () => {
-    const existingSlugs = new Set(groups.map((g) => g.slug));
-    let idx = groups.length + 1;
-    while (existingSlugs.has(`group_${idx}`)) idx++;
     setGroups([
       ...groups,
       {
-        slug: `group_${idx}`,
+        slug: `group_${Date.now().toString(36)}`,
         sort_order: groups.length,
         is_active: true,
         translations: {},
@@ -83,7 +79,6 @@ export function SubtypesEditor({ serviceId, initialSubtypes }: Props) {
 
     startTransition(async () => {
       const result = await saveSubtypes({
-        service_id: serviceId,
         groups: normalized,
       });
 

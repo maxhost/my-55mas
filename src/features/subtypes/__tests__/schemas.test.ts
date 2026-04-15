@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { subtypeItemInputSchema, subtypeGroupInputSchema, saveSubtypeGroupsSchema } from '../schemas';
+import { subtypeItemInputSchema, subtypeGroupInputSchema, saveSubtypeGroupsSchema, assignGroupsSchema } from '../schemas';
 
 describe('subtypeItemInputSchema', () => {
   it('accepts valid item input', () => {
@@ -104,7 +104,6 @@ describe('subtypeGroupInputSchema', () => {
 describe('saveSubtypeGroupsSchema', () => {
   it('accepts valid save input with groups', () => {
     const result = saveSubtypeGroupsSchema.safeParse({
-      service_id: '550e8400-e29b-41d4-a716-446655440000',
       groups: [
         {
           slug: 'pet_type',
@@ -122,16 +121,57 @@ describe('saveSubtypeGroupsSchema', () => {
 
   it('accepts empty groups array (clear all)', () => {
     const result = saveSubtypeGroupsSchema.safeParse({
-      service_id: '550e8400-e29b-41d4-a716-446655440000',
       groups: [],
     });
     expect(result.success).toBe(true);
   });
 
+  it('rejects when groups is missing', () => {
+    const result = saveSubtypeGroupsSchema.safeParse({});
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('assignGroupsSchema', () => {
+  it('accepts valid assignment input', () => {
+    const result = assignGroupsSchema.safeParse({
+      service_id: '550e8400-e29b-41d4-a716-446655440000',
+      group_ids: [
+        { group_id: '660e8400-e29b-41d4-a716-446655440000', sort_order: 0 },
+        { group_id: '770e8400-e29b-41d4-a716-446655440000', sort_order: 1 },
+      ],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts empty group_ids (unassign all)', () => {
+    const result = assignGroupsSchema.safeParse({
+      service_id: '550e8400-e29b-41d4-a716-446655440000',
+      group_ids: [],
+    });
+    expect(result.success).toBe(true);
+  });
+
   it('rejects invalid service_id', () => {
-    const result = saveSubtypeGroupsSchema.safeParse({
+    const result = assignGroupsSchema.safeParse({
       service_id: 'not-a-uuid',
-      groups: [],
+      group_ids: [],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects invalid group_id', () => {
+    const result = assignGroupsSchema.safeParse({
+      service_id: '550e8400-e29b-41d4-a716-446655440000',
+      group_ids: [{ group_id: 'bad', sort_order: 0 }],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects negative sort_order', () => {
+    const result = assignGroupsSchema.safeParse({
+      service_id: '550e8400-e29b-41d4-a716-446655440000',
+      group_ids: [{ group_id: '660e8400-e29b-41d4-a716-446655440000', sort_order: -1 }],
     });
     expect(result.success).toBe(false);
   });

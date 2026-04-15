@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import type { SubtypeItemInput } from '../types';
+import { slugify } from '@/shared/lib/slugify';
 
 type Props = {
   item: SubtypeItemInput;
@@ -19,17 +20,17 @@ export function SubtypeItemRow({ item, locale, isPrimary, onChange, onRemove }: 
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-muted-foreground rounded bg-muted px-2 py-0.5 font-mono text-xs">
-        {item.slug}
-      </span>
       <Input
         value={item.translations[locale] ?? ''}
-        onChange={(e) =>
-          onChange({
+        onChange={(e) => {
+          const name = e.target.value;
+          const updated = {
             ...item,
-            translations: { ...item.translations, [locale]: e.target.value },
-          })
-        }
+            translations: { ...item.translations, [locale]: name },
+          };
+          if (isPrimary) updated.slug = slugify(name);
+          onChange(updated);
+        }}
         placeholder={t('namePlaceholder')}
         className="h-7 flex-1 text-xs"
       />

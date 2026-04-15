@@ -29,15 +29,25 @@
     "archive": "Arxiu",
     "talents": "Talents 55+",
     "clients": "Clients",
+    "spokenLanguages": "Llengües parlades",
     "members": "Membres",
     "services": "Serveis",
     "dashboard": "Tauler",
     "talentServices": "Serveis Talent",
     "forms": "Formularis",
+    "subtypes": "Subtipus",
+    "talentTags": "Etiquetes de talent",
     "surveyQuestions": "Preguntes Estadístiques",
     "payments": "Pagaments",
     "notifications": "Notificacions",
-    "migration": "Migració"
+    "migration": "Migració",
+    "groupOperations": "Operacions",
+    "groupUsers": "Usuaris",
+    "groupStaff": "Staff",
+    "groupCatalog": "Catàleg",
+    "groupForms": "Formularis",
+    "groupStats": "Estadístiques",
+    "groupSystem": "Sistema"
   },
   "AdminServices": {
     "title": "Serveis",
@@ -160,7 +170,10 @@
     "selectTable": "Seleccionar taula...",
     "selectColumn": "Seleccionar columna...",
     "dbColumnInfo": "No hi ha taules disponibles per al mapeig.",
-    "optionLabels": "Etiquetes de les opcions"
+    "optionLabels": "Etiquetes de les opcions",
+    "loadingOptions": "Carregant opcions…",
+    "failedToLoadOptions": "No s'han pogut carregar les opcions.",
+    "dynamicOptionsLoaded": "{count} opcions carregades del catàleg."
   },
   "DbTables": {
     "profiles": "Perfil",
@@ -191,7 +204,8 @@
     "authPassword": "Contrasenya",
     "authConfirmPassword": "Confirmar contrasenya",
     "companyName": "Nom de l'empresa",
-    "companyTaxId": "CIF / NIF empresa"
+    "companyTaxId": "CIF / NIF empresa",
+    "otherLanguage": "Altres idiomes parlats"
   },
   "DbColumnOptions": {
     "gender_male": "Masculí",
@@ -288,7 +302,7 @@
   },
   "AdminSubtypes": {
     "title": "Subtipus",
-    "description": "Definiu grups de subtipus per a aquest servei (ex: \"Tipus d'animal\" → gos, gat; \"Mida\" → petit, gran).",
+    "description": "Gestioneu els grups de subtipus reutilitzables. Després assigneu-los a serveis individuals.",
     "addGroup": "Afegir grup",
     "addItem": "Afegir element",
     "noGroups": "No hi ha grups de subtipus definits.",
@@ -299,7 +313,48 @@
     "namePlaceholder": "Nom",
     "active": "Actiu",
     "save": "Desar",
-    "saving": "Desant..."
+    "saving": "Desant...",
+    "assignTitle": "Grups assignats",
+    "assignDescription": "Seleccioneu quins grups de subtipus s'apliquen a aquest servei.",
+    "saveAssignments": "Desar assignacions",
+    "noGroupsAvailable": "No hi ha grups creats. Creeu grups a la secció Subtipus."
+  },
+  "AdminTalentTags": {
+    "title": "Etiquetes de talent",
+    "description": "Gestiona les etiquetes que el backoffice aplica als talents. Desactivar conserva les assignacions històriques.",
+    "addTag": "Afegir etiqueta",
+    "noTags": "No hi ha etiquetes definides.",
+    "slug": "slug",
+    "namePlaceholder": "Nom",
+    "sortOrder": "Ordre",
+    "active": "Actiu",
+    "save": "Desar",
+    "saving": "Desant...",
+    "delete": "Eliminar",
+    "confirmDelete": "Desactivar aquesta etiqueta? Les assignacions existents es conservaran."
+  },
+  "AdminSpokenLanguages": {
+    "title": "Llengües parlades",
+    "description": "Gestiona el catàleg d'idiomes parlats pels talents i els clients. Els codis ISO són immutables un cop creats.",
+    "addLanguage": "Afegir idioma",
+    "noLanguages": "No hi ha idiomes definits.",
+    "code": "Codi ISO",
+    "codeHint": "Minúscules, 2–3 lletres. Ex.: pt, en, yue.",
+    "codeReadonlyHint": "El codi ISO no es pot modificar. Per reanomenar, crea un idioma nou.",
+    "sortOrder": "Ordre",
+    "active": "Actiu",
+    "save": "Desar canvis",
+    "saving": "Desant…",
+    "delete": "Eliminar",
+    "confirmDelete": "Desactivar aquest idioma? S'amagarà dels desplegables, però els perfils existents amb aquest codi es conservaran.",
+    "translationPlaceholder": "Nom traduït",
+    "loadError": "No s'han pogut carregar els idiomes.",
+    "errors": {
+      "duplicateCode": "Ja existeix un idioma amb aquest codi.",
+      "saveFailed": "No s'ha pogut desar. Torna-ho a provar.",
+      "invalidCode": "El codi ha de ser minúscules i 2–3 lletres (ex.: pt, en, yue).",
+      "missingTranslation": "Falten traduccions en un o més idiomes."
+    }
   },
   "TalentPortal": {
     "save": "Desar",

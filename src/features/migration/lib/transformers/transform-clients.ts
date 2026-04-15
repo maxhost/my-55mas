@@ -10,6 +10,7 @@ export type TransformedClient = {
     gender: string | null;
     birth_date: string | null;
     created_at: string | null;
+    other_language_raw: string | null;
   };
   client_profile: {
     company_name: string | null;
@@ -113,6 +114,7 @@ export function transformClients(
         gender,
         birth_date: mapped.birth_date || null,
         created_at: mapped.created_at || null,
+        other_language_raw: mapped.other_language || null,
       },
       client_profile: {
         company_name: isBusiness ? (mapped.company_name || mapped.full_name) : null,

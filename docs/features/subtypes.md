@@ -2,44 +2,40 @@
 
 ## Resumen
 
-Sistema para definir sub-tipos dentro de un servicio usando una jerarquía de dos niveles: **grupos** (ej: "tipo_de_mascota") que contienen **ítems** (ej: perro, gato, pez). Los sub-tipos se definen a nivel de servicio y se usan para filtrar talentos por especialidad.
+Sistema para definir sub-tipos usando una jerarquía de dos niveles: **grupos** (ej: "tipo_de_mascota") que contienen **ítems** (ej: perro, gato, pez). Los grupos son entidades independientes y reutilizables — se crean en `/admin/subtypes` y se asignan a servicios vía tabla junction many-to-many.
 
 ## Requisitos
 
 ### Funcionales
 
-1. **CRUD de grupos e ítems**: Admin gestiona grupos y sus ítems por servicio desde la tab "Sub-tipos"
-2. **Traducciones**: Cada grupo e ítem tiene nombre traducido por locale
-3. **Ordenamiento**: Grupos e ítems tienen sort_order para controlar el orden de display (flechas ↑↓)
-4. **Activar/desactivar**: Grupos e ítems individuales pueden desactivarse sin eliminarlos
-5. **Field type "subtype"**: Nuevo tipo de campo en el form builder — **pendiente de implementar** (ver nota)
-6. **Relación talento↔subtipo**: Tabla normalizada `talent_service_subtypes` para queries eficientes
+1. **CRUD global de grupos e ítems**: Admin gestiona grupos desde `/admin/subtypes` (sección dedicada)
+2. **Asignación a servicios**: Un grupo puede asignarse a múltiples servicios desde la tab "Sub-tipos" del editor de servicio
+3. **Traducciones**: Cada grupo e ítem tiene nombre traducido por locale
+4. **Ordenamiento**: Grupos e ítems tienen sort_order para controlar el orden de display
+5. **Activar/desactivar**: Grupos e ítems individuales pueden desactivarse sin eliminarlos
+6. **Field type "subtype"**: Tipo de campo en el form builder — referencia grupos por slug
+7. **Relación talento↔subtipo**: Tabla normalizada `talent_service_subtypes` para queries eficientes
 
 ### No funcionales
 
 - Feature aislado en `features/subtypes/`
 - No importa de otros features
-- Grupos son propiedad del servicio (FK a services)
-- Un servicio puede tener múltiples grupos independientes
-
-> **Nota — field type "subtype" no implementado:** `FIELD_TYPES` en `src/features/forms/types.ts` aún no incluye `'subtype'`. Está definido como requisito pero no implementado en esta versión.
+- Grupos son entidades independientes (sin FK a services)
+- Relación con servicios vía junction table `service_subtype_group_assignments`
 
 ## Esquema DB
 
-### Jerarquía: service → grupos → ítems
+### Jerarquía: grupos → ítems (independientes de servicios)
 
 ```sql
--- Grupos de sub-tipos (primer nivel)
--- Ej: "tipo_de_mascota", "tamaño"
+-- Grupos de sub-tipos (entidades independientes, reutilizables)
 CREATE TABLE service_subtype_groups (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  service_id  uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
-  slug        text NOT NULL,
+  slug        text NOT NULL UNIQUE,       -- globalmente único
   sort_order  int NOT NULL DEFAULT 0,
   is_active   boolean NOT NULL DEFAULT true,
   created_at  timestamptz DEFAULT now(),
-  updated_at  timestamptz DEFAULT now(),
-  UNIQUE (service_id, slug)
+  updated_at  timestamptz DEFAULT now()
 );
 
 CREATE TABLE service_subtype_group_translations (
@@ -51,12 +47,19 @@ CREATE TABLE service_subtype_group_translations (
   PRIMARY KEY (group_id, locale)
 );
 
--- Ítems dentro de un grupo (segundo nivel)
--- Ej: grupo "tipo_de_mascota" → ítems: dog, cat, fish
+-- Asignación many-to-many: qué grupos aplican a cada servicio
+CREATE TABLE service_subtype_group_assignments (
+  service_id  uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
+  group_id    uuid NOT NULL REFERENCES service_subtype_groups(id) ON DELETE CASCADE,
+  sort_order  int NOT NULL DEFAULT 0,
+  created_at  timestamptz DEFAULT now(),
+  PRIMARY KEY (service_id, group_id)
+);
+
+-- Ítems dentro de un grupo
 CREATE TABLE service_subtypes (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   group_id    uuid NOT NULL REFERENCES service_subtype_groups(id) ON DELETE CASCADE,
-  service_id  uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
   slug        text NOT NULL,
   sort_order  int DEFAULT 0,
   is_active   boolean NOT NULL DEFAULT true,
@@ -83,77 +86,6 @@ CREATE TABLE talent_service_subtypes (
 );
 ```
 
-**Nota crítica:** `service_subtypes.group_id` referencia a `service_subtype_groups`, NO a `services` directamente. La relación con el servicio es indirecta: `service_subtypes → service_subtype_groups → services`.
-
-## Tipos TypeScript
-
-Definidos en `src/features/subtypes/types.ts`:
-
-```typescript
-// ── Grupos ────────────────────────────────────────────
-type SubtypeGroup = {
-  id: string
-  service_id: string
-  slug: string
-  sort_order: number
-  is_active: boolean
-}
-
-type SubtypeGroupWithTranslations = SubtypeGroup & {
-  translations: Record<string, string>  // locale → name
-  items: SubtypeItemWithTranslations[]
-}
-
-// ── Ítems ─────────────────────────────────────────────
-type SubtypeItem = {
-  id: string
-  group_id: string
-  slug: string
-  sort_order: number
-  is_active: boolean
-}
-
-type SubtypeItemWithTranslations = SubtypeItem & {
-  translations: Record<string, string>  // locale → name
-}
-
-// ── Inputs para save action ───────────────────────────
-type SubtypeItemInput = {
-  id?: string  // presente para update, ausente para create
-  slug: string
-  sort_order: number
-  is_active: boolean
-  translations: Record<string, string>
-}
-
-type SubtypeGroupInput = {
-  id?: string
-  slug: string
-  sort_order: number
-  is_active: boolean
-  translations: Record<string, string>
-  items: SubtypeItemInput[]
-}
-
-type SaveSubtypeGroupsInput = {
-  service_id: string
-  groups: SubtypeGroupInput[]
-}
-```
-
-## Schemas Zod
-
-Definidos en `src/features/subtypes/schemas.ts`:
-
-```typescript
-// slug: snake_case, empieza con letra, 1–50 chars
-const slugSchema = z.string().min(1).max(50).regex(/^[a-z][a-z0-9_]*$/)
-
-subtypeItemInputSchema   // id?, slug, sort_order, is_active, translations
-subtypeGroupInputSchema  // id?, slug, sort_order, is_active, translations, items[]
-saveSubtypeGroupsSchema  // service_id (UUID), groups[]
-```
-
 ## Arquitectura
 
 ### Feature structure
@@ -161,43 +93,45 @@ saveSubtypeGroupsSchema  // service_id (UUID), groups[]
 ```
 features/subtypes/
 ├── index.ts
-├── types.ts              — SubtypeGroup, SubtypeItem, *WithTranslations, *Input
-├── schemas.ts            — subtypeItemInputSchema, subtypeGroupInputSchema, saveSubtypeGroupsSchema
+├── types.ts              — SubtypeGroup, SubtypeItem, *WithTranslations, *Input, AssignGroupsInput
+├── schemas.ts            — saveSubtypeGroupsSchema, assignGroupsSchema
 ├── actions/
-│   ├── list-subtypes.ts  — Por service_id, retorna SubtypeGroupWithTranslations[]
-│   ├── save-subtypes.ts  — Upsert grupos + ítems + traducciones
-│   └── get-subtypes.ts   — Con traducciones por locale
+│   ├── list-subtypes.ts      — Por serviceId (via junction), retorna grupos asignados
+│   ├── list-all-subtypes.ts  — Todos los grupos globalmente (para admin standalone)
+│   ├── save-subtypes.ts      — Upsert grupos + ítems + traducciones (global)
+│   ├── get-subtypes.ts       — Subtypes activos por servicio + locale (para formularios)
+│   └── assign-groups.ts      — Asignar/desasignar grupos a un servicio
 └── components/
-    ├── subtypes-editor.tsx     — Lista editable de grupos (add/remove/reorder)
-    ├── subtype-group-card.tsx  — Card de grupo con ítems inline
-    └── subtype-item-row.tsx    — Fila individual de ítem con slug + traducciones
+    ├── subtypes-editor.tsx          — Editor global de grupos (CRUD)
+    ├── group-assignment-editor.tsx  — Checklist para asignar grupos a un servicio
+    ├── subtype-group-card.tsx       — Card de grupo con ítems inline
+    └── subtype-item-row.tsx         — Fila individual de ítem
 ```
 
 ### Admin UI
 
-Tab "Sub-tipos" en el editor de servicio existente (`ServiceEditTabs`):
-- 4to tab junto a Contenido, Configuración, Formulario
-- `SubtypesEditor` con locale tabs para traducciones
-- Reordenar con flechas ↑↓ (no drag-and-drop)
+- **`/admin/subtypes`**: Sección dedicada para CRUD global de grupos e ítems con traducciones
+- **Tab "Sub-tipos" en editor de servicio**: Checklist para asignar grupos existentes al servicio
+- **Form builder**: Dropdown de grupos (solo los asignados al servicio) para campo tipo "subtype"
 
 ## Cascade behavior
 
 | Acción | Resultado |
 |---|---|
-| DELETE service | CASCADE → service_subtype_groups → service_subtypes → talent_service_subtypes borrados |
-| DELETE service_subtype_group | CASCADE → service_subtypes → talent_service_subtypes borrados |
-| DELETE service_subtype | CASCADE → talent_service_subtypes borrados |
+| DELETE service | CASCADE → assignments borradas. Grupos sobreviven (independientes). |
+| DELETE grupo | CASCADE → assignments + ítems + talent_service_subtypes borrados |
+| DELETE ítem | CASCADE → talent_service_subtypes borrados |
 | DELETE talent_profile | CASCADE → talent_service_subtypes borrados |
 
 ## Criterios de aceptación
 
-- [ ] Admin puede crear grupos de sub-tipos para un servicio
-- [ ] Admin puede crear ítems dentro de cada grupo, con traducciones
-- [ ] Admin puede reordenar (flechas ↑↓), activar/desactivar, eliminar grupos e ítems
-- [ ] Tab "Sub-tipos" aparece como 4to tab en el editor de servicio
-- [ ] Talento puede seleccionar sub-tipos al completar talent form
-- [ ] Selección se guarda en talent_service_subtypes (normalizado)
-- [ ] Queries eficientes: "¿qué talentos manejan perros en Lisboa?"
-- [ ] Build pasa: `NODE_ENV=production pnpm build`
-- [ ] Tests escritos y pasando
-- [ ] Field type "subtype" en form builder: pendiente (marcado como TODO)
+- [x] Admin puede crear/editar/eliminar grupos de sub-tipos globalmente en `/admin/subtypes`
+- [x] Admin puede asignar grupos a servicios desde la tab "Sub-tipos"
+- [x] Un mismo grupo puede asignarse a múltiples servicios
+- [x] Admin puede crear ítems dentro de cada grupo, con traducciones
+- [x] Admin puede reordenar, activar/desactivar, eliminar grupos e ítems
+- [x] Form builder muestra solo grupos asignados al servicio
+- [x] Talento puede seleccionar sub-tipos al completar talent form
+- [x] Selección se guarda en talent_service_subtypes (normalizado)
+- [x] Build pasa: `NODE_ENV=production pnpm build`
+- [x] Tests escritos y pasando (schemas)

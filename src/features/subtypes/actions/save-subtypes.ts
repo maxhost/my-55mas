@@ -6,7 +6,7 @@ import { saveSubtypeGroupsSchema } from '../schemas';
 import type { SaveSubtypeGroupsInput, SubtypeGroupInput } from '../types';
 
 /**
- * Saves all subtype groups + items for a service (full replace strategy):
+ * Saves all subtype groups + items globally (full replace strategy):
  * 1. Delete groups no longer in the list (CASCADE handles items + translations)
  * 2. Upsert groups: update existing, insert new
  * 3. For each group: upsert items + translations
@@ -17,14 +17,13 @@ export async function saveSubtypes(input: SaveSubtypeGroupsInput) {
     return { error: parsed.error.flatten().fieldErrors };
   }
 
-  const { service_id, groups } = parsed.data;
+  const { groups } = parsed.data;
   const supabase = createClient();
 
-  // 1. Get existing group IDs for this service
+  // 1. Get all existing group IDs
   const { data: existing } = await supabase
     .from('service_subtype_groups')
-    .select('id')
-    .eq('service_id', service_id);
+    .select('id');
 
   const existingIds = (existing ?? []).map((e) => e.id);
   const incomingIds = groups.filter((g) => g.id).map((g) => g.id!);
@@ -42,17 +41,17 @@ export async function saveSubtypes(input: SaveSubtypeGroupsInput) {
 
   // 3. Upsert each group + its items
   for (const group of groups) {
-    const result = await upsertGroup(supabase, service_id, group);
+    const result = await upsertGroup(supabase, group);
     if (result?.error) return result;
   }
 
+  revalidatePath('/[locale]/(admin)/admin/subtypes', 'layout');
   revalidatePath('/[locale]/(admin)/admin/services', 'layout');
-  return { data: { service_id } };
+  return { data: { success: true } };
 }
 
 async function upsertGroup(
   supabase: ReturnType<typeof createClient>,
-  serviceId: string,
   group: SubtypeGroupInput
 ) {
   let groupId: string;
@@ -69,7 +68,7 @@ async function upsertGroup(
     // Insert new group
     const { data, error } = await supabase
       .from('service_subtype_groups')
-      .insert({ service_id: serviceId, slug: group.slug, sort_order: group.sort_order, is_active: group.is_active })
+      .insert({ slug: group.slug, sort_order: group.sort_order, is_active: group.is_active })
       .select('id')
       .single();
     if (error) return { error: { _db: [error.message] } };
@@ -85,12 +84,11 @@ async function upsertGroup(
   }
 
   // Upsert items within this group
-  return upsertItems(supabase, serviceId, groupId, group.items);
+  return upsertItems(supabase, groupId, group.items);
 }
 
 async function upsertItems(
   supabase: ReturnType<typeof createClient>,
-  serviceId: string,
   groupId: string,
   items: SubtypeGroupInput['items']
 ) {
@@ -129,7 +127,6 @@ async function upsertItems(
       const { data, error } = await supabase
         .from('service_subtypes')
         .insert({
-          service_id: serviceId,
           group_id: groupId,
           slug: item.slug,
           sort_order: item.sort_order,

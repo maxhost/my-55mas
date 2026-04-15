@@ -44,7 +44,7 @@ CREATE TABLE talent_profiles (
   preferred_payment   text,
   status              text NOT NULL DEFAULT 'pending'
                       CHECK (status IN ('pending', 'approved', 'rejected', 'suspended')),
-  handler_id          uuid REFERENCES profiles(id),
+  created_by          uuid REFERENCES profiles(id) ON DELETE SET NULL,  -- staff que creó el registro (antes handler_id)
   approved_at         timestamptz,
   approved_by         uuid REFERENCES profiles(id),
   internal_notes      text,

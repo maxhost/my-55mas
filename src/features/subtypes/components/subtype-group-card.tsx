@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronRight, Plus, ArrowUp, ArrowDown, Trash2 } from 'lucide-react';
 import type { SubtypeGroupInput, SubtypeItemInput } from '../types';
 import { SubtypeItemRow } from './subtype-item-row';
+import { slugify } from '@/shared/lib/slugify';
 
 type Props = {
   group: SubtypeGroupInput;
@@ -44,15 +45,12 @@ export function SubtypeGroupCard({
   };
 
   const addItem = () => {
-    const existingSlugs = new Set(group.items.map((i) => i.slug));
-    let idx = group.items.length + 1;
-    while (existingSlugs.has(`item_${idx}`)) idx++;
     onChange({
       ...group,
       items: [
         ...group.items,
         {
-          slug: `item_${idx}`,
+          slug: `item-${Date.now().toString(36)}`,
           sort_order: group.items.length,
           is_active: true,
           translations: {},
@@ -80,12 +78,16 @@ export function SubtypeGroupCard({
 
         <Input
           value={group.translations[locale] ?? ''}
-          onChange={(e) =>
-            onChange({
+          onChange={(e) => {
+            const name = e.target.value;
+            const updated = {
               ...group,
-              translations: { ...group.translations, [locale]: e.target.value },
-            })
-          }
+              translations: { ...group.translations, [locale]: name },
+            };
+            // Auto-derive slug from primary locale name
+            if (isPrimary) updated.slug = slugify(name);
+            onChange(updated);
+          }}
           placeholder={t('groupName')}
           className="h-7 w-48 text-xs"
         />

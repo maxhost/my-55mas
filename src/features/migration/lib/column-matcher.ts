@@ -44,6 +44,16 @@ function matchScore(csvCol: string, dbCol: string): number {
     professional_status: ['professionalstatus', 'situacionprofesional'],
     address: ['billingaddress', 'direccion', 'endereco', 'morada'],
     postal_code: ['postalcode', 'codigopostal', 'zip', 'cep'],
+    talent_tag_column: ['55handler', 'handler', 'handler55', 'etiqueta', 'etiquetas', 'tags', 'tag'],
+    internal_notes: ['description', 'descripcion', 'descricao', 'notes', 'notas', 'notasinternas', 'internalnotes'],
+    other_language: [
+      'otherlanguage', 'otherlanguages',
+      'otroidioma', 'otrosidiomas',
+      'outroidioma', 'outrosidiomas', 'outralingua', 'outraslinguas',
+      'autrelangue', 'autreslangues',
+      'altreidioma', 'altresidiomes',
+      'languages', 'idiomas', 'linguas', 'langues', 'idiomes',
+    ],
   };
 
   for (const [key, synonyms] of Object.entries(aliases)) {

@@ -2,7 +2,6 @@
 
 export type SubtypeGroup = {
   id: string;
-  service_id: string;
   slug: string;
   sort_order: number;
   is_active: boolean;
@@ -59,6 +58,12 @@ export type SubtypeGroupInput = {
 };
 
 export type SaveSubtypeGroupsInput = {
-  service_id: string;
   groups: SubtypeGroupInput[];
+};
+
+// ── Input types for group assignment ──────────────────
+
+export type AssignGroupsInput = {
+  service_id: string;
+  group_ids: { group_id: string; sort_order: number }[];
 };

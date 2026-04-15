@@ -1,9 +1,11 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { useEffect, useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DB_COLUMN_REGISTRY, getTableDef, getColumnDef } from '@/shared/lib/forms/db-column-registry';
+import { getSpokenLanguageOptions } from '@/shared/lib/spoken-languages/actions';
 import type { FormField } from '@/shared/lib/forms/types';
 
 type Props = {
@@ -24,8 +26,51 @@ export function DbColumnFieldConfig({
   const t = useTranslations('AdminFormBuilder');
   const tTables = useTranslations('DbTables');
   const tColumns = useTranslations('DbColumns');
+  const locale = useLocale();
+  const [loadingOptions, setLoadingOptions] = useState(false);
+  const [optionsError, setOptionsError] = useState<string | null>(null);
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
 
   const tables = allowedTables.filter((key) => key in DB_COLUMN_REGISTRY);
+
+  const tableDef = field.db_table ? getTableDef(field.db_table) : undefined;
+  const columnDef = field.db_table && field.db_column
+    ? getColumnDef(field.db_table, field.db_column)
+    : undefined;
+
+  // Hydrate dynamic options for columns with optionsSource (e.g. spoken_languages).
+  // Runs when the mapping changes or the admin locale changes.
+  useEffect(() => {
+    if (columnDef?.optionsSource !== 'spoken_languages') return;
+
+    let cancelled = false;
+    setLoadingOptions(true);
+    setOptionsError(null);
+    getSpokenLanguageOptions(locale)
+      .then((opts) => {
+        if (cancelled) return;
+        const snapshot = opts.map((o) => ({ value: o.code, label: o.label }));
+        const codes = opts.map((o) => o.code);
+        onChangeRef.current({
+          ...field,
+          options: codes,
+          options_snapshot: snapshot,
+        });
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setOptionsError(t('failedToLoadOptions'));
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingOptions(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [field.db_table, field.db_column, columnDef?.optionsSource, locale]);
 
   if (tables.length === 0) {
     return (
@@ -35,19 +80,25 @@ export function DbColumnFieldConfig({
     );
   }
 
-  const tableDef = field.db_table ? getTableDef(field.db_table) : undefined;
-  const columnDef = field.db_table && field.db_column
-    ? getColumnDef(field.db_table, field.db_column)
-    : undefined;
-
   const handleTableChange = (table: string) => {
-    onChange({ ...field, db_table: table || undefined, db_column: undefined, options: undefined });
+    onChange({
+      ...field,
+      db_table: table || undefined,
+      db_column: undefined,
+      options: undefined,
+      options_snapshot: undefined,
+    });
   };
 
   const handleColumnChange = (column: string) => {
     const colDef = field.db_table ? getColumnDef(field.db_table, column) : undefined;
     const options = colDef?.options ? [...colDef.options] : undefined;
-    onChange({ ...field, db_column: column || undefined, options });
+    onChange({
+      ...field,
+      db_column: column || undefined,
+      options,
+      options_snapshot: undefined,
+    });
   };
 
   return (
@@ -82,8 +133,19 @@ export function DbColumnFieldConfig({
         </div>
       </div>
 
+      {/* Dynamic options status (e.g. spoken_languages) */}
+      {columnDef?.optionsSource && (
+        <div className="text-muted-foreground space-y-0.5 text-xs">
+          {loadingOptions && <p>{t('loadingOptions')}</p>}
+          {optionsError && <p className="text-destructive">{optionsError}</p>}
+          {!loadingOptions && !optionsError && field.options_snapshot && (
+            <p>{t('dynamicOptionsLoaded', { count: field.options_snapshot.length })}</p>
+          )}
+        </div>
+      )}
+
       {/* Option labels for select-type columns */}
-      {columnDef?.options && columnDef.options.length > 0 && (
+      {columnDef?.options && columnDef.options.length > 0 && !columnDef.optionsSource && (
         <div className="space-y-1">
           <Label className="text-xs">{t('optionLabels')}</Label>
           {columnDef.options.map((opt) => (

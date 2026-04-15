@@ -1,7 +1,8 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import type { ImportLookups, SurveyQuestionOption, ServiceOption, SubtypeGroupOption } from '../types';
+import { getSpokenLanguageAliases } from '@/shared/lib/spoken-languages/actions';
+import type { ImportLookups, SurveyQuestionOption, ServiceOption, SubtypeGroupOption, TalentTagOption } from '../types';
 import type { OrderLookups } from '../lib/transformers/transform-orders';
 
 /**
@@ -21,11 +22,17 @@ export async function getImportLookups(locale: string): Promise<ImportLookups> {
 
   const countryCode = LOCALE_TO_COUNTRY[locale] ?? 'ES';
 
-  const [citiesRes, countriesRes, defaultCountryRes] = await Promise.all([
-    supabase.from('city_translations').select('city_id, name').eq('locale', locale),
-    supabase.from('country_translations').select('country_id, name').eq('locale', locale),
-    supabase.from('countries').select('id').eq('code', countryCode).single(),
-  ]);
+  const [citiesRes, countriesRes, defaultCountryRes, tagsRes, spokenLanguageAliases] =
+    await Promise.all([
+      supabase.from('city_translations').select('city_id, name').eq('locale', locale),
+      supabase.from('country_translations').select('country_id, name').eq('locale', locale),
+      supabase.from('countries').select('id').eq('code', countryCode).single(),
+      supabase
+        .from('talent_tags')
+        .select('id, slug, talent_tag_translations(locale, name)')
+        .eq('is_active', true),
+      getSpokenLanguageAliases(),
+    ]);
 
   const citiesByName = new Map<string, string>();
   for (const c of citiesRes.data ?? []) {
@@ -37,11 +44,57 @@ export async function getImportLookups(locale: string): Promise<ImportLookups> {
     if (c.name) countriesByName.set(c.name.toLowerCase(), c.country_id);
   }
 
+  // Build tagIdsByName map with locale → 'es' → slug fallback chain.
+  // All translations for a tag are added (case-insensitive) so a CSV in any
+  // locale can match the same tag.
+  const tagIdsByName = new Map<string, string>();
+  for (const tag of tagsRes.data ?? []) {
+    const trans = tag.talent_tag_translations as unknown as
+      | { locale: string; name: string }[]
+      | null;
+    let matched = false;
+    for (const t of trans ?? []) {
+      if (t.name) {
+        tagIdsByName.set(t.name.toLowerCase(), tag.id);
+        matched = true;
+      }
+    }
+    if (!matched && tag.slug) tagIdsByName.set(tag.slug.toLowerCase(), tag.id);
+  }
+
   return {
     citiesByName,
     countriesByName,
     defaultCountryId: defaultCountryRes.data?.id ?? null,
+    tagIdsByName,
+    spokenLanguageAliases,
   };
+}
+
+/**
+ * Load active talent tags for the column mapper UI (informational display only).
+ * The import itself resolves names → ids via getImportLookups.tagIdsByName.
+ */
+export async function getTalentTagOptions(locale: string): Promise<TalentTagOption[]> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from('talent_tags')
+    .select('id, slug, talent_tag_translations(locale, name)')
+    .eq('is_active', true)
+    .order('sort_order', { ascending: true });
+
+  if (error) throw error;
+
+  return (data ?? []).map((tag) => {
+    const trans = tag.talent_tag_translations as unknown as
+      | { locale: string; name: string }[]
+      | null;
+    const byLocale = new Map<string, string>();
+    for (const t of trans ?? []) byLocale.set(t.locale, t.name);
+    const name = byLocale.get(locale) ?? byLocale.get('es') ?? tag.slug;
+    return { id: tag.id, name };
+  });
 }
 
 /**
@@ -101,9 +154,9 @@ export async function getSubtypeGroupOptions(locale: string): Promise<SubtypeGro
     .from('service_subtype_groups')
     .select(`
       id,
-      services!inner(slug),
       service_subtype_group_translations!inner(name),
-      service_subtypes(id, service_subtype_translations!inner(name))
+      service_subtypes(id, service_subtype_translations!inner(name)),
+      service_subtype_group_assignments(services(slug))
     `)
     .eq('service_subtype_group_translations.locale', locale)
     .eq('service_subtypes.service_subtype_translations.locale', locale)
@@ -112,13 +165,14 @@ export async function getSubtypeGroupOptions(locale: string): Promise<SubtypeGro
   if (error) throw error;
 
   return (data ?? []).map((g) => {
-    const svc = g.services as unknown as { slug: string };
     const trans = g.service_subtype_group_translations as unknown as { name: string }[];
     const subtypes = g.service_subtypes as unknown as { id: string; service_subtype_translations: { name: string }[] }[];
+    const assignments = g.service_subtype_group_assignments as unknown as { services: { slug: string } }[];
+    const serviceSlugs = assignments.map((a) => a.services.slug);
 
     return {
       id: g.id,
-      serviceSlug: svc.slug,
+      serviceSlugs,
       groupName: trans[0]?.name ?? g.id,
       items: subtypes.map((st) => ({
         id: st.id,
