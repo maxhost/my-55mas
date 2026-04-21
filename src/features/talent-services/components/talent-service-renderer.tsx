@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
 import { FormRenderer } from '@/shared/components/form-renderer';
-import type { FormWithTranslations, FormField, FormTranslationData } from '@/shared/lib/forms/types';
+import type { FormWithTranslations, FormField, FormTranslationData, ServiceSelectOption } from '@/shared/lib/forms/types';
 import { submitTalentService } from '../actions/submit-talent-service';
 
 type SubtypeOption = { id: string; slug: string; name: string; group_slug: string };
@@ -19,6 +19,7 @@ type Props = {
   existingData: Record<string, unknown> | null;
   selectedSubtypeIds: string[];
   subtypeOptions: SubtypeOption[];
+  serviceOptions?: ServiceSelectOption[];
 };
 
 export function TalentServiceRenderer({
@@ -30,6 +31,7 @@ export function TalentServiceRenderer({
   existingData,
   selectedSubtypeIds,
   subtypeOptions,
+  serviceOptions,
 }: Props) {
   const t = useTranslations('TalentPortal');
   const tc = useTranslations('Common');
@@ -107,6 +109,7 @@ export function TalentServiceRenderer({
       isPending={isPending}
       selectPlaceholder={t('select')}
       renderCustomField={renderCustomField}
+      serviceOptions={serviceOptions}
     />
   );
 }

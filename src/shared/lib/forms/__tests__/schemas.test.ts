@@ -55,6 +55,28 @@ describe('formFieldSchema — email/password types', () => {
   });
 });
 
+// ── service_select field ────────────────────────────
+
+describe('formFieldSchema — service_select', () => {
+  it('accepts service_select field', () => {
+    const result = formFieldSchema.safeParse({
+      key: 'offered_services',
+      type: 'service_select',
+      required: true,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts optional service_select field', () => {
+    const result = formFieldSchema.safeParse({
+      key: 'offered_services',
+      type: 'service_select',
+      required: false,
+    });
+    expect(result.success).toBe(true);
+  });
+});
+
 // ── Step actions ─────────────────────────────────────
 
 describe('stepActionSchema', () => {

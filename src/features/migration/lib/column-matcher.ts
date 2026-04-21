@@ -20,8 +20,11 @@ function matchScore(csvCol: string, dbCol: string): number {
   const a = normalize(csvCol);
   const b = normalize(dbCol);
 
+  if (!a || !b) return 0;
   if (a === b) return 1;
-  if (a.includes(b) || b.includes(a)) return 0.7;
+  // Require the shorter string to be ≥4 chars to avoid spurious substring hits
+  // like "age" matching "otherlanguage"
+  if (Math.min(a.length, b.length) >= 4 && (a.includes(b) || b.includes(a))) return 0.7;
 
   // Check for common aliases
   const aliases: Record<string, string[]> = {
@@ -33,7 +36,7 @@ function matchScore(csvCol: string, dbCol: string): number {
     status: ['estado', 'estat', 'statut', 'candidatestatus'],
     nif: ['nie', 'taxid', 'dni', 'cif', 'identificacion'],
     is_business: ['clienttype', 'type', 'tipo'],
-    legacy_id: ['client', 'specialist', 'numero'],
+    legacy_id: ['client', 'specialist', 'numero', 'appointment', 'appointmentnumber', 'pedido', 'numeropedido'],
     created_at: ['joinedat', 'registeredat', 'fecha', 'createdat'],
     terms_accepted: ['termsofconditions', 'terms', 'terminos', 'condiciones'],
     billing_state: ['stateprovince', 'state', 'province', 'estado', 'provincia'],
@@ -54,6 +57,25 @@ function matchScore(csvCol: string, dbCol: string): number {
       'altreidioma', 'altresidiomes',
       'languages', 'idiomas', 'linguas', 'langues', 'idiomes',
     ],
+    // ── Orders / Pedidos ─────────────────────────────
+    contact_name: ['clientname', 'nombrecliente', 'nomecliente', 'clientename'],
+    contact_email: ['clientemail', 'emailcliente'],
+    service_name: ['servicename', 'servicio', 'servico'],
+    talent_name: ['specialist', 'especialista', 'talent', 'talento'],
+    schedule_type: ['recurring', 'recorrente', 'recurrente'],
+    price_subtotal: ['totalpricewdiscount', 'totalpricewithdiscount', 'subtotal'],
+    price_total: ['billedprice', 'precofacturado', 'totalcobrado'],
+    talent_amount: ['specialistamount', 'montoespecialista', 'importeespecialista'],
+    staff_member_name: ['55member', 'staffmember', 'miembro55', 'membre55'],
+    appointment_date: ['appointmentdate', 'fechacita', 'fechaservicio', 'servicedate'],
+    service_state: ['stateprovince', 'comunidad', 'region'],
+    unit_price: ['unitprice', 'preciounitario', 'precounitario'],
+    specialist_unit_price: ['specialistunitprice', 'specialistup', 'preciounitarioespecialista'],
+    quantity: ['cantidad', 'quantidade', 'qty'],
+    discount: ['descuento', 'desconto'],
+    payment_status: ['clientpayed', 'clientpaid', 'pagocliente', 'pagado'],
+    rating: ['valoracion', 'avaliacao', 'puntuacion'],
+    stripe_id: ['stripeid', 'stripepaymentid', 'idpago'],
   };
 
   for (const [key, synonyms] of Object.entries(aliases)) {
@@ -90,6 +112,9 @@ export function autoMatchColumns(
     }
 
     if (bestMatch) usedDbColumns.add(bestMatch);
+
+    // DEBUG: log every auto-match result
+    console.log(`[column-matcher] CSV "${csvCol}" → DB "${bestMatch}" (score ${bestScore.toFixed(2)})`);
 
     return {
       csvColumn: csvCol,

@@ -13,7 +13,9 @@ import {
   getSurveyQuestions,
   getServiceOptions,
   getSubtypeGroupOptions,
+  getOrderLookups,
 } from '../actions/get-lookup-data';
+import type { OrderLookups } from '../lib/transformers/transform-orders';
 import type {
   MigrationTarget,
   CsvLocale,
@@ -41,21 +43,24 @@ export function MigrationWizard({ locale }: WizardProps) {
   const [surveyQuestions, setSurveyQuestions] = useState<SurveyQuestionOption[]>([]);
   const [serviceOptions, setServiceOptions] = useState<ServiceOption[]>([]);
   const [subtypeGroupOptions, setSubtypeGroupOptions] = useState<SubtypeGroupOption[]>([]);
+  const [orderLookups, setOrderLookups] = useState<OrderLookups | null>(null);
 
   const handleTargetSelect = useCallback(async (t: MigrationTarget, selectedCsvLocale: CsvLocale) => {
     setTarget(t);
     setCsvLocale(selectedCsvLocale);
     // UI labels use system locale; service/subtype labels also in system locale for the mapper dropdowns
-    const [cols, questions, services, subtypeGroups] = await Promise.all([
+    const [cols, questions, services, subtypeGroups, orderLk] = await Promise.all([
       getTableColumns(t),
       getSurveyQuestions(locale),
       getServiceOptions(locale),
       getSubtypeGroupOptions(locale),
+      t === 'orders' ? getOrderLookups(selectedCsvLocale) : Promise.resolve(null),
     ]);
     setDbColumns(cols);
     setSurveyQuestions(questions);
     setServiceOptions(services);
     setSubtypeGroupOptions(subtypeGroups);
+    setOrderLookups(orderLk);
     setStep('upload');
   }, [locale]);
 
@@ -142,6 +147,7 @@ export function MigrationWizard({ locale }: WizardProps) {
             mappings={mappings}
             locale={locale}
             csvLocale={csvLocale}
+            orderLookups={orderLookups ?? undefined}
           />
           <Button variant="outline" onClick={handleBack}>{t('back')}</Button>
         </>

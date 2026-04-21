@@ -26,16 +26,19 @@ export async function submitTalentService(input: SubmitInput) {
   const { talent_id, service_id, country_id, form_id, form_data, form_schema, subtype_ids } = input;
   const supabase = createClient();
 
-  // 1. Update talent_services with form data
+  // 1. Upsert talent_services with form data (creates if not exists)
   const { error: updateError } = await supabase
     .from('talent_services')
-    .update({
-      form_data: form_data as unknown as Json,
-      form_id,
-    })
-    .eq('talent_id', talent_id)
-    .eq('service_id', service_id)
-    .eq('country_id', country_id);
+    .upsert(
+      {
+        talent_id,
+        service_id,
+        country_id,
+        form_data: form_data as unknown as Json,
+        form_id,
+      },
+      { onConflict: 'talent_id,service_id,country_id' }
+    );
 
   if (updateError) return { error: { _db: [updateError.message] } };
 

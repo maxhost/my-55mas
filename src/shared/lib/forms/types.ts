@@ -10,6 +10,7 @@ export const FIELD_TYPES = [
   'file',
   'subtype',
   'survey',
+  'service_select',
   'email',
   'password',
   'db_column',
@@ -121,6 +122,13 @@ export type SaveFormResult =
 export type CloneFormResult = {
   data?: FormWithTranslations;
   error?: string;
+};
+
+// ── Service select option (for FormRenderer) ────────
+
+export type ServiceSelectOption = {
+  id: string;
+  name: string;
 };
 
 // ── Survey question render data (for FormRenderer) ───

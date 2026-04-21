@@ -1,7 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import type { FormField, FormTranslationData } from '@/shared/lib/forms/types';
+import type { FormField, FormTranslationData, ServiceSelectOption } from '@/shared/lib/forms/types';
 import { getColumnDef } from '@/shared/lib/forms/db-column-registry';
 import { SurveyFieldRenderer } from './survey-field-renderer';
 import type { SurveyQuestionRenderData } from '@/shared/lib/forms/types';
@@ -25,6 +25,10 @@ type SelectRenderProps = FieldRenderProps & {
 
 type SurveyRenderProps = FieldRenderProps & {
   surveyQuestions?: Record<string, SurveyQuestionRenderData>;
+};
+
+type ServiceSelectRenderProps = FieldRenderProps & {
+  serviceOptions?: ServiceSelectOption[];
 };
 
 // ── Renderers ────────────────────────────────────────
@@ -185,6 +189,44 @@ export function renderDbColumn({ field, value, label, placeholder, errorClass, i
         placeholder={placeholder}
         className={errorClass}
       />
+    </div>
+  );
+}
+
+export function renderServiceSelect({ field, value, label, isRequired, onChange, serviceOptions }: ServiceSelectRenderProps) {
+  const selected = (value as string[]) ?? [];
+  const options = serviceOptions ?? [];
+
+  if (options.length === 0) {
+    return (
+      <div key={field.key} className="space-y-1">
+        <Label className="text-muted-foreground">{label}{isRequired && ' *'}</Label>
+        <p className="text-muted-foreground text-xs">No hay servicios disponibles</p>
+      </div>
+    );
+  }
+
+  return (
+    <div key={field.key} className="space-y-2">
+      <Label>{label}{isRequired && ' *'}</Label>
+      <div className="flex flex-wrap gap-2">
+        {options.map((opt) => (
+          <label key={opt.id} className="flex items-center gap-1.5 text-sm">
+            <input
+              type="checkbox"
+              checked={selected.includes(opt.id)}
+              onChange={(e) => {
+                const next = e.target.checked
+                  ? [...selected, opt.id]
+                  : selected.filter((id) => id !== opt.id);
+                onChange(field.key, next);
+              }}
+              className="h-4 w-4"
+            />
+            {opt.name}
+          </label>
+        ))}
+      </div>
     </div>
   );
 }

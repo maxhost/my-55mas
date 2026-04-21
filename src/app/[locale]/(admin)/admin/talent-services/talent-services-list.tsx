@@ -6,8 +6,10 @@ import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Link } from '@/lib/i18n/navigation';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { ConfirmDialog } from '@/shared/components/confirm-dialog';
+import { Plus, Trash2 } from 'lucide-react';
 import { createTalentService } from '@/features/talent-services/actions/create-talent-service';
+import { deleteTalentForm } from '@/features/talent-services/actions/delete-talent-form';
 import type { TalentServiceListItem } from '@/features/talent-services/actions/list-talent-services';
 
 type Props = {
@@ -21,6 +23,8 @@ export function TalentServicesList({ forms, availableServices }: Props) {
   const router = useRouter();
   const [selectedService, setSelectedService] = useState('');
   const [isPending, startTransition] = useTransition();
+  const [deleteTarget, setDeleteTarget] = useState<TalentServiceListItem | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const handleCreate = () => {
     if (!selectedService) return;
@@ -34,6 +38,23 @@ export function TalentServicesList({ forms, availableServices }: Props) {
       }
       toast.success(tc('savedSuccess'));
       router.push(`/admin/talent-services/${result.id}`);
+    });
+  };
+
+  const handleConfirmDelete = () => {
+    if (!deleteTarget) return;
+    setDeleteError(null);
+    startTransition(async () => {
+      const result = await deleteTalentForm(deleteTarget.service_id);
+      if (result && 'error' in result) {
+        const errObj = result.error as Record<string, string[] | undefined>;
+        const msg = Object.values(errObj).flat().filter(Boolean)[0];
+        setDeleteError(msg ?? t('deleteError'));
+        return;
+      }
+      setDeleteTarget(null);
+      toast.success(tc('deletedSuccess'));
+      router.refresh();
     });
   };
 
@@ -75,6 +96,7 @@ export function TalentServicesList({ forms, availableServices }: Props) {
               <th className="py-2 font-medium">{t('service')}</th>
               <th className="py-2 font-medium">{t('variants')}</th>
               <th className="py-2 font-medium">{t('updated')}</th>
+              <th className="w-10 py-2" />
             </tr>
           </thead>
           <tbody>
@@ -98,11 +120,38 @@ export function TalentServicesList({ forms, availableServices }: Props) {
                     ? new Date(form.updated_at).toLocaleDateString()
                     : '—'}
                 </td>
+                <td className="py-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setDeleteTarget(form)}
+                  >
+                    <Trash2 className="size-3.5" />
+                  </Button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteTarget(null);
+            setDeleteError(null);
+          }
+        }}
+        title={t('deleteFormTitle')}
+        description={t('deleteFormDescription', { name: deleteTarget?.service_name ?? '' })}
+        confirmLabel={t('deleteConfirm')}
+        cancelLabel={tc('cancel')}
+        onConfirm={handleConfirmDelete}
+        variant="destructive"
+        isPending={isPending}
+        error={deleteError}
+      />
     </div>
   );
 }

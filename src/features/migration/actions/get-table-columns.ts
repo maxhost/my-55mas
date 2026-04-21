@@ -64,6 +64,18 @@ const ORDER_COLUMNS: DbColumn[] = [
   { name: 'price_total', required: false, description: 'Total price with tax' },
   { name: 'schedule_type', required: false, description: 'Recurring? (yes/no)' },
   { name: 'created_at', required: false, description: 'Order date' },
+  { name: 'legacy_id', required: false, description: 'Legacy appointment # (for idempotent re-runs)' },
+  { name: 'talent_amount', required: false, description: 'Amount paid to the specialist' },
+  { name: 'staff_member_name', required: false, description: 'Staff member name (55+ Member, for lookup)' },
+  { name: 'appointment_date', required: false, description: 'Date of service appointment' },
+  { name: 'service_state', required: false, description: 'State/Province where service is delivered' },
+  { name: 'unit_price', required: false, description: 'Unit price (client-facing)' },
+  { name: 'specialist_unit_price', required: false, description: 'Unit price for the specialist' },
+  { name: 'quantity', required: false, description: 'Number of units/sessions' },
+  { name: 'discount', required: false, description: 'Discount percentage' },
+  { name: 'payment_status', required: false, description: 'Payment status (paid/unpaid)' },
+  { name: 'rating', required: false, description: 'Client rating (1-5)' },
+  { name: 'stripe_id', required: false, description: 'Stripe payment ID' },
 ];
 
 const COLUMNS_MAP: Record<MigrationTarget, DbColumn[]> = {

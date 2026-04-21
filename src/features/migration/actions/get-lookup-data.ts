@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { getSpokenLanguageAliases } from '@/shared/lib/spoken-languages/actions';
 import type { ImportLookups, SurveyQuestionOption, ServiceOption, SubtypeGroupOption, TalentTagOption } from '../types';
+import { normalizeName } from '../lib/transformers/transform-orders';
 import type { OrderLookups } from '../lib/transformers/transform-orders';
 
 /**
@@ -107,20 +108,20 @@ export async function getSurveyQuestions(
 
   const { data, error } = await supabase
     .from('survey_questions')
-    .select('id, key, survey_question_translations!inner(label)')
+    .select('id, key, survey_question_translations(locale, label)')
     .eq('is_active', true)
-    .eq('survey_question_translations.locale', locale)
     .order('sort_order', { ascending: true });
 
   if (error) throw error;
 
   return (data ?? []).map((q) => {
-    const translations = q.survey_question_translations as unknown as { label: string }[];
-    return {
-      id: q.id,
-      key: q.key,
-      label: translations[0]?.label ?? q.key,
-    };
+    const translations = q.survey_question_translations as unknown as
+      | { locale: string; label: string }[]
+      | null;
+    const byLocale = new Map<string, string>();
+    for (const t of translations ?? []) byLocale.set(t.locale, t.label);
+    const label = byLocale.get(locale) ?? byLocale.get('es') ?? q.key;
+    return { id: q.id, key: q.key, label };
   });
 }
 
@@ -184,8 +185,9 @@ export async function getSubtypeGroupOptions(locale: string): Promise<SubtypeGro
 
 export async function getOrderLookups(locale: string): Promise<OrderLookups> {
   const supabase = createClient();
+  const countryCode = LOCALE_TO_COUNTRY[locale] ?? 'ES';
 
-  const [servicesRes, clientsRes, talentsRes, citiesRes, countriesRes] =
+  const [servicesRes, clientsRes, talentsRes, citiesRes, countriesRes, staffRes] =
     await Promise.all([
       supabase
         .from('service_translations')
@@ -206,28 +208,37 @@ export async function getOrderLookups(locale: string): Promise<OrderLookups> {
       supabase
         .from('countries')
         .select('id, code')
-        .eq('code', 'PT')
+        .eq('code', countryCode)
         .single(),
+      supabase
+        .from('staff_profiles')
+        .select('id, first_name, last_name'),
     ]);
 
   const servicesByName = new Map<string, string>();
   for (const s of servicesRes.data ?? []) {
-    if (s.name) servicesByName.set(s.name.toLowerCase(), s.service_id);
+    if (s.name) servicesByName.set(normalizeName(s.name), s.service_id);
   }
 
   const clientsByName = new Map<string, string>();
   for (const c of clientsRes.data ?? []) {
-    if (c.full_name) clientsByName.set(c.full_name.toLowerCase(), c.id);
+    if (c.full_name) clientsByName.set(normalizeName(c.full_name), c.id);
   }
 
   const talentsByName = new Map<string, string>();
   for (const t of talentsRes.data ?? []) {
-    if (t.full_name) talentsByName.set(t.full_name.toLowerCase(), t.id);
+    if (t.full_name) talentsByName.set(normalizeName(t.full_name), t.id);
   }
 
   const citiesByName = new Map<string, string>();
   for (const c of citiesRes.data ?? []) {
-    if (c.name) citiesByName.set(c.name.toLowerCase(), c.city_id);
+    if (c.name) citiesByName.set(normalizeName(c.name), c.city_id);
+  }
+
+  const staffByName = new Map<string, string>();
+  for (const s of staffRes.data ?? []) {
+    const fullName = `${s.first_name ?? ''} ${s.last_name ?? ''}`.trim();
+    if (fullName) staffByName.set(normalizeName(fullName), s.id);
   }
 
   return {
@@ -235,6 +246,7 @@ export async function getOrderLookups(locale: string): Promise<OrderLookups> {
     clientsByName,
     talentsByName,
     citiesByName,
-    countryIdForPT: countriesRes.data?.id ?? null,
+    staffByName,
+    defaultCountryId: countriesRes.data?.id ?? null,
   };
 }

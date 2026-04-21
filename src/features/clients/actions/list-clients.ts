@@ -13,16 +13,35 @@ export async function listClients({
 }: ListClientsParams): Promise<ClientListItem[]> {
   const supabase = createClient();
 
-  // Query 1: client profiles + base profile
-  const { data: clients, error: clientsError } = await supabase
-    .from('client_profiles')
-    .select(
-      'id, user_id, company_name, status, created_at, profiles!inner(full_name, preferred_country, preferred_city)'
-    )
-    .order('created_at', { ascending: false });
+  // Query 1: client profiles + base profile (paginated to bypass PostgREST 1000-row cap)
+  const PAGE_SIZE = 1000;
+  type ClientRow = {
+    id: string;
+    user_id: string;
+    company_name: string | null;
+    status: string | null;
+    created_at: string;
+    profiles: { full_name: string | null; preferred_country: string | null; preferred_city: string | null };
+  };
+  const clients: ClientRow[] = [];
+  let from = 0;
+  while (true) {
+    const { data: page, error } = await supabase
+      .from('client_profiles')
+      .select(
+        'id, user_id, company_name, status, created_at, profiles!inner(full_name, preferred_country, preferred_city)'
+      )
+      .order('created_at', { ascending: false })
+      .range(from, from + PAGE_SIZE - 1);
 
-  if (clientsError) throw clientsError;
-  if (!clients || clients.length === 0) return [];
+    if (error) throw error;
+    if (!page || page.length === 0) break;
+    clients.push(...(page as unknown as ClientRow[]));
+    if (page.length < PAGE_SIZE) break;
+    from += PAGE_SIZE;
+  }
+
+  if (clients.length === 0) return [];
 
   // Query 2: localized country names
   const { data: countries, error: countriesError } = await supabase
@@ -43,27 +62,20 @@ export async function listClients({
   const countryMap = buildNameMap(countries ?? []);
   const cityMap = buildNameMap(cities ?? []);
 
-  return clients.map((c) => {
-    const profile = c.profiles as unknown as {
-      full_name: string | null;
-      preferred_country: string | null;
-      preferred_city: string | null;
-    };
-    return {
-      id: c.id,
-      user_id: c.user_id,
-      full_name: profile.full_name,
-      country_name: profile.preferred_country
-        ? countryMap.get(profile.preferred_country) ?? null
-        : null,
-      country_id: profile.preferred_country,
-      city_name: profile.preferred_city
-        ? cityMap.get(profile.preferred_city) ?? null
-        : null,
-      city_id: profile.preferred_city,
-      company_name: c.company_name,
-      status: c.status as ClientListItem['status'],
-      created_at: c.created_at,
-    };
-  });
+  return clients.map((c) => ({
+    id: c.id,
+    user_id: c.user_id,
+    full_name: c.profiles.full_name,
+    country_name: c.profiles.preferred_country
+      ? countryMap.get(c.profiles.preferred_country) ?? null
+      : null,
+    country_id: c.profiles.preferred_country,
+    city_name: c.profiles.preferred_city
+      ? cityMap.get(c.profiles.preferred_city) ?? null
+      : null,
+    city_id: c.profiles.preferred_city,
+    company_name: c.company_name,
+    status: c.status as ClientListItem['status'],
+    created_at: c.created_at,
+  }));
 }

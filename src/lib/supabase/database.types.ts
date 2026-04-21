@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       categories: {
@@ -502,6 +527,7 @@ export type Database = {
       }
       orders: {
         Row: {
+          appointment_date: string | null
           client_id: string
           contact_address: string | null
           contact_email: string
@@ -510,24 +536,38 @@ export type Database = {
           country_id: string
           created_at: string | null
           currency: string
+          discount: number | null
           form_data: Json
           form_id: string | null
           id: string
+          legacy_data: Json | null
+          legacy_id: string | null
           notes: string | null
+          order_number: number
+          payment_status: string | null
           price_subtotal: number
           price_tax: number
           price_tax_rate: number
           price_total: number
+          quantity: number | null
+          rating: number | null
           schedule_type: string
           service_address: string | null
           service_city_id: string | null
           service_id: string | null
           service_postal_code: string | null
+          service_state: string | null
+          specialist_unit_price: number | null
+          staff_member_id: string | null
           status: string
+          stripe_id: string | null
+          talent_amount: number | null
           talent_id: string | null
+          unit_price: number | null
           updated_at: string | null
         }
         Insert: {
+          appointment_date?: string | null
           client_id: string
           contact_address?: string | null
           contact_email: string
@@ -536,24 +576,38 @@ export type Database = {
           country_id: string
           created_at?: string | null
           currency: string
+          discount?: number | null
           form_data: Json
           form_id?: string | null
           id?: string
+          legacy_data?: Json | null
+          legacy_id?: string | null
           notes?: string | null
+          order_number?: number
+          payment_status?: string | null
           price_subtotal: number
           price_tax?: number
           price_tax_rate?: number
           price_total: number
+          quantity?: number | null
+          rating?: number | null
           schedule_type?: string
           service_address?: string | null
           service_city_id?: string | null
           service_id?: string | null
           service_postal_code?: string | null
+          service_state?: string | null
+          specialist_unit_price?: number | null
+          staff_member_id?: string | null
           status?: string
+          stripe_id?: string | null
+          talent_amount?: number | null
           talent_id?: string | null
+          unit_price?: number | null
           updated_at?: string | null
         }
         Update: {
+          appointment_date?: string | null
           client_id?: string
           contact_address?: string | null
           contact_email?: string
@@ -562,21 +616,34 @@ export type Database = {
           country_id?: string
           created_at?: string | null
           currency?: string
+          discount?: number | null
           form_data?: Json
           form_id?: string | null
           id?: string
+          legacy_data?: Json | null
+          legacy_id?: string | null
           notes?: string | null
+          order_number?: number
+          payment_status?: string | null
           price_subtotal?: number
           price_tax?: number
           price_tax_rate?: number
           price_total?: number
+          quantity?: number | null
+          rating?: number | null
           schedule_type?: string
           service_address?: string | null
           service_city_id?: string | null
           service_id?: string | null
           service_postal_code?: string | null
+          service_state?: string | null
+          specialist_unit_price?: number | null
+          staff_member_id?: string | null
           status?: string
+          stripe_id?: string | null
+          talent_amount?: number | null
           talent_id?: string | null
+          unit_price?: number | null
           updated_at?: string | null
         }
         Relationships: [
@@ -634,6 +701,13 @@ export type Database = {
             columns: ["service_id"]
             isOneToOne: false
             referencedRelation: "services_localized"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_staff_member_id_fkey"
+            columns: ["staff_member_id"]
+            isOneToOne: false
+            referencedRelation: "staff_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -2827,6 +2901,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

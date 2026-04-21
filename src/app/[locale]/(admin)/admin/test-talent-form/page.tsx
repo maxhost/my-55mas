@@ -3,6 +3,7 @@ import { getCountries } from '@/features/services/actions/get-countries';
 import { getCities } from '@/features/services/actions/get-cities';
 import { listRegistrationForms } from '@/features/general-forms/actions/list-registration-forms';
 import { listSurveyQuestions } from '@/features/survey-questions/actions/list-survey-questions';
+import { getServiceOptionsForForm } from '@/features/services/actions/get-service-options-for-form';
 import type { SurveyQuestionRenderData } from '@/shared/lib/forms/types';
 import { TestTalentFormClient } from './test-talent-form-client';
 
@@ -11,11 +12,12 @@ type Props = { params: { locale: string } };
 export default async function TestTalentFormPage({ params: { locale } }: Props) {
   unstable_setRequestLocale(locale);
 
-  const [countries, cities, registrationForms, surveyQuestions] = await Promise.all([
+  const [countries, cities, registrationForms, surveyQuestions, serviceOptions] = await Promise.all([
     getCountries(locale),
     getCities(locale),
     listRegistrationForms(),
     listSurveyQuestions(),
+    getServiceOptionsForForm(locale),
   ]);
 
   const countryOptions = countries.map((c) => ({ id: c.id, name: c.name }));
@@ -49,6 +51,7 @@ export default async function TestTalentFormPage({ params: { locale } }: Props) 
         cities={cityOptions}
         registrationForms={registrationForms}
         surveyQuestions={surveyMap}
+        serviceOptions={serviceOptions}
       />
     </div>
   );

@@ -114,7 +114,12 @@ export function transformClients(
         gender,
         birth_date: mapped.birth_date || null,
         created_at: mapped.created_at || null,
-        other_language_raw: mapped.other_language || null,
+        other_language_raw: (() => {
+          const val = mapped.other_language || null;
+          // DEBUG: log what value reaches other_language_raw
+          console.log(`[transform-clients] Row ${rowIndex}: other_language mapped value =`, JSON.stringify(val), '| all mapped keys:', Object.keys(mapped).join(', '));
+          return val;
+        })(),
       },
       client_profile: {
         company_name: isBusiness ? (mapped.company_name || mapped.full_name) : null,

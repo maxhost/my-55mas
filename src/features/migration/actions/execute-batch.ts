@@ -7,6 +7,7 @@ import type { TransformedClient } from '../lib/transformers/transform-clients';
 import type { TransformedTalent } from '../lib/transformers/transform-talents';
 import type { TransformedOrder } from '../lib/transformers/transform-orders';
 import { insertTalentServices } from './insert-talent-services';
+import { insertOrders } from './insert-orders';
 
 export async function executeBatch(
   target: MigrationTarget,
@@ -268,21 +269,3 @@ async function insertTalents(
   return { inserted, errors };
 }
 
-async function insertOrders(
-  rows: TransformedOrder[],
-  startIndex: number
-): Promise<BatchResult> {
-  const admin = createAdminClient();
-  const errors: RowError[] = [];
-
-  const { error, count } = await admin
-    .from('orders')
-    .insert(rows, { count: 'exact' });
-
-  if (error) {
-    errors.push({ rowIndex: startIndex, message: error.message });
-    return { inserted: 0, errors };
-  }
-
-  return { inserted: count ?? rows.length, errors: [] };
-}

@@ -8,6 +8,7 @@ import type {
   FormTranslationData,
   StepAction,
   SurveyQuestionRenderData,
+  ServiceSelectOption,
 } from '@/shared/lib/forms/types';
 import {
   renderBoolean,
@@ -15,6 +16,7 @@ import {
   renderSingleSelect,
   renderMultiselect,
   renderSurveyField,
+  renderServiceSelect,
   renderDbColumn,
   renderDefaultInput,
 } from './field-renderers';
@@ -24,6 +26,7 @@ import {
 export type SubmitMeta = {
   action: 'save' | 'register';
   redirect_url?: string;
+  isLastStep: boolean;
 };
 
 type FormLike = {
@@ -35,11 +38,12 @@ type Props = {
   form: FormLike;
   locale: string;
   initialData?: Record<string, unknown>;
-  onSubmit: (formData: Record<string, unknown>, meta?: SubmitMeta) => void;
+  onSubmit: (formData: Record<string, unknown>, meta?: SubmitMeta) => void | Promise<boolean>;
   submitLabel?: string;
   isPending?: boolean;
   selectPlaceholder?: string;
   surveyQuestions?: Record<string, SurveyQuestionRenderData>;
+  serviceOptions?: ServiceSelectOption[];
   renderCustomField?: (
     field: FormField,
     trans: FormTranslationData,
@@ -57,6 +61,7 @@ export function FormRenderer({
   isPending = false,
   selectPlaceholder = '',
   surveyQuestions,
+  serviceOptions,
   renderCustomField,
 }: Props) {
   const [data, setData] = useState<Record<string, unknown>>(initialData ?? {});
@@ -90,7 +95,7 @@ export function FormRenderer({
     return missing.size === 0;
   };
 
-  const handleAction = (action: StepAction) => {
+  const handleAction = async (action: StepAction) => {
     if (action.type === 'back') {
       setStepIndex((i) => Math.max(0, i - 1));
       setErrors(new Set());
@@ -105,11 +110,18 @@ export function FormRenderer({
       return;
     }
 
+    const isLastStep = stepIndex >= steps.length - 1;
     const meta: SubmitMeta = {
       action: action.type === 'register' ? 'register' : 'save',
       redirect_url: action.redirect_url,
+      isLastStep,
     };
-    onSubmit(data, meta);
+    const result = await onSubmit(data, meta);
+
+    // Advance to next step if consumer signals success and there are more steps
+    if (result === true && !isLastStep) {
+      setStepIndex((i) => Math.min(steps.length - 1, i + 1));
+    }
   };
 
   const renderField = (field: FormField) => {
@@ -131,6 +143,9 @@ export function FormRenderer({
     if (field.type === 'multiselect') return renderMultiselect(selectBase);
     if (field.type === 'survey' && field.survey_question_key) {
       return renderSurveyField({ ...base, surveyQuestions });
+    }
+    if (field.type === 'service_select') {
+      return renderServiceSelect({ ...base, serviceOptions });
     }
     if (field.type === 'db_column') {
       return renderDbColumn(selectBase);

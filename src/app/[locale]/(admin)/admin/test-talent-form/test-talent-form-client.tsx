@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { getEmbeddableForm } from '@/features/general-forms/actions/get-embeddable-form';
 import { RegistrationFormEmbed } from '@/features/general-forms/components/registration-form-embed';
 import type { RegistrationFormListItem, RegistrationFormWithTranslations } from '@/features/general-forms/types';
-import type { SurveyQuestionRenderData } from '@/shared/lib/forms/types';
+import type { SurveyQuestionRenderData, ServiceSelectOption } from '@/shared/lib/forms/types';
 
 type CountryOption = { id: string; name: string };
 type CityOption = { id: string; name: string; country_id: string };
@@ -16,9 +16,10 @@ type Props = {
   cities: CityOption[];
   registrationForms: RegistrationFormListItem[];
   surveyQuestions: Record<string, SurveyQuestionRenderData>;
+  serviceOptions: ServiceSelectOption[];
 };
 
-export function TestTalentFormClient({ locale, countries, cities, registrationForms, surveyQuestions }: Props) {
+export function TestTalentFormClient({ locale, countries, cities, registrationForms, surveyQuestions, serviceOptions }: Props) {
   const [selectedSlug, setSelectedSlug] = useState('');
   const [countryId, setCountryId] = useState('');
   const [cityId, setCityId] = useState('');
@@ -144,6 +145,9 @@ export function TestTalentFormClient({ locale, countries, cities, registrationFo
             locale={locale}
             onSubmit={handleSubmit}
             surveyQuestions={surveyQuestions}
+            serviceOptions={serviceOptions}
+            countryId={countryId}
+            cityId={cityId}
           />
         </div>
       )}

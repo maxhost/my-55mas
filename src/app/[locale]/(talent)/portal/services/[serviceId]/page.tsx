@@ -3,6 +3,7 @@ import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
 import { getTalentServiceForm } from '@/features/talent-services/actions/get-talent-service-form';
 import { getSubtypes } from '@/features/subtypes/actions/get-subtypes';
+import { getServiceOptionsForForm } from '@/features/services/actions/get-service-options-for-form';
 import { TalentServiceRenderer } from '@/features/talent-services/components/talent-service-renderer';
 
 type Props = { params: { locale: string; serviceId: string } };
@@ -63,8 +64,11 @@ export default async function TalentServiceFormPage({ params: { locale, serviceI
     );
   }
 
-  // Load subtype options for this service
-  const subtypeOptions = await getSubtypes(serviceId, locale);
+  // Load subtype + service options in parallel
+  const [subtypeOptions, serviceOptions] = await Promise.all([
+    getSubtypes(serviceId, locale),
+    getServiceOptionsForForm(locale),
+  ]);
 
   return (
     <div className="p-8">
@@ -78,6 +82,7 @@ export default async function TalentServiceFormPage({ params: { locale, serviceI
         existingData={formData.existingData}
         selectedSubtypeIds={formData.selectedSubtypeIds}
         subtypeOptions={subtypeOptions}
+        serviceOptions={serviceOptions}
       />
     </div>
   );

@@ -9,6 +9,8 @@ type RegisterInput = {
   form_schema: FormSchema;
   locale: string;
   target_role: 'talent' | 'client';
+  country_id?: string;
+  city_id?: string;
 };
 
 /**
@@ -20,7 +22,7 @@ type RegisterInput = {
  * Passwords are never persisted in form_data.
  */
 export async function registerUser(input: RegisterInput) {
-  const { form_data, form_schema, locale, target_role } = input;
+  const { form_data, form_schema, locale, target_role, country_id, city_id } = input;
 
   console.log('[registerUser] START', { locale, target_role });
   console.log('[registerUser] form_data keys:', Object.keys(form_data));
@@ -105,6 +107,8 @@ export async function registerUser(input: RegisterInput) {
     const { error: talentError } = await supabase.from('talent_profiles').insert({
       user_id: userId,
       status: 'pending',
+      ...(country_id && { country_id }),
+      ...(city_id && { city_id }),
       ...talentData,
     });
 
