@@ -135,11 +135,16 @@ export function CatalogFormBuilder({
   };
 
   const setStepActions = (index: number, actions: StepAction[]) => {
-    updateStep(index, { ...schema.steps[index], actions });
+    setSchema((prev) => ({
+      ...prev,
+      steps: prev.steps.map((s, i) => (i === index ? { ...s, actions } : s)),
+    }));
   };
 
   const handleSave = () => {
     setError(null);
+    console.log('[CatalogFormBuilder] saving schema:', JSON.stringify(schema, null, 2));
+    console.log('[CatalogFormBuilder] translations:', translations);
     startTransition(async () => {
       const result = await saveCatalogFormSchema({
         form_id: formId,
