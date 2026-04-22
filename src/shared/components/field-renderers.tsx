@@ -1,6 +1,4 @@
 import { X } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -170,9 +168,10 @@ export function renderMultiselectCheckbox({ field, value, onChange }: RenderProp
   );
 }
 
-// Dropdown con chips: barra full-width con los chips seleccionados + chevron
-// fijo a la derecha. Click en el chevron abre el dropdown con las opciones
-// no seleccionadas. X en cada chip para removerlo.
+// Dropdown con chips: el SelectTrigger ES la barra full-width (así el
+// SelectContent se ancla al ancho del input). Los chips viven dentro del
+// trigger; los X usan spans con role=button para evitar nested <button>,
+// y stopPropagation para no disparar la apertura del dropdown al removerlos.
 export function renderMultiselectDropdown({
   field,
   value,
@@ -197,61 +196,70 @@ export function renderMultiselectDropdown({
   return (
     <div key={field.key} className="space-y-1">
       <Label>{labelText(field)}</Label>
-      <div
-        className={`border-input bg-background flex w-full min-h-9 items-center gap-1.5 rounded-lg border px-2 py-1 ${errorClass}`}
+      <Select
+        value=""
+        onValueChange={(v) => {
+          if (v == null) return;
+          addValue(v);
+        }}
       >
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
-          {selected.length === 0 && (
-            <span className="text-muted-foreground text-sm">
-              {field.placeholder || selectPlaceholder}
-            </span>
-          )}
-          {selected.map((opt) => (
-            <Badge
-              key={opt}
-              variant="secondary"
-              className="flex items-center gap-1 pr-1"
-            >
-              {labels[opt] ?? opt}
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-xs"
-                className="size-4"
-                onClick={() => removeValue(opt)}
-                aria-label="remove"
-              >
-                <X className="size-3" />
-              </Button>
-            </Badge>
-          ))}
-        </div>
-        <Select
-          value=""
-          onValueChange={(v) => {
-            if (v == null) return;
-            addValue(v);
-          }}
+        <SelectTrigger
+          aria-label={field.label}
+          className={`h-auto min-h-9 w-full justify-between py-1 ${errorClass}`}
         >
-          <SelectTrigger
-            aria-label={field.label}
-            className="size-7 shrink-0 border-0 bg-transparent p-0 shadow-none focus-visible:border-transparent focus-visible:ring-0"
-          />
-          <SelectContent align="end">
-            {available.length === 0 ? (
-              <div className="text-muted-foreground p-2 text-xs">
-                (sin más opciones)
-              </div>
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
+            {selected.length === 0 ? (
+              <span className="text-muted-foreground">
+                {field.placeholder || selectPlaceholder}
+              </span>
             ) : (
-              available.map((opt) => (
-                <SelectItem key={opt} value={opt}>
+              selected.map((opt) => (
+                <span
+                  key={opt}
+                  className="bg-secondary text-secondary-foreground inline-flex items-center gap-1 rounded-md pl-2 pr-1 py-0.5 text-xs"
+                  onPointerDown={(e) => e.stopPropagation()}
+                >
                   {labels[opt] ?? opt}
-                </SelectItem>
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    aria-label="remove"
+                    className="hover:bg-muted-foreground/20 inline-flex size-4 items-center justify-center rounded cursor-pointer"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      removeValue(opt);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        removeValue(opt);
+                      }
+                    }}
+                  >
+                    <X className="size-3" />
+                  </span>
+                </span>
               ))
             )}
-          </SelectContent>
-        </Select>
-      </div>
+          </div>
+        </SelectTrigger>
+        <SelectContent>
+          {available.length === 0 ? (
+            <div className="text-muted-foreground p-2 text-xs">
+              (sin más opciones)
+            </div>
+          ) : (
+            available.map((opt) => (
+              <SelectItem key={opt} value={opt}>
+                {labels[opt] ?? opt}
+              </SelectItem>
+            ))
+          )}
+        </SelectContent>
+      </Select>
       {field.description && (
         <p className="text-muted-foreground text-xs">{field.description}</p>
       )}
