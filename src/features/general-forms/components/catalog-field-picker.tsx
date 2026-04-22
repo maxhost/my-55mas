@@ -49,6 +49,8 @@ export function CatalogFieldPicker({
     }
   }
 
+  const selectedField = flat.find((f) => f.field_id === selected);
+
   const handleAdd = () => {
     if (!selected) return;
     onAdd(selected, required);
@@ -65,7 +67,16 @@ export function CatalogFieldPicker({
           onValueChange={(v) => setSelected(v ?? '')}
         >
           <SelectTrigger>
-            <SelectValue placeholder={t('addField')} />
+            <SelectValue placeholder={t('addField')}>
+              {selectedField ? (
+                <span className="truncate">
+                  <span className="text-muted-foreground mr-1 text-xs">
+                    [{selectedField.group_name}]
+                  </span>
+                  {selectedField.label}
+                </span>
+              ) : null}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {flat.length === 0 ? (

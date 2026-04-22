@@ -135,7 +135,10 @@ export function PersistenceTargetFields({
             }}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Seleccioná un grupo" />
+              <SelectValue placeholder="Seleccioná un grupo">
+                {subtypeGroups.find((g) => g.slug === current.subtype_group)?.name ??
+                  null}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {subtypeGroups.map((g) => (
