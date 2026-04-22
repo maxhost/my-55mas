@@ -1,118 +1,154 @@
-# Field Catalog — Estado y pendientes
+# Field Catalog — Runbook S7/S8 (integración manual)
 
-> Documento de handoff para retomar el trabajo tras reiniciar la sesión de Claude Code y reparar el MCP de Supabase.
-> Última actualización: 2026-04-21
+> Actualizado 2026-04-21 tras completar S1–S6b. Este documento reemplaza al handoff previo.
 
-## Contexto
+## Estado del código
 
-Feature: `docs/features/field-catalog.md` (spec completa).
+Pipeline completo commiteado en `main`:
 
-Objetivo: mover la definición de campos de formulario del JSON inline a un catálogo central en DB, referenciado por UUID desde los forms.
+| S | Commit | Qué |
+|---|---|---|
+| S1 | `5b6c3de` | Migración aplicada + tipos DB regenerados |
+| S2 | `979fbd7` | Zod validation (discriminated union) |
+| S3 | `64d4cb4` | 6 adapters + dispatchers |
+| S4 | `907ee57` | resolve-form orchestrator |
+| S5a | `641224c` | 5 server actions backend |
+| S5b | `acfbb1e` | `/admin/field-catalog` + nav + i18n 5 locales |
+| S6a | `c559b7f` | Renderer refactorizado a ResolvedField |
+| S6b | `f7a5fe2` | Callers al pipeline ResolvedForm + persistFormData |
 
-La sesión se interrumpió justo después de crear la migración SQL y los 3 archivos de tipos iniciales. La migración **no se aplicó** porque el MCP de Supabase estaba roto.
+Smoke check realizado: `/es/admin/field-catalog`, `/es/admin`, `/es/admin/spoken-languages`, `/es/admin/test-talent-form`, `/es/admin/forms` → todas 200 en dev server. 388/388 tests verdes, `NODE_ENV=production pnpm build` OK.
 
-## Bloqueador actual: MCP de Supabase
+## Formularios actuales en DB (dev `vkfolbfchkwezrbkxpiv`)
 
-### Diagnóstico
-Había dos configs de MCP en conflicto:
-- `.mcp.json` (proyecto) → correcto, HTTP hosted: `https://mcp.supabase.com/mcp?features=account,database,development`
-- Config local → rota, con placeholder `YOUR_SUPABASE_ACCESS_TOKEN`
+| slug | target_role | steps | ID |
+|---|---|---|---|
+| `formulario-general` | talent | 1 | `617eb9f1-…-c46d` |
+| `formulario-registro-cliente` | client | 2 | `9022e29e-…-3b6c` |
+| `registro-talento` | talent | 3 | `c7a8ace3-…-87f4` |
 
-### Acción ya tomada
-Se eliminó la config local rota con `claude mcp remove supabase -s local`. Queda solo la HTTP del proyecto.
+Todos tienen schema legacy (`steps[].fields[]` inline). `resolveFormFromJson` los valida con Zod y al fallar retorna `{ steps: [] }` → la página carga pero el form se ve vacío hasta recreación.
 
-### Para reparar al reiniciar
-1. Cerrar Claude Code y volver a abrir en `/Users/maxi/claude-workspace/55mas`
-2. Correr `/mcp`, seleccionar `supabase`, seguir flujo OAuth en el browser
-3. Verificar con `claude mcp list` — debería decir "connected" en vez de "Needs authentication"
+## S7 — Integración registration end-to-end
 
-**Fallback si OAuth no funciona:** generar Personal Access Token en https://supabase.com/dashboard/account/tokens y reconfigurar con stdio usando `@supabase/mcp-server-supabase` (paquete oficial, no el `@anthropic-ai/...` que estaba antes).
+### Paso 1: crear fields en `/admin/field-catalog`
 
-Proyecto dev: `55mais-dev` — ID `vkfolbfchkwezrbkxpiv` (región eu-west-1). **Nunca tocar producción.**
+`pnpm dev` y navegar a `/es/admin/field-catalog`. Crear un grupo y estos 3 fields para cubrir el flujo de `registro-talento` (step 1):
 
-## Lo que ya está hecho (untracked, no commiteado)
+**Grupo**: slug `registration`, traducciones mínimas (al menos `es`: "Registro").
 
-### 1. Spec
-`docs/features/field-catalog.md` — 195 líneas, completa.
+**Fields**:
 
-### 2. Migración SQL (creada, NO aplicada)
-`supabase/migrations/20260422_create_field_catalog.sql` — 5 tablas:
-- `form_field_groups` + `form_field_group_translations`
-- `form_field_definitions` + `form_field_definition_translations`
-- `user_form_responses` (UNIQUE por user_id + field_definition_id)
-- 4 índices, 2 CHECK constraints (input_type, persistence_type)
+1. **full_name**
+   - key: `full_name`
+   - input_type: `text`
+   - persistence_type: `db_column`
+   - table: `profiles` / column: `full_name`
+   - translations es: label="Nombre completo"
 
-### 3. Tipos TypeScript en `src/shared/lib/field-catalog/`
-- `types.ts` — `InputType`, `PersistenceType`, targets, `FieldGroup`, `FieldDefinition`, `UserFormResponse`
-- `schema-types.ts` — `CatalogFieldRef`, `CatalogFormStep`, `CatalogFormSchema`, `VariantOverride`
-- `resolved-types.ts` — `ResolvedField`, `ResolvedStep`, `ResolvedForm`
+2. **email**
+   - key: `auth_email`
+   - input_type: `email`
+   - persistence_type: `auth`
+   - auth_field: `email`
+   - translations es: label="Email"
 
-## Lo que falta
+3. **password**
+   - key: `auth_password`
+   - input_type: `password`
+   - persistence_type: `auth`
+   - auth_field: `password`
+   - translations es: label="Contraseña"
 
-### Pasos inmediatos al retomar
-- [ ] Reparar MCP Supabase (ver sección arriba)
-- [ ] Aplicar migración al proyecto dev (`supabase db push` o via MCP)
-- [ ] Regenerar tipos DB: `supabase gen types typescript --local > src/lib/supabase/database.types.ts`
-- [ ] Commitear lo que ya existe como baseline (spec + migración + tipos)
+Anotar los 3 UUIDs que devuelve el admin (aparecen en la URL al editar o en la DB con `SELECT id, key FROM form_field_definitions;`).
 
-### Motor core (`src/shared/lib/field-catalog/`)
-- [ ] `resolve-form.ts` — resuelve CatalogFormSchema → ResolvedForm (carga defs + traducciones + valores previos)
-- [ ] `load-form-values.ts` — lee valores actuales del usuario por field_definition_id
-- [ ] `persist-form-data.ts` — dispatcher que escribe por persistence_type
-- [ ] `cascade-field-refs.ts` — aplica VariantOverride (added/removed/require_overrides) sobre field_refs base
-- [ ] `catalog-schema-validation.ts` — Zod discriminated union validando persistence_type + target
+### Paso 2: pegar CatalogFormSchema en `registration_forms.schema`
 
-### Adapters de persistencia (`src/shared/lib/field-catalog/persistence/`)
-- [ ] `db-column.ts` — UPDATE en tabla mapeada
-- [ ] `auth.ts` — signUp via Supabase Auth (no read)
-- [ ] `form-response.ts` — UPSERT en `user_form_responses`
-- [ ] `survey.ts` — UPSERT en `survey_responses`
-- [ ] `service-select.ts` — UPSERT en `talent_services`
-- [ ] `subtype.ts` — UPSERT en `talent_service_subtypes`
+Via SQL (reemplazar `<UUID_*>` con los IDs del paso 1):
 
-### Feature admin (`src/features/field-catalog/`)
-- [ ] `schemas.ts` — Zod schemas para grupos y definiciones
-- [ ] `actions/list-field-catalog.ts`
-- [ ] `actions/save-field-group.ts`
-- [ ] `actions/save-field-definition.ts`
-- [ ] `actions/toggle-field-active.ts`
-- [ ] `components/field-catalog-manager.tsx`
-- [ ] `components/field-group-card.tsx`
-- [ ] `components/field-definition-editor.tsx`
-- [ ] Ruta `/admin/field-catalog` (page + layout)
+```sql
+UPDATE registration_forms
+SET schema = '{
+  "steps": [
+    {
+      "key": "step_1",
+      "field_refs": [
+        {"field_definition_id": "<UUID_FULL_NAME>", "required": true},
+        {"field_definition_id": "<UUID_EMAIL>", "required": true},
+        {"field_definition_id": "<UUID_PASSWORD>", "required": true}
+      ],
+      "actions": [
+        {"key": "btn_register", "type": "register"}
+      ]
+    }
+  ]
+}'::jsonb
+WHERE slug = 'registro-talento' AND city_id IS NULL;
+```
 
-### Integraciones
-- [ ] Registration forms → usar CatalogFormSchema en vez de FormField[] inline
-- [ ] Talent service forms → idem
-- [ ] Validación server-side de `required` antes de persistir
-- [ ] Validación de que todos los UUIDs del schema existen en `form_field_definitions`
+### Paso 3: testeo browser
 
-### Tests (`src/shared/lib/field-catalog/__tests__/`)
-- [ ] resolve-form
-- [ ] cascade-field-refs
-- [ ] persist-form-data (dispatcher)
-- [ ] cada adapter de persistencia
-- [ ] validación Zod
+1. `/es/admin/test-talent-form` → seleccionar `registro-talento`, un país y una ciudad
+2. El form debería renderizar los 3 fields con labels en español
+3. Completar y submit (action type='register' dispara `registerUser`)
+4. Verificar en DB:
+   - `auth.users` tiene el nuevo usuario
+   - `profiles.full_name` tiene el valor
+   - `talent_profiles` tiene un row con `status='pending'`
 
-### Verificación final
-- [ ] Build pasa con `NODE_ENV=production pnpm build`
-- [ ] `pnpm lint` limpio
-- [ ] Fallback i18n 3 niveles funcionando: locale → país default → 'es'
+### Paso 4: verificar soft-delete warning
 
-## Plan de sesiones sugerido (a validar al retomar)
+1. En `/admin/field-catalog` desactivar el field "full_name" (botón power en la fila)
+2. Debería aparecer toast: "Este campo se usa en 1 formulario."
+3. Re-activar para no dejar roto el form.
 
-Propuesta inicial — revisar exhaustivamente antes de aprobar (feedback: el usuario espera múltiples rondas de revisión buscando gaps).
+## S8 — Integración talent_service end-to-end
 
-1. **Sesión 1 — DB baseline:** aplicar migración, regenerar tipos, commit baseline, seed mínimo (1 grupo, 3 campos de prueba)
-2. **Sesión 2 — Motor core + validación Zod:** resolve-form, load-form-values, cascade-field-refs, catalog-schema-validation + tests
-3. **Sesión 3 — Adapters de persistencia:** 6 adapters + persist-form-data dispatcher + tests
-4. **Sesión 4 — Admin CRUD (backend):** schemas + 4 actions + tests
-5. **Sesión 5 — Admin CRUD (UI):** 3 componentes + ruta `/admin/field-catalog`
-6. **Sesión 6 — Integración registration:** migrar un form real, validar end-to-end
-7. **Sesión 7 — Integración talent_service:** migrar el flujo restante, verificación final de build + criterios de aceptación
+### Paso 1: crear fields adicionales en el catálogo
+
+Fields de perfil talent (grupo "talent-service" o similar):
+
+1. **phone** → db_column profiles.phone, input=text
+2. **address** → db_column talent_profiles.address, input=text
+3. **has_car** → db_column talent_profiles.has_car, input=boolean
+4. **preferred_payment** → db_column talent_profiles.preferred_payment, input=single_select, options: `bank_transfer, cash, paypal`
+
+### Paso 2: editar un `talent_forms.schema`
+
+```sql
+SELECT id, service_id, city_id FROM talent_forms LIMIT 3;
+```
+
+Pegar schema con `field_refs` usando los UUIDs de los fields creados.
+
+### Paso 3: testeo browser
+
+1. Logearse como talent (el que creó S7)
+2. Navegar a `/es/portal/services/<serviceId>`
+3. Ver el formulario renderizado con los fields del catálogo
+4. Completar y guardar
+5. Verificar en DB:
+   - `talent_services` tiene el row con `form_id`
+   - `talent_profiles.address`, `has_car`, `preferred_payment` actualizados
+   - Si hay `subtype` field: `talent_service_subtypes` tiene los rows
+
+## Gotchas que ya resolvimos — no olvidar
+
+- **Schemas legacy no crashean**: `resolveFormFromJson` retorna `{steps:[]}` si Zod falla, la page carga pero muestra form vacío.
+- **service_select adapter requiere `country_id`**: actions lo pasan vía `PersistContext` (resuelto desde `talent_profiles.country_id`).
+- **`db_column` v1 solo soporta profiles, talent_profiles, client_profiles**. Para orders.X → out-of-scope v1 (requiere context order_id).
+- **Cambio de email autenticado** (`auth.updateUser` con confirmación) — out-of-scope v1. Un field email que deba pre-fillear debe ser `db_column → profiles.email`, no `auth`.
+- **Auth read siempre undefined** (no pre-fill passwords).
+
+## Out of scope v1 (documentados, no implementar)
+
+- `options_source` dinámico desde tablas
+- i18n fallback 3-niveles (locale → country default → 'es'); v1 usa locale → 'es'
+- Cascade General→Variante (variants con added/removed/require_overrides)
 
 ## Referencias
 
+- Plan completo: `~/.claude/plans/abstract-brewing-glade.md`
 - Spec: `docs/features/field-catalog.md`
-- Memoria relacionada: `project_db_schema_decisions.md`, `project_supabase_environments.md`
-- Feature anterior (completa): `db_column` field type — ver memoria `project_db_column_sessions_plan.md`
+- Tipos motor: `src/shared/lib/field-catalog/`
+- Feature admin: `src/features/field-catalog/`
