@@ -200,7 +200,7 @@ export function FieldDefinitionSheet({
                 setInputType(v as InputType);
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -222,7 +222,7 @@ export function FieldDefinitionSheet({
                 handlePersistenceTypeChange(v as PersistenceType);
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

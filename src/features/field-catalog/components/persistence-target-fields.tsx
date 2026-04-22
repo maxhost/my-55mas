@@ -55,7 +55,7 @@ export function PersistenceTargetFields({
               onChange({ table: v, column: '' });
             }}
           >
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -81,7 +81,7 @@ export function PersistenceTargetFields({
                 onChange({ ...current, column: v });
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Seleccioná una columna">
                   {current.column || null}
                 </SelectValue>
@@ -113,7 +113,7 @@ export function PersistenceTargetFields({
             onChange({ auth_field: v as (typeof AUTH_FIELDS)[number] });
           }}
         >
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -162,7 +162,7 @@ export function PersistenceTargetFields({
               onChange({ subtype_group: v });
             }}
           >
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Seleccioná un grupo">
                 {subtypeGroups.find((g) => g.slug === current.subtype_group)?.name ??
                   null}

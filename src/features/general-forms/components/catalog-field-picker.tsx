@@ -66,7 +66,7 @@ export function CatalogFieldPicker({
           value={selected}
           onValueChange={(v) => setSelected(v ?? '')}
         >
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder={t('addField')}>
               {selectedField ? (
                 <span className="truncate">
