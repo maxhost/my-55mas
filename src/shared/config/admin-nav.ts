@@ -41,6 +41,7 @@ export const adminNavGroups: NavGroup[] = [
       { labelKey: 'subtypes', href: '/admin/subtypes', icon: 'tags' },
       { labelKey: 'talentTags', href: '/admin/talent-tags', icon: 'tags' },
       { labelKey: 'talentServices', href: '/admin/talent-services', icon: 'file-text' },
+      { labelKey: 'fieldCatalog', href: '/admin/field-catalog', icon: 'database' },
     ],
   },
   {

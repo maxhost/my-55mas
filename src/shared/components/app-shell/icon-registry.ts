@@ -18,6 +18,7 @@ import {
   ChevronDown,
   Circle,
   Globe,
+  Database,
 } from 'lucide-react';
 
 const icons: Record<string, LucideIcon> = {
@@ -36,6 +37,7 @@ const icons: Record<string, LucideIcon> = {
   upload: Upload,
   'chevron-down': ChevronDown,
   globe: Globe,
+  database: Database,
 };
 
 export function getNavIcon(name: string): LucideIcon {
