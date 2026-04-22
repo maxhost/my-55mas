@@ -93,6 +93,7 @@ export function RegistrationFormEditor({
         <CatalogFormBuilder
           formId={formId}
           initialSchema={(form?.schema as unknown as CatalogFormSchema) ?? null}
+          initialTranslations={form?.translations ?? {}}
           groups={catalogGroups}
         />
       </TabsContent>

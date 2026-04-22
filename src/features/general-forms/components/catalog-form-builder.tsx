@@ -5,27 +5,37 @@ import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Save } from 'lucide-react';
+import { locales } from '@/lib/i18n/config';
 import type {
   CatalogFormSchema,
   CatalogFormStep,
 } from '@/shared/lib/field-catalog/schema-types';
+import type { StepAction } from '@/shared/lib/forms/types';
 import type { FieldGroupWithFields } from '@/shared/lib/field-catalog/admin-types';
 import { saveCatalogFormSchema } from '../actions/save-catalog-form-schema';
 import { CatalogStepCard } from './catalog-step-card';
 
+type LocaleTranslations = {
+  labels: Record<string, string>;
+  placeholders: Record<string, string>;
+  option_labels: Record<string, string>;
+};
+
+type AllTranslations = Record<string, LocaleTranslations>;
+
 type Props = {
   formId: string;
   initialSchema: CatalogFormSchema | null;
+  initialTranslations: AllTranslations;
   groups: FieldGroupWithFields[];
 };
 
 function emptySchema(): CatalogFormSchema {
-  return { steps: [{ key: 'step_1', field_refs: [] }] };
+  return { steps: [{ key: 'step_1', field_refs: [], actions: [] }] };
 }
 
-// Coerces whatever es lo que vino del DB (jsonb) a CatalogFormSchema si ya
-// lo es, o schema vacío si es legacy.
 function initSchema(incoming: CatalogFormSchema | null): CatalogFormSchema {
   if (!incoming || !Array.isArray(incoming.steps)) return emptySchema();
   const steps = incoming.steps
@@ -33,9 +43,24 @@ function initSchema(incoming: CatalogFormSchema | null): CatalogFormSchema {
     .map((s) => ({
       key: s.key,
       field_refs: Array.isArray(s.field_refs) ? s.field_refs : [],
-      actions: s.actions,
+      actions: Array.isArray(s.actions) ? s.actions : [],
     }));
   return steps.length > 0 ? { steps } : emptySchema();
+}
+
+function initTranslations(
+  incoming: AllTranslations | undefined | null
+): AllTranslations {
+  const out: AllTranslations = {};
+  for (const locale of locales) {
+    const existing = incoming?.[locale];
+    out[locale] = {
+      labels: existing?.labels ?? {},
+      placeholders: existing?.placeholders ?? {},
+      option_labels: existing?.option_labels ?? {},
+    };
+  }
+  return out;
 }
 
 function swap<T>(arr: T[], i: number, j: number): T[] {
@@ -44,17 +69,38 @@ function swap<T>(arr: T[], i: number, j: number): T[] {
   return copy;
 }
 
-export function CatalogFormBuilder({ formId, initialSchema, groups }: Props) {
+export function CatalogFormBuilder({
+  formId,
+  initialSchema,
+  initialTranslations,
+  groups,
+}: Props) {
   const t = useTranslations('AdminFormBuilder');
   const tc = useTranslations('Common');
   const router = useRouter();
-  const locale = useLocale();
+  const uiLocale = useLocale();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [activeLocale, setActiveLocale] = useState<string>(locales[0]);
 
   const [schema, setSchema] = useState<CatalogFormSchema>(() =>
     initSchema(initialSchema)
   );
+  const [translations, setTranslations] = useState<AllTranslations>(() =>
+    initTranslations(initialTranslations)
+  );
+
+  const activeLabels = translations[activeLocale]?.labels ?? {};
+
+  const setLabelForActive = (key: string, value: string) => {
+    setTranslations((prev) => ({
+      ...prev,
+      [activeLocale]: {
+        ...prev[activeLocale],
+        labels: { ...prev[activeLocale]?.labels, [key]: value },
+      },
+    }));
+  };
 
   const updateStep = (index: number, step: CatalogFormStep) => {
     setSchema((prev) => ({
@@ -68,7 +114,11 @@ export function CatalogFormBuilder({ formId, initialSchema, groups }: Props) {
       ...prev,
       steps: [
         ...prev.steps,
-        { key: `step_${prev.steps.length + 1}`, field_refs: [] },
+        {
+          key: `step_${prev.steps.length + 1}`,
+          field_refs: [],
+          actions: [],
+        },
       ],
     }));
   };
@@ -84,10 +134,18 @@ export function CatalogFormBuilder({ formId, initialSchema, groups }: Props) {
     setSchema((prev) => ({ ...prev, steps: swap(prev.steps, from, to) }));
   };
 
+  const setStepActions = (index: number, actions: StepAction[]) => {
+    updateStep(index, { ...schema.steps[index], actions });
+  };
+
   const handleSave = () => {
     setError(null);
     startTransition(async () => {
-      const result = await saveCatalogFormSchema({ form_id: formId, schema });
+      const result = await saveCatalogFormSchema({
+        form_id: formId,
+        schema,
+        translations,
+      });
       if (!result.ok) {
         setError(result.error);
         toast.error(result.error || tc('saveError'));
@@ -115,6 +173,16 @@ export function CatalogFormBuilder({ formId, initialSchema, groups }: Props) {
         </div>
       </div>
 
+      <Tabs value={activeLocale} onValueChange={setActiveLocale}>
+        <TabsList>
+          {locales.map((l) => (
+            <TabsTrigger key={l} value={l}>
+              {l.toUpperCase()}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+
       {schema.steps.length === 0 ? (
         <p className="text-muted-foreground py-6 text-center text-sm">
           {t('noSteps')}
@@ -127,12 +195,16 @@ export function CatalogFormBuilder({ formId, initialSchema, groups }: Props) {
               step={step}
               stepIndex={i}
               totalSteps={schema.steps.length}
-              locale={locale}
+              uiLocale={uiLocale}
+              activeLocale={activeLocale}
+              labels={activeLabels}
               groups={groups}
               onChange={(s) => updateStep(i, s)}
               onRemove={() => removeStep(i)}
               onMoveUp={() => moveStep(i, i - 1)}
               onMoveDown={() => moveStep(i, i + 1)}
+              onLabelChange={setLabelForActive}
+              onActionsChange={(actions) => setStepActions(i, actions)}
             />
           ))}
         </div>

@@ -12,43 +12,46 @@ import type {
   CatalogFormStep,
   CatalogFieldRef,
 } from '@/shared/lib/field-catalog/schema-types';
+import type { StepAction } from '@/shared/lib/forms/types';
 import type { FieldGroupWithFields } from '@/shared/lib/field-catalog/admin-types';
+import { StepActionEditor } from '@/shared/components/form-builder/step-action-editor';
 import { CatalogFieldPicker } from './catalog-field-picker';
 
 type Props = {
   step: CatalogFormStep;
   stepIndex: number;
   totalSteps: number;
-  locale: string;
+  uiLocale: string;
+  activeLocale: string;
+  labels: Record<string, string>;
   groups: FieldGroupWithFields[];
   onChange: (step: CatalogFormStep) => void;
   onRemove: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
+  onLabelChange: (key: string, value: string) => void;
+  onActionsChange: (actions: StepAction[]) => void;
 };
 
-// Mapa rápido field_definition_id → metadata para render labels.
-function buildFieldMap(
-  groups: FieldGroupWithFields[]
-): Map<string, { key: string; label: string; group_name: string; input_type: string; persistence_type: string }> {
-  const map = new Map<
-    string,
-    { key: string; label: string; group_name: string; input_type: string; persistence_type: string }
-  >();
-  return map;
-}
+type FieldMeta = {
+  key: string;
+  label: string;
+  group_name: string;
+  input_type: string;
+  persistence_type: string;
+};
 
 function resolveFieldMeta(
   groups: FieldGroupWithFields[],
-  locale: string
-): Map<string, { key: string; label: string; group_name: string; input_type: string; persistence_type: string }> {
-  const map = buildFieldMap(groups);
+  uiLocale: string
+): Map<string, FieldMeta> {
+  const map = new Map<string, FieldMeta>();
   for (const g of groups) {
     const groupName =
-      g.translations[locale as keyof typeof g.translations] || g.slug;
+      g.translations[uiLocale as keyof typeof g.translations] || g.slug;
     for (const f of g.fields) {
       const label =
-        f.translations[locale as keyof typeof f.translations]?.label || f.key;
+        f.translations[uiLocale as keyof typeof f.translations]?.label || f.key;
       map.set(f.id, {
         key: f.key,
         label,
@@ -71,17 +74,21 @@ export function CatalogStepCard({
   step,
   stepIndex,
   totalSteps,
-  locale,
+  uiLocale,
+  activeLocale,
+  labels,
   groups,
   onChange,
   onRemove,
   onMoveUp,
   onMoveDown,
+  onLabelChange,
+  onActionsChange,
 }: Props) {
   const t = useTranslations('AdminFormBuilder');
   const tCatalog = useTranslations('AdminFieldCatalog');
 
-  const meta = resolveFieldMeta(groups, locale);
+  const meta = resolveFieldMeta(groups, uiLocale);
 
   const addFieldRef = (field_definition_id: string, required: boolean) => {
     const newRef: CatalogFieldRef = { field_definition_id, required };
@@ -148,6 +155,19 @@ export function CatalogStepCard({
       </CardHeader>
 
       <CardContent className="space-y-3">
+        {/* Step label (current active locale) */}
+        <div className="space-y-1">
+          <Label className="text-xs">
+            {t('stepLabel')} ({activeLocale.toUpperCase()})
+          </Label>
+          <Input
+            value={labels[step.key] ?? ''}
+            onChange={(e) => onLabelChange(step.key, e.target.value)}
+            placeholder={t('stepLabel')}
+            className="h-8 text-sm"
+          />
+        </div>
+
         {step.field_refs.length === 0 ? (
           <p className="text-muted-foreground text-sm">{t('noFields')}</p>
         ) : (
@@ -186,11 +206,11 @@ export function CatalogStepCard({
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Checkbox
-                      id={`req-${i}`}
+                      id={`req-${stepIndex}-${i}`}
                       checked={ref.required}
                       onCheckedChange={() => toggleRequired(i)}
                     />
-                    <Label htmlFor={`req-${i}`} className="text-xs">
+                    <Label htmlFor={`req-${stepIndex}-${i}`} className="text-xs">
                       {tCatalog('active').replace('Activo', 'Obligatorio')}
                     </Label>
                   </div>
@@ -228,9 +248,18 @@ export function CatalogStepCard({
 
         <CatalogFieldPicker
           groups={groups}
-          locale={locale}
+          locale={uiLocale}
           excludeFieldIds={usedIds}
           onAdd={addFieldRef}
+        />
+
+        <StepActionEditor
+          actions={step.actions ?? []}
+          stepIndex={stepIndex}
+          stepKey={step.key}
+          translations={{ labels }}
+          onChange={onActionsChange}
+          onLabelChange={onLabelChange}
         />
       </CardContent>
     </Card>
