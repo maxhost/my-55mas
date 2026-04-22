@@ -2300,7 +2300,6 @@ export type Database = {
       }
       talent_profiles: {
         Row: {
-          address: string | null
           approved_at: string | null
           approved_by: string | null
           city_id: string | null
@@ -2312,17 +2311,14 @@ export type Database = {
           internal_notes: string | null
           legacy_id: number | null
           photo_url: string | null
-          postal_code: string | null
           preferred_payment: string | null
           professional_status: string | null
-          state: string | null
           status: string
           terms_accepted: boolean
           updated_at: string | null
           user_id: string
         }
         Insert: {
-          address?: string | null
           approved_at?: string | null
           approved_by?: string | null
           city_id?: string | null
@@ -2334,17 +2330,14 @@ export type Database = {
           internal_notes?: string | null
           legacy_id?: number | null
           photo_url?: string | null
-          postal_code?: string | null
           preferred_payment?: string | null
           professional_status?: string | null
-          state?: string | null
           status?: string
           terms_accepted?: boolean
           updated_at?: string | null
           user_id: string
         }
         Update: {
-          address?: string | null
           approved_at?: string | null
           approved_by?: string | null
           city_id?: string | null
@@ -2356,10 +2349,8 @@ export type Database = {
           internal_notes?: string | null
           legacy_id?: number | null
           photo_url?: string | null
-          postal_code?: string | null
           preferred_payment?: string | null
           professional_status?: string | null
-          state?: string | null
           status?: string
           terms_accepted?: boolean
           updated_at?: string | null
