@@ -2,10 +2,8 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import type { Json } from '@/lib/supabase/database.types';
-import { extractMappedFields } from '@/shared/lib/forms/extract-mapped-fields';
-
-import type { FormSchema } from '@/shared/lib/forms/types';
+import type { ResolvedForm } from '@/shared/lib/field-catalog/resolved-types';
+import { persistFormData } from '@/shared/lib/field-catalog/persist-form-data';
 
 type SubmitInput = {
   talent_id: string;
@@ -13,66 +11,42 @@ type SubmitInput = {
   country_id: string;
   form_id: string;
   form_data: Record<string, unknown>;
-  form_schema: FormSchema;
-  subtype_ids: string[];
+  resolved_form: ResolvedForm;
 };
 
-/**
- * Saves a talent's completed form:
- * 1. Updates talent_services.form_data + form_id
- * 2. Syncs talent_service_subtypes (delete old + insert new)
- */
+// Guarda el form completo de un talent_service. Asume que talent_services
+// ya tiene un row para (talent_id, service_id, country_id) — crea/actualiza
+// el registro con form_id, luego despacha todos los fields a sus adapters.
+//
+// Cambio de email del usuario autenticado (requiere supabase.auth.updateUser
+// con confirmación por email) → no implementado v1.
 export async function submitTalentService(input: SubmitInput) {
-  const { talent_id, service_id, country_id, form_id, form_data, form_schema, subtype_ids } = input;
+  const { talent_id, service_id, country_id, form_id, form_data, resolved_form } =
+    input;
   const supabase = createClient();
 
-  // 1. Upsert talent_services with form data (creates if not exists)
-  const { error: updateError } = await supabase
+  // Upsert talent_services header (form_id + contexto).
+  const { error: tsError } = await supabase
     .from('talent_services')
     .upsert(
-      {
-        talent_id,
-        service_id,
-        country_id,
-        form_data: form_data as unknown as Json,
-        form_id,
-      },
+      { talent_id, service_id, country_id, form_id },
       { onConflict: 'talent_id,service_id,country_id' }
     );
+  if (tsError) return { error: { _db: [tsError.message] } };
 
-  if (updateError) return { error: { _db: [updateError.message] } };
+  const fields = resolved_form.steps.flatMap((s) => s.fields);
+  // En este flow no hay auth — el talent ya está autenticado.
+  const nonAuthFields = fields.filter((f) => f.persistence_type !== 'auth');
 
-  // 2. Extract db_column mapped fields and update talent_profiles if any
-  const mapped = extractMappedFields(form_schema, form_data);
-  const tpData = mapped.talent_profiles;
-  if (tpData && Object.keys(tpData).length > 0) {
-    const { error: tpError } = await supabase
-      .from('talent_profiles')
-      .update(tpData)
-      .eq('user_id', talent_id);
-
-    if (tpError) return { error: { _db: [tpError.message] } };
-  }
-
-  // 3. Sync subtypes: delete existing + insert new
-  const { error: deleteError } = await supabase
-    .from('talent_service_subtypes')
-    .delete()
-    .eq('talent_id', talent_id);
-
-  if (deleteError) return { error: { _db: [deleteError.message] } };
-
-  if (subtype_ids.length > 0) {
-    const rows = subtype_ids.map((subtype_id) => ({
-      talent_id,
-      subtype_id,
-    }));
-
-    const { error: insertError } = await supabase
-      .from('talent_service_subtypes')
-      .insert(rows);
-
-    if (insertError) return { error: { _db: [insertError.message] } };
+  const result = await persistFormData({
+    supabase,
+    userId: talent_id,
+    fields: nonAuthFields,
+    formData: form_data,
+    context: { serviceSelect: { country_id } },
+  });
+  if (!result.ok) {
+    return { error: { _db: result.errors.map((e) => e.message) } };
   }
 
   revalidatePath('/[locale]/(talent)/portal', 'layout');

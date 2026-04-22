@@ -5,33 +5,26 @@ import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { FormRenderer, type SubmitMeta } from '@/shared/components/form-renderer';
-import type { SurveyQuestionRenderData, ServiceSelectOption } from '@/shared/lib/forms/types';
-import type { RegistrationFormWithTranslations } from '../types';
+import type { ResolvedForm } from '@/shared/lib/field-catalog/resolved-types';
 import { registerUser } from '../actions/register-user';
 import { saveRegistrationStep } from '../actions/save-registration-step';
 
 type Props = {
-  form: RegistrationFormWithTranslations;
-  locale: string;
-  initialData?: Record<string, unknown>;
-  onSubmit?: (formData: Record<string, unknown>) => Promise<void> | void;
+  resolvedForm: ResolvedForm;
+  targetRole: 'talent' | 'client';
   submitLabel?: string;
-  surveyQuestions?: Record<string, SurveyQuestionRenderData>;
-  serviceOptions?: ServiceSelectOption[];
   countryId?: string;
   cityId?: string;
+  onSubmit?: (formData: Record<string, unknown>) => Promise<void> | void;
 };
 
 export function RegistrationFormEmbed({
-  form,
-  locale,
-  initialData,
-  onSubmit,
+  resolvedForm,
+  targetRole,
   submitLabel,
-  surveyQuestions,
-  serviceOptions,
   countryId,
   cityId,
+  onSubmit,
 }: Props) {
   const tc = useTranslations('Common');
   const currentLocale = useLocale();
@@ -40,14 +33,12 @@ export function RegistrationFormEmbed({
   const [error, setError] = useState<string | null>(null);
 
   const handleRedirect = (redirectUrl?: string) => {
-    if (redirectUrl) {
-      router.push(`/${currentLocale}${redirectUrl}`);
-    }
+    if (redirectUrl) router.push(`/${currentLocale}${redirectUrl}`);
   };
 
   const handleSubmit = async (
     formData: Record<string, unknown>,
-    meta?: SubmitMeta,
+    meta?: SubmitMeta
   ): Promise<boolean> => {
     setError(null);
     setIsPending(true);
@@ -55,41 +46,34 @@ export function RegistrationFormEmbed({
       if (meta?.action === 'register') {
         const result = await registerUser({
           form_data: formData,
-          form_schema: form.schema,
+          resolved_form: resolvedForm,
           locale: currentLocale,
-          target_role: form.target_role,
+          target_role: targetRole,
           country_id: countryId,
           city_id: cityId,
         });
-
         if ('error' in result && result.error) {
-          const errObj = result.error as Record<string, string[] | undefined>;
-          const msg = Object.values(errObj).flat().filter(Boolean)[0];
-          setError(msg ?? tc('saveError'));
-          toast.error(msg ?? tc('saveError'));
+          const msg = flattenError(result.error);
+          setError(msg);
+          toast.error(msg);
           return false;
         }
-
         toast.success(tc('savedSuccess'));
         if (meta.isLastStep) handleRedirect(meta.redirect_url);
         return true;
       }
 
-      // Default: save action — persist to DB, then optional callback
       const stepResult = await saveRegistrationStep({
         form_data: formData,
-        form_schema: form.schema,
-        target_role: form.target_role,
+        resolved_form: resolvedForm,
+        target_role: targetRole,
       });
-
       if ('error' in stepResult && stepResult.error) {
-        const errObj = stepResult.error as Record<string, string[] | undefined>;
-        const msg = Object.values(errObj).flat().filter(Boolean)[0];
-        setError(msg ?? tc('saveError'));
-        toast.error(msg ?? tc('saveError'));
+        const msg = flattenError(stepResult.error);
+        setError(msg);
+        toast.error(msg);
         return false;
       }
-
       if (onSubmit) await onSubmit(formData);
       toast.success(tc('savedSuccess'));
       if (meta?.isLastStep) handleRedirect(meta?.redirect_url);
@@ -112,15 +96,16 @@ export function RegistrationFormEmbed({
         </p>
       )}
       <FormRenderer
-        form={form}
-        locale={locale}
-        initialData={initialData}
+        form={resolvedForm}
         onSubmit={handleSubmit}
         submitLabel={submitLabel ?? (isPending ? tc('saving') : tc('save'))}
         isPending={isPending}
-        surveyQuestions={surveyQuestions}
-        serviceOptions={serviceOptions}
       />
     </div>
   );
+}
+
+function flattenError(error: Record<string, string[] | undefined>): string {
+  const msg = Object.values(error).flat().filter(Boolean)[0];
+  return msg ?? 'Error';
 }

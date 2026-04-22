@@ -2,10 +2,10 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { Label } from '@/components/ui/label';
-import { getEmbeddableForm } from '@/features/general-forms/actions/get-embeddable-form';
+import { getResolvedEmbeddableForm } from '@/features/general-forms/actions/get-resolved-embeddable-form';
 import { RegistrationFormEmbed } from '@/features/general-forms/components/registration-form-embed';
-import type { RegistrationFormListItem, RegistrationFormWithTranslations } from '@/features/general-forms/types';
-import type { SurveyQuestionRenderData, ServiceSelectOption } from '@/shared/lib/forms/types';
+import type { RegistrationFormListItem } from '@/features/general-forms/types';
+import type { ResolvedForm } from '@/shared/lib/field-catalog/resolved-types';
 
 type CountryOption = { id: string; name: string };
 type CityOption = { id: string; name: string; country_id: string };
@@ -15,15 +15,16 @@ type Props = {
   countries: CountryOption[];
   cities: CityOption[];
   registrationForms: RegistrationFormListItem[];
-  surveyQuestions: Record<string, SurveyQuestionRenderData>;
-  serviceOptions: ServiceSelectOption[];
 };
 
-export function TestTalentFormClient({ locale, countries, cities, registrationForms, surveyQuestions, serviceOptions }: Props) {
+export function TestTalentFormClient({ locale, countries, cities, registrationForms }: Props) {
   const [selectedSlug, setSelectedSlug] = useState('');
   const [countryId, setCountryId] = useState('');
   const [cityId, setCityId] = useState('');
-  const [form, setForm] = useState<RegistrationFormWithTranslations | null>(null);
+  const [form, setForm] = useState<{
+    resolvedForm: ResolvedForm;
+    targetRole: 'talent' | 'client';
+  } | null>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'loaded' | 'unavailable'>('idle');
   const [isPending, startTransition] = useTransition();
 
@@ -51,16 +52,19 @@ export function TestTalentFormClient({ locale, countries, cities, registrationFo
 
     setStatus('loading');
     startTransition(async () => {
-      const result = await getEmbeddableForm(selectedSlug, cityId);
+      const result = await getResolvedEmbeddableForm(selectedSlug, cityId, locale);
       if (result.available) {
-        setForm(result.form);
+        setForm({
+          resolvedForm: result.resolvedForm,
+          targetRole: result.targetRole,
+        });
         setStatus('loaded');
       } else {
         setForm(null);
         setStatus('unavailable');
       }
     });
-  }, [selectedSlug, cityId]);
+  }, [selectedSlug, cityId, locale]);
 
   const handleSubmit = async (formData: Record<string, unknown>) => {
     // eslint-disable-next-line no-console
@@ -141,11 +145,9 @@ export function TestTalentFormClient({ locale, countries, cities, registrationFo
       {status === 'loaded' && form && !isPending && (
         <div className="max-w-lg rounded-md border p-6">
           <RegistrationFormEmbed
-            form={form}
-            locale={locale}
+            resolvedForm={form.resolvedForm}
+            targetRole={form.targetRole}
             onSubmit={handleSubmit}
-            surveyQuestions={surveyQuestions}
-            serviceOptions={serviceOptions}
             countryId={countryId}
             cityId={cityId}
           />

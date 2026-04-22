@@ -1,9 +1,8 @@
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
 import { getTalentServiceForm } from '@/features/talent-services/actions/get-talent-service-form';
-import { getSubtypes } from '@/features/subtypes/actions/get-subtypes';
-import { getServiceOptionsForForm } from '@/features/services/actions/get-service-options-for-form';
+import { resolveFormFromJson } from '@/shared/lib/field-catalog/resolve-form-from-json';
 import { TalentServiceRenderer } from '@/features/talent-services/components/talent-service-renderer';
 
 type Props = { params: { locale: string; serviceId: string } };
@@ -64,11 +63,12 @@ export default async function TalentServiceFormPage({ params: { locale, serviceI
     );
   }
 
-  // Load subtype + service options in parallel
-  const [subtypeOptions, serviceOptions] = await Promise.all([
-    getSubtypes(serviceId, locale),
-    getServiceOptionsForForm(locale),
-  ]);
+  const resolvedForm = await resolveFormFromJson({
+    supabase,
+    schemaJson: formData.form.schema,
+    userId: user.id,
+    locale,
+  });
 
   return (
     <div className="p-8">
@@ -77,12 +77,8 @@ export default async function TalentServiceFormPage({ params: { locale, serviceI
         talentId={talentProfile.id}
         serviceId={serviceId}
         countryId={countryId}
-        form={formData.form}
-        locale={locale}
-        existingData={formData.existingData}
-        selectedSubtypeIds={formData.selectedSubtypeIds}
-        subtypeOptions={subtypeOptions}
-        serviceOptions={serviceOptions}
+        formId={formData.form.id}
+        resolvedForm={resolvedForm}
       />
     </div>
   );
