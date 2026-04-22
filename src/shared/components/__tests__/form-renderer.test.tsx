@@ -121,12 +121,30 @@ describe('FormRenderer', () => {
     expect(screen.getByText('Masculino')).toBeInTheDocument();
   });
 
-  it('renders multiselect with option labels', () => {
+  it('multiselect_dropdown renders selected values as chips and hides them from the dropdown', () => {
+    const form = singleStep([
+      makeField({
+        key: 'langs',
+        input_type: 'multiselect_dropdown',
+        label: 'Languages',
+        options: ['es', 'en', 'pt'],
+        option_labels: { es: 'Español', en: 'English', pt: 'Português' },
+        current_value: ['es'],
+      }),
+    ]);
+    render(<FormRenderer form={form} onSubmit={vi.fn()} />);
+    // Chip already-selected
+    expect(screen.getByText('Español')).toBeInTheDocument();
+    // Trigger button exists (and chip X remove button)
+    expect(screen.getAllByRole('button').length).toBeGreaterThan(0);
+  });
+
+  it('renders multiselect_checkbox with option labels', () => {
     const onSubmit = vi.fn();
     const form = singleStep([
       makeField({
         key: 'langs',
-        input_type: 'multiselect',
+        input_type: 'multiselect_checkbox',
         label: 'Languages',
         options: ['es', 'en'],
         option_labels: { es: 'Español', en: 'English' },

@@ -128,7 +128,7 @@ describe('fieldDefinitionInputSchema — discriminated union', () => {
   it('accepts subtype with valid target', () => {
     const result = fieldDefinitionInputSchema.safeParse({
       ...baseDefinition,
-      input_type: 'multiselect',
+      input_type: 'multiselect_checkbox',
       persistence_type: 'subtype',
       persistence_target: { subtype_group: 'cleaning_areas' },
     });

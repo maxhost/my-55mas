@@ -1,5 +1,15 @@
+import { X } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import type { ResolvedField } from '@/shared/lib/field-catalog/resolved-types';
 
@@ -128,7 +138,7 @@ export function renderSingleSelect({
   );
 }
 
-export function renderMultiselect({ field, value, onChange }: RenderProps) {
+export function renderMultiselectCheckbox({ field, value, onChange }: RenderProps) {
   const options = field.options ?? [];
   const labels = field.option_labels ?? {};
   const selected = (value as string[] | undefined) ?? [];
@@ -152,6 +162,89 @@ export function renderMultiselect({ field, value, onChange }: RenderProps) {
             {labels[opt] ?? opt}
           </label>
         ))}
+      </div>
+      {field.description && (
+        <p className="text-muted-foreground text-xs">{field.description}</p>
+      )}
+    </div>
+  );
+}
+
+// Dropdown con chips: abrís el dropdown, elegís un item, se suma a la
+// barra de chips arriba del trigger. X en cada chip para removerlo.
+// Los items ya seleccionados no aparecen en el dropdown.
+export function renderMultiselectDropdown({
+  field,
+  value,
+  errorClass,
+  onChange,
+  selectPlaceholder,
+}: SelectRenderProps) {
+  const options = field.options ?? [];
+  const labels = field.option_labels ?? {};
+  const selected = (value as string[] | undefined) ?? [];
+  const available = options.filter((opt) => !selected.includes(opt));
+
+  const addValue = (next: string) => {
+    if (!next) return;
+    if (selected.includes(next)) return;
+    onChange(field.key, [...selected, next]);
+  };
+  const removeValue = (opt: string) => {
+    onChange(field.key, selected.filter((s) => s !== opt));
+  };
+
+  return (
+    <div key={field.key} className="space-y-1">
+      <Label>{labelText(field)}</Label>
+      <div
+        className={`border-input bg-background flex min-h-9 flex-wrap items-center gap-1.5 rounded-lg border p-1.5 ${errorClass}`}
+      >
+        {selected.map((opt) => (
+          <Badge
+            key={opt}
+            variant="secondary"
+            className="flex items-center gap-1 pr-1"
+          >
+            {labels[opt] ?? opt}
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-xs"
+              className="size-4"
+              onClick={() => removeValue(opt)}
+              aria-label="remove"
+            >
+              <X className="size-3" />
+            </Button>
+          </Badge>
+        ))}
+        <Select
+          value=""
+          onValueChange={(v) => {
+            if (v == null) return;
+            addValue(v);
+          }}
+        >
+          <SelectTrigger className="h-7 min-w-[140px] border-0 px-2 shadow-none focus-visible:ring-0">
+            <SelectValue placeholder={field.placeholder || selectPlaceholder}>
+              {/* siempre vacío: el valor se traslada a los chips */}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {available.length === 0 ? (
+              <div className="text-muted-foreground p-2 text-xs">
+                (sin más opciones)
+              </div>
+            ) : (
+              available.map((opt) => (
+                <SelectItem key={opt} value={opt}>
+                  {labels[opt] ?? opt}
+                </SelectItem>
+              ))
+            )}
+          </SelectContent>
+        </Select>
       </div>
       {field.description && (
         <p className="text-muted-foreground text-xs">{field.description}</p>
@@ -185,8 +278,10 @@ export function renderResolvedField(
       return renderTextarea(base);
     case 'single_select':
       return renderSingleSelect(selectBase);
-    case 'multiselect':
-      return renderMultiselect(base);
+    case 'multiselect_checkbox':
+      return renderMultiselectCheckbox(base);
+    case 'multiselect_dropdown':
+      return renderMultiselectDropdown(selectBase);
     default: {
       const _exhaustive: never = field.input_type;
       void _exhaustive;

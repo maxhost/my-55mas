@@ -166,9 +166,11 @@ export function FieldDefinitionSheet({
   // service_select las va a cargar del contexto del talent (fuera v1).
   const isDynamicOptions =
     persistenceType === 'subtype' || persistenceType === 'service_select';
-  const hasOptions =
-    (inputType === 'single_select' || inputType === 'multiselect') &&
-    !isDynamicOptions;
+  const takesOptions =
+    inputType === 'single_select' ||
+    inputType === 'multiselect_checkbox' ||
+    inputType === 'multiselect_dropdown';
+  const hasOptions = takesOptions && !isDynamicOptions;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>

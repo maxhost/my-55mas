@@ -9,7 +9,8 @@ export const INPUT_TYPES = [
   'boolean',
   'textarea',
   'single_select',
-  'multiselect',
+  'multiselect_checkbox',
+  'multiselect_dropdown',
 ] as const;
 
 export type InputType = (typeof INPUT_TYPES)[number];

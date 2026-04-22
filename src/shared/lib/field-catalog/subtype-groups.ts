@@ -46,7 +46,8 @@ export type SubtypeOption = {
 
 // Carga los subtypes de un grupo para enriquecer field.options/option_labels
 // al resolver un field con persistence_type='subtype'. El render usa
-// input_type='multiselect' y estos valores son los subtype_ids de DB.
+// input_type='multiselect_checkbox' o 'multiselect_dropdown'; los values
+// son los subtype_ids de DB.
 export async function loadSubtypeOptionsForGroup(
   supabase: Sb,
   groupSlug: string,
