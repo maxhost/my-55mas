@@ -84,6 +84,7 @@ export function FieldDefinitionSheet({
   const t = useTranslations('AdminFieldCatalog');
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   const [key, setKey] = useState('');
   const [inputType, setInputType] = useState<InputType>('text');
@@ -99,6 +100,7 @@ export function FieldDefinitionSheet({
 
   useEffect(() => {
     if (!open) return;
+    setError(null);
     setKey(field?.key ?? '');
     setInputType((field?.input_type ?? 'text') as InputType);
     const pt = (field?.persistence_type ?? 'form_response') as PersistenceType;
@@ -124,7 +126,9 @@ export function FieldDefinitionSheet({
       .filter(Boolean);
   };
 
-  const handleSave = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
     const input = {
       id: field?.id ?? null,
       group_id: groupId,
@@ -143,7 +147,9 @@ export function FieldDefinitionSheet({
       const result = await saveFieldDefinition(input);
       if (!result.ok) {
         const key = mapErrorKey(result.error);
+        setError(result.error);
         toast.error(t(`errors.${key}`));
+        console.error('[FieldDefinitionSheet] saveFieldDefinition error:', result.error);
         return;
       }
       toast.success(t('savedSuccess'));
@@ -152,73 +158,70 @@ export function FieldDefinitionSheet({
     });
   };
 
+  const hasOptions =
+    inputType === 'single_select' || inputType === 'multiselect';
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
+      <SheetContent side="right" className="overflow-y-auto sm:max-w-xl">
         <SheetHeader>
           <SheetTitle>{field ? t('editField') : t('addField')}</SheetTitle>
         </SheetHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label>{t('key')}</Label>
-              <Input value={key} onChange={(e) => setKey(e.target.value)} />
-              <p className="text-muted-foreground text-xs">{t('keyHint')}</p>
-            </div>
-            <div className="space-y-1.5">
-              <Label>{t('sortOrder')}</Label>
-              <Input
-                type="number"
-                value={sortOrder}
-                onChange={(e) => setSortOrder(parseInt(e.target.value, 10) || 0)}
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-4 p-4">
+          <div className="space-y-2">
+            <Label>{t('key')} *</Label>
+            <Input
+              value={key}
+              onChange={(e) => setKey(e.target.value)}
+              placeholder="full_name"
+              required
+            />
+            <p className="text-muted-foreground text-xs">{t('keyHint')}</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label>{t('inputType')}</Label>
-              <Select
-                value={inputType}
-                onValueChange={(v) => {
-                  if (v == null) return;
-                  setInputType(v as InputType);
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {INPUT_TYPES.map((it) => (
-                    <SelectItem key={it} value={it}>
-                      {it}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>{t('persistenceType')}</Label>
-              <Select
-                value={persistenceType}
-                onValueChange={(v) => {
-                  if (v == null) return;
-                  handlePersistenceTypeChange(v as PersistenceType);
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PERSISTENCE_TYPES.map((pt) => (
-                    <SelectItem key={pt} value={pt}>
-                      {pt}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label>{t('inputType')}</Label>
+            <Select
+              value={inputType}
+              onValueChange={(v) => {
+                if (v == null) return;
+                setInputType(v as InputType);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {INPUT_TYPES.map((it) => (
+                  <SelectItem key={it} value={it}>
+                    {it}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('persistenceType')}</Label>
+            <Select
+              value={persistenceType}
+              onValueChange={(v) => {
+                if (v == null) return;
+                handlePersistenceTypeChange(v as PersistenceType);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PERSISTENCE_TYPES.map((pt) => (
+                  <SelectItem key={pt} value={pt}>
+                    {pt}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <PersistenceTargetFields
@@ -227,8 +230,8 @@ export function FieldDefinitionSheet({
             onChange={setTarget}
           />
 
-          {(inputType === 'single_select' || inputType === 'multiselect') && (
-            <div className="space-y-1.5">
+          {hasOptions && (
+            <div className="space-y-2">
               <Label>Options</Label>
               <Input
                 value={optionsText}
@@ -239,6 +242,20 @@ export function FieldDefinitionSheet({
             </div>
           )}
 
+          <FieldTranslationTabs
+            translations={translations}
+            onChange={setTranslations}
+          />
+
+          <div className="space-y-2">
+            <Label>{t('sortOrder')}</Label>
+            <Input
+              type="number"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(parseInt(e.target.value, 10) || 0)}
+            />
+          </div>
+
           <div className="flex items-center gap-2">
             <Checkbox
               id="field-active"
@@ -248,20 +265,12 @@ export function FieldDefinitionSheet({
             <Label htmlFor="field-active">{t('active')}</Label>
           </div>
 
-          <FieldTranslationTabs
-            translations={translations}
-            onChange={setTranslations}
-          />
-        </div>
+          {error && <p className="text-destructive text-sm">{error}</p>}
 
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t('cancel')}
-          </Button>
-          <Button onClick={handleSave} disabled={isPending}>
+          <Button type="submit" disabled={isPending} className="w-full">
             {isPending ? t('saving') : t('save')}
           </Button>
-        </div>
+        </form>
       </SheetContent>
     </Sheet>
   );
@@ -270,8 +279,8 @@ export function FieldDefinitionSheet({
 function mapErrorKey(error: string): string {
   if (error === 'duplicateKey') return 'duplicateKey';
   if (error === 'groupNotFound') return 'groupNotFound';
-  if (error === 'invalidKey') return 'invalidKey';
-  if (error.includes('missingLabel')) return 'missingLabel';
-  if (error.includes('missingTranslation')) return 'missingTranslation';
+  if (error.includes('invalidKey') || error.includes('key:')) return 'invalidKey';
+  if (error.includes('missingLabel') || error.includes('translations'))
+    return 'missingLabel';
   return 'saveFailed';
 }

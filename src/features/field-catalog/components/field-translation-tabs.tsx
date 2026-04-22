@@ -38,6 +38,7 @@ export function FieldTranslationTabs({ translations, onChange }: Props) {
           {CATALOG_LOCALES.map((l) => (
             <TabsTrigger key={l} value={l}>
               {l.toUpperCase()}
+              {l === 'es' && ' *'}
             </TabsTrigger>
           ))}
         </TabsList>
@@ -47,6 +48,7 @@ export function FieldTranslationTabs({ translations, onChange }: Props) {
               value={translations[l].label}
               onChange={(e) => setField(l, 'label', e.target.value)}
               placeholder={t('label')}
+              required={l === 'es'}
             />
             <Input
               value={translations[l].placeholder}

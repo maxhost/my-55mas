@@ -6,18 +6,28 @@ import {
 import { CATALOG_LOCALES } from './types';
 
 // ── Translations ────────────────────────────────────
+// Solo 'es' es obligatoria (fallback por defecto). Otros locales opcionales.
 
 const groupTranslationsShape = CATALOG_LOCALES.reduce(
   (acc, locale) => {
-    acc[locale] = z.string().min(1, 'missingTranslation');
+    acc[locale] =
+      locale === 'es'
+        ? z.string().min(1, 'missingTranslation')
+        : z.string();
     return acc;
   },
   {} as Record<(typeof CATALOG_LOCALES)[number], z.ZodString>
 );
 export const groupTranslationsSchema = z.object(groupTranslationsShape);
 
-const fieldTranslationEntrySchema = z.object({
+const fieldTranslationEntryWithLabelSchema = z.object({
   label: z.string().min(1, 'missingLabel'),
+  placeholder: z.string(),
+  description: z.string(),
+  option_labels: z.record(z.string(), z.string()).nullable(),
+});
+const fieldTranslationEntryOptionalSchema = z.object({
+  label: z.string(),
   placeholder: z.string(),
   description: z.string(),
   option_labels: z.record(z.string(), z.string()).nullable(),
@@ -25,10 +35,16 @@ const fieldTranslationEntrySchema = z.object({
 
 const fieldTranslationsShape = CATALOG_LOCALES.reduce(
   (acc, locale) => {
-    acc[locale] = fieldTranslationEntrySchema;
+    acc[locale] =
+      locale === 'es'
+        ? fieldTranslationEntryWithLabelSchema
+        : fieldTranslationEntryOptionalSchema;
     return acc;
   },
-  {} as Record<(typeof CATALOG_LOCALES)[number], typeof fieldTranslationEntrySchema>
+  {} as Record<
+    (typeof CATALOG_LOCALES)[number],
+    typeof fieldTranslationEntryWithLabelSchema
+  >
 );
 export const fieldTranslationsSchema = z.object(fieldTranslationsShape);
 
@@ -39,7 +55,7 @@ export const fieldGroupInputSchema = z.object({
   slug: z
     .string()
     .min(1)
-    .regex(/^[a-z0-9_]+$/, 'invalidSlug'),
+    .regex(/^[a-z0-9_-]+$/, 'invalidSlug'),
   sort_order: z.number().int().min(0),
   is_active: z.boolean(),
   translations: groupTranslationsSchema,
@@ -65,7 +81,7 @@ const commonDefinitionFields = {
   key: z
     .string()
     .min(1)
-    .regex(/^[a-z0-9_]+$/, 'invalidKey'),
+    .regex(/^[a-z0-9_-]+$/, 'invalidKey'),
   input_type: z.enum(INPUT_TYPES),
   options: z.array(z.string()).nullable(),
   options_source: z.string().nullable(),

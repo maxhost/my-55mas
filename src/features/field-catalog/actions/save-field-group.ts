@@ -10,12 +10,20 @@ const UNIQUE_VIOLATION = '23505';
 export async function saveFieldGroup(
   input: FieldGroupInput
 ): Promise<SaveFieldGroupResult> {
+  console.log('[saveFieldGroup] input:', {
+    id: input.id,
+    slug: input.slug,
+    sort_order: input.sort_order,
+    is_active: input.is_active,
+    translations_keys: Object.keys(input.translations ?? {}),
+  });
   const parsed = fieldGroupInputSchema.safeParse(input);
   if (!parsed.success) {
-    return {
-      ok: false,
-      error: parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '),
-    };
+    const msg = parsed.error.issues
+      .map((i) => `${i.path.join('.')}: ${i.message}`)
+      .join('; ');
+    console.log('[saveFieldGroup] Zod FAIL:', msg);
+    return { ok: false, error: msg };
   }
   const group = parsed.data;
   const supabase = createAdminClient();
@@ -32,10 +40,12 @@ export async function saveFieldGroup(
       .select('id')
       .single();
     if (error) {
+      console.log('[saveFieldGroup] insert FAIL:', error.code, error.message);
       if (error.code === UNIQUE_VIOLATION) return { ok: false, error: 'duplicateSlug' };
       return { ok: false, error: error.message };
     }
     id = data.id;
+    console.log('[saveFieldGroup] insert OK, id:', id);
   } else {
     const { error } = await supabase
       .from('form_field_groups')
@@ -47,6 +57,7 @@ export async function saveFieldGroup(
       })
       .eq('id', id);
     if (error) {
+      console.log('[saveFieldGroup] update FAIL:', error.code, error.message);
       if (error.code === UNIQUE_VIOLATION) return { ok: false, error: 'duplicateSlug' };
       return { ok: false, error: error.message };
     }
@@ -55,12 +66,16 @@ export async function saveFieldGroup(
   const translationRows = CATALOG_LOCALES.map((locale) => ({
     group_id: id!,
     locale,
-    name: group.translations[locale],
+    name: group.translations[locale] || '',
   }));
   const { error: tErr } = await supabase
     .from('form_field_group_translations')
     .upsert(translationRows, { onConflict: 'group_id,locale' });
-  if (tErr) return { ok: false, error: tErr.message };
+  if (tErr) {
+    console.log('[saveFieldGroup] translations FAIL:', tErr.message);
+    return { ok: false, error: tErr.message };
+  }
+  console.log('[saveFieldGroup] OK, id:', id);
 
   revalidatePath('/[locale]/(admin)/admin/field-catalog', 'layout');
   return { ok: true, data: { id: id! } };

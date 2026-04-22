@@ -41,6 +41,7 @@ export function FieldGroupSheet({ open, onOpenChange, group }: Props) {
   const t = useTranslations('AdminFieldCatalog');
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   const [slug, setSlug] = useState('');
   const [sortOrder, setSortOrder] = useState(0);
@@ -51,6 +52,7 @@ export function FieldGroupSheet({ open, onOpenChange, group }: Props) {
 
   useEffect(() => {
     if (open) {
+      setError(null);
       setSlug(group?.slug ?? '');
       setSortOrder(group?.sort_order ?? 0);
       setIsActive(group?.is_active ?? true);
@@ -62,7 +64,9 @@ export function FieldGroupSheet({ open, onOpenChange, group }: Props) {
     setTranslations((prev) => ({ ...prev, [locale]: value }));
   };
 
-  const handleSave = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
     const input: FieldGroupInput = {
       id: group?.id ?? null,
       slug,
@@ -74,7 +78,9 @@ export function FieldGroupSheet({ open, onOpenChange, group }: Props) {
       const result = await saveFieldGroup(input);
       if (!result.ok) {
         const key = mapErrorKey(result.error);
+        setError(result.error);
         toast.error(t(`errors.${key}`));
+        console.error('[FieldGroupSheet] saveFieldGroup error:', result.error);
         return;
       }
       toast.success(t('savedSuccess'));
@@ -85,19 +91,48 @@ export function FieldGroupSheet({ open, onOpenChange, group }: Props) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-lg">
+      <SheetContent side="right" className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>{group ? t('editGroup') : t('addGroup')}</SheetTitle>
         </SheetHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-1.5">
-            <Label>{t('slug')}</Label>
-            <Input value={slug} onChange={(e) => setSlug(e.target.value)} />
+        <form onSubmit={handleSubmit} className="space-y-4 p-4">
+          <div className="space-y-2">
+            <Label>{t('slug')} *</Label>
+            <Input
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              placeholder="registration"
+              required
+            />
             <p className="text-muted-foreground text-xs">{t('slugHint')}</p>
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
+            <Label>{t('translations')}</Label>
+            <Tabs defaultValue="es">
+              <TabsList>
+                {CATALOG_LOCALES.map((l) => (
+                  <TabsTrigger key={l} value={l}>
+                    {l.toUpperCase()}
+                    {l === 'es' && ' *'}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              {CATALOG_LOCALES.map((l) => (
+                <TabsContent key={l} value={l} className="pt-2">
+                  <Input
+                    value={translations[l]}
+                    onChange={(e) => setTranslation(l, e.target.value)}
+                    placeholder={t('label')}
+                    required={l === 'es'}
+                  />
+                </TabsContent>
+              ))}
+            </Tabs>
+          </div>
+
+          <div className="space-y-2">
             <Label>{t('sortOrder')}</Label>
             <Input
               type="number"
@@ -115,37 +150,12 @@ export function FieldGroupSheet({ open, onOpenChange, group }: Props) {
             <Label htmlFor="group-active">{t('active')}</Label>
           </div>
 
-          <div className="space-y-2">
-            <Label>{t('translations')}</Label>
-            <Tabs defaultValue="es">
-              <TabsList>
-                {CATALOG_LOCALES.map((l) => (
-                  <TabsTrigger key={l} value={l}>
-                    {l.toUpperCase()}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              {CATALOG_LOCALES.map((l) => (
-                <TabsContent key={l} value={l} className="pt-2">
-                  <Input
-                    value={translations[l]}
-                    onChange={(e) => setTranslation(l, e.target.value)}
-                    placeholder={t('label')}
-                  />
-                </TabsContent>
-              ))}
-            </Tabs>
-          </div>
-        </div>
+          {error && <p className="text-destructive text-sm">{error}</p>}
 
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t('cancel')}
-          </Button>
-          <Button onClick={handleSave} disabled={isPending}>
+          <Button type="submit" disabled={isPending} className="w-full">
             {isPending ? t('saving') : t('save')}
           </Button>
-        </div>
+        </form>
       </SheetContent>
     </Sheet>
   );
@@ -153,7 +163,8 @@ export function FieldGroupSheet({ open, onOpenChange, group }: Props) {
 
 function mapErrorKey(error: string): string {
   if (error === 'duplicateSlug') return 'duplicateSlug';
-  if (error === 'invalidSlug') return 'invalidSlug';
-  if (error.includes('missingTranslation')) return 'missingTranslation';
+  if (error.includes('invalidSlug') || error.includes('slug')) return 'invalidSlug';
+  if (error.includes('missingTranslation') || error.includes('translations'))
+    return 'missingTranslation';
   return 'saveFailed';
 }

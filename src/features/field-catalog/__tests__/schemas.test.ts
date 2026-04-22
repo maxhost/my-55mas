@@ -60,13 +60,22 @@ describe('fieldGroupInputSchema', () => {
     ).toBe(false);
   });
 
-  it('rejects when a locale translation is empty', () => {
+  it('rejects when es translation is empty (required fallback)', () => {
+    expect(
+      fieldGroupInputSchema.safeParse({
+        ...baseGroup,
+        translations: { ...fullGroupTranslations, es: '' },
+      }).success
+    ).toBe(false);
+  });
+
+  it('accepts when a non-es translation is empty', () => {
     expect(
       fieldGroupInputSchema.safeParse({
         ...baseGroup,
         translations: { ...fullGroupTranslations, pt: '' },
       }).success
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it('accepts edit mode (id present)', () => {
@@ -146,7 +155,7 @@ describe('fieldDefinitionInputSchema — discriminated union', () => {
     expect(result.success).toBe(false);
   });
 
-  it('rejects when a required locale label is empty', () => {
+  it('rejects when es label is empty (required fallback)', () => {
     const result = fieldDefinitionInputSchema.safeParse({
       ...baseDefinition,
       persistence_type: 'form_response',
@@ -157,5 +166,18 @@ describe('fieldDefinitionInputSchema — discriminated union', () => {
       },
     });
     expect(result.success).toBe(false);
+  });
+
+  it('accepts when a non-es label is empty', () => {
+    const result = fieldDefinitionInputSchema.safeParse({
+      ...baseDefinition,
+      persistence_type: 'form_response',
+      persistence_target: null,
+      translations: {
+        ...fullFieldTranslations,
+        en: { ...emptyFieldTrEntry, label: '' },
+      },
+    });
+    expect(result.success).toBe(true);
   });
 });
