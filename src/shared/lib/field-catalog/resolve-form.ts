@@ -6,22 +6,39 @@ import type {
   InputType,
   PersistenceType,
 } from './types';
-import type { ResolvedField, ResolvedForm, ResolvedStep } from './resolved-types';
+import type {
+  ResolvedAction,
+  ResolvedField,
+  ResolvedForm,
+  ResolvedStep,
+} from './resolved-types';
+import type { StepAction } from '@/shared/lib/forms/types';
 import { loadFormValues } from './load-form-values';
 import type { Sb } from './persistence/context';
 
 const FALLBACK_LOCALE = 'es';
+
+/**
+ * Per-form labels keyed by step.key and action.key.
+ * Step/action labels are per-form (they live in registration_form_translations
+ * or talent_form_translations), NOT in the central catalog. The caller is
+ * responsible for loading them from the right table and merging locale over
+ * fallback ('es'). Missing keys fall back to the structural key itself.
+ */
+export type FormLabels = Record<string, string>;
 
 export type ResolveFormInput = {
   supabase: Sb;
   schema: CatalogFormSchema;
   userId: string | null;
   locale: string;
+  formLabels?: FormLabels;
 };
 
 export async function resolveForm(input: ResolveFormInput): Promise<ResolvedForm> {
-  const { supabase, schema, userId, locale } = input;
+  const { supabase, schema, userId, locale, formLabels } = input;
   const fieldIds = collectFieldIds(schema);
+  const labels: FormLabels = formLabels ?? {};
 
   const [definitions, translations] = await Promise.all([
     loadDefinitions(supabase, fieldIds),
@@ -43,14 +60,27 @@ export async function resolveForm(input: ResolveFormInput): Promise<ResolvedForm
 
   const steps: ResolvedStep[] = schema.steps.map((step) => ({
     key: step.key,
-    label: step.key,
+    label: labels[step.key] ?? step.key,
     fields: step.field_refs.map(
       (ref) => resolvedFields.find((rf) => matchesRef(rf, ref))!
     ),
-    actions: step.actions,
+    actions: resolveActions(step.actions, labels),
   }));
 
   return { steps };
+}
+
+function resolveActions(
+  actions: StepAction[] | undefined,
+  labels: FormLabels
+): ResolvedAction[] | undefined {
+  if (!actions || actions.length === 0) return undefined;
+  return actions.map((a) => ({
+    key: a.key,
+    type: a.type,
+    label: labels[a.key] ?? a.key,
+    redirect_url: a.redirect_url,
+  }));
 }
 
 // ── Queries ─────────────────────────────────────────

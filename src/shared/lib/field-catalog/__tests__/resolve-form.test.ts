@@ -253,4 +253,81 @@ describe('resolveForm', () => {
     expect(fields[0]?.label).toBe('phone');
     expect(fields[1]?.label).toBe('bio');
   });
+
+  // ── formLabels: step + action translations ──────────
+
+  it('applies formLabels[step.key] as ResolvedStep.label', async () => {
+    const sb = makeSupabase(
+      { data: definitionsPayload, error: null },
+      { data: [], error: null }
+    );
+    const result = await resolveForm({
+      supabase: sb,
+      schema: baseSchema,
+      userId: null,
+      locale: 'es',
+      formLabels: { step1: 'Datos personales' },
+    });
+    expect(result.steps[0]?.label).toBe('Datos personales');
+  });
+
+  it('falls back ResolvedStep.label to step.key when formLabels missing', async () => {
+    const sb = makeSupabase(
+      { data: definitionsPayload, error: null },
+      { data: [], error: null }
+    );
+    const result = await resolveForm({
+      supabase: sb,
+      schema: baseSchema,
+      userId: null,
+      locale: 'es',
+      formLabels: {},
+    });
+    expect(result.steps[0]?.label).toBe('step1');
+  });
+
+  it('translates action labels via formLabels[action.key] with fallback', async () => {
+    const schemaWithActions: CatalogFormSchema = {
+      steps: [
+        {
+          key: 'step1',
+          field_refs: [{ field_definition_id: FIELD_A, required: false }],
+          actions: [
+            { key: 'btn_next', type: 'next' },
+            { key: 'btn_submit', type: 'submit' },
+          ],
+        },
+      ],
+    };
+    const sb = makeSupabase(
+      { data: [definitionsPayload[0]], error: null },
+      { data: [], error: null }
+    );
+    const result = await resolveForm({
+      supabase: sb,
+      schema: schemaWithActions,
+      userId: null,
+      locale: 'es',
+      formLabels: { btn_next: 'Continuar' },
+    });
+    const actions = result.steps[0]?.actions ?? [];
+    expect(actions[0]?.label).toBe('Continuar');
+    expect(actions[1]?.label).toBe('btn_submit'); // fallback to key
+    expect(actions[0]?.type).toBe('next');
+    expect(actions[1]?.type).toBe('submit');
+  });
+
+  it('returns undefined actions when step has none', async () => {
+    const sb = makeSupabase(
+      { data: definitionsPayload, error: null },
+      { data: [], error: null }
+    );
+    const result = await resolveForm({
+      supabase: sb,
+      schema: baseSchema,
+      userId: null,
+      locale: 'es',
+    });
+    expect(result.steps[0]?.actions).toBeUndefined();
+  });
 });

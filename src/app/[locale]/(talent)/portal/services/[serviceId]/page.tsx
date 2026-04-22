@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
 import { getTalentServiceForm } from '@/features/talent-services/actions/get-talent-service-form';
+import { loadTalentFormLabels } from '@/features/talent-services/actions/load-talent-form-labels';
 import { resolveFormFromJson } from '@/shared/lib/field-catalog/resolve-form-from-json';
 import { TalentServiceRenderer } from '@/features/talent-services/components/talent-service-renderer';
 
@@ -63,11 +64,17 @@ export default async function TalentServiceFormPage({ params: { locale, serviceI
     );
   }
 
+  const formLabels = await loadTalentFormLabels(
+    supabase,
+    formData.form.id,
+    locale
+  );
   const resolvedForm = await resolveFormFromJson({
     supabase,
     schemaJson: formData.form.schema,
     userId: user.id,
     locale,
+    formLabels,
   });
 
   return (

@@ -1,5 +1,5 @@
 import type { InputType, PersistenceType, PersistenceTarget } from './types';
-import type { StepAction } from '@/shared/lib/forms/types';
+import type { StepActionType } from '@/shared/lib/forms/types';
 
 // ── Resolved Field (ready for rendering) ─────────────
 
@@ -23,21 +23,34 @@ export type ResolvedField = {
   current_value?: unknown;
 };
 
+// ── Resolved Action (translated for rendering) ───────
+
+/**
+ * A step action enriched with its translated label. `key` remains the
+ * stable identifier used by handlers; `label` is the user-facing text.
+ */
+export type ResolvedAction = {
+  key: string;
+  type: StepActionType;
+  label: string;
+  redirect_url?: string;
+};
+
 // ── Resolved Step ────────────────────────────────────
 
 export type ResolvedStep = {
   key: string;
   label: string;
   fields: ResolvedField[];
-  actions?: StepAction[];
+  actions?: ResolvedAction[];
 };
 
 // ── Resolved Form ────────────────────────────────────
 
 /**
  * A fully resolved form ready for client-side rendering.
- * All field definitions have been loaded, translated, and enriched
- * with current values.
+ * All field definitions, step labels, and action labels have been loaded
+ * and translated. Current user values are pre-populated.
  */
 export type ResolvedForm = {
   steps: ResolvedStep[];

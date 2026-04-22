@@ -154,26 +154,28 @@ describe('FormRenderer', () => {
     expect(screen.getByText('Used for contact only')).toBeInTheDocument();
   });
 
-  it('wizard mode: renders step actions and advances on "next"', () => {
+  it('wizard mode: renders translated step actions and advances on "next"', () => {
     const form: ResolvedForm = {
       steps: [
         {
           key: 'step1',
           label: 'Step 1',
           fields: [makeField({ key: 'a', label: 'A' })],
-          actions: [{ key: 'btn_next', type: 'next' }],
+          actions: [{ key: 'btn_next', type: 'next', label: 'Continuar' }],
         },
         {
           key: 'step2',
           label: 'Step 2',
           fields: [makeField({ key: 'b', label: 'B' })],
-          actions: [{ key: 'btn_submit', type: 'submit' }],
+          actions: [{ key: 'btn_submit', type: 'submit', label: 'Enviar' }],
         },
       ],
     };
     render(<FormRenderer form={form} onSubmit={vi.fn()} />);
     expect(screen.getByText('Step 1')).toBeInTheDocument();
-    fireEvent.click(screen.getByText('btn_next'));
+    // action label (not key) is rendered on the button
+    fireEvent.click(screen.getByText('Continuar'));
     expect(screen.getByText('Step 2')).toBeInTheDocument();
+    expect(screen.getByText('Enviar')).toBeInTheDocument();
   });
 });

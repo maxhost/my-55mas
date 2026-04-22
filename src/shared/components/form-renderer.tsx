@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import type {
+  ResolvedAction,
   ResolvedForm,
   ResolvedField,
   ResolvedStep,
 } from '@/shared/lib/field-catalog/resolved-types';
-import type { StepAction } from '@/shared/lib/forms/types';
 import { renderResolvedField } from './field-renderers';
 
 // ── Types ────────────────────────────────────────────
@@ -85,7 +85,7 @@ export function FormRenderer({
     return missing.size === 0;
   };
 
-  const handleAction = async (action: StepAction) => {
+  const handleAction = async (action: ResolvedAction) => {
     if (action.type === 'back') {
       setStepIndex((i) => Math.max(0, i - 1));
       setErrors(new Set());
@@ -124,7 +124,7 @@ export function FormRenderer({
     </div>
   );
 
-  const renderActions = (actions: StepAction[]) => (
+  const renderActions = (actions: ResolvedAction[]) => (
     <div className="flex justify-end gap-2">
       {actions.map((action) => {
         const isBack = action.type === 'back';
@@ -135,7 +135,7 @@ export function FormRenderer({
             onClick={() => handleAction(action)}
             disabled={isPending && !isBack}
           >
-            {action.key}
+            {action.label}
           </Button>
         );
       })}
@@ -144,11 +144,11 @@ export function FormRenderer({
 
   if (isWizard) {
     const currentStep = steps[stepIndex];
-    const actions =
+    const actions: ResolvedAction[] =
       currentStep.actions ??
       (stepIndex < steps.length - 1
-        ? [{ key: 'btn_next', type: 'next' as const }]
-        : [{ key: 'btn_submit', type: 'submit' as const }]);
+        ? [{ key: 'btn_next', type: 'next', label: 'Next' }]
+        : [{ key: 'btn_submit', type: 'submit', label: 'Submit' }]);
 
     return (
       <div className="space-y-6">
