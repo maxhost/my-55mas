@@ -1,31 +1,29 @@
 import type {
-  FieldDefinition,
-  FieldGroup,
   InputType,
   PersistenceType,
   PersistenceTarget,
 } from '@/shared/lib/field-catalog/types';
+import {
+  CATALOG_LOCALES,
+  type CatalogFieldTranslationEntry as FieldTranslationEntry,
+  type CatalogFieldTranslations as FieldTranslations,
+  type CatalogGroupTranslations as GroupTranslations,
+  type CatalogLocale,
+  type FieldDefinitionWithTranslations,
+  type FieldGroupWithFields,
+} from '@/shared/lib/field-catalog/admin-types';
 
-export const CATALOG_LOCALES = ['es', 'en', 'pt', 'fr', 'ca'] as const;
-export type CatalogLocale = (typeof CATALOG_LOCALES)[number];
-
-export type GroupTranslations = Record<CatalogLocale, string>;
-
-export type FieldTranslationEntry = {
-  label: string;
-  placeholder: string;
-  description: string;
-  option_labels: Record<string, string> | null;
-};
-export type FieldTranslations = Record<CatalogLocale, FieldTranslationEntry>;
-
-export type FieldGroupWithFields = FieldGroup & {
-  translations: GroupTranslations;
-  fields: FieldDefinitionWithTranslations[];
-};
-
-export type FieldDefinitionWithTranslations = FieldDefinition & {
-  translations: FieldTranslations;
+// Re-exports para que el feature admin pueda seguir importando de 'types'
+// sin conocer admin-types. Los consumidores externos (pages/builders de
+// otros features) importan directamente de shared/lib/field-catalog/admin-types.
+export { CATALOG_LOCALES };
+export type {
+  CatalogLocale,
+  FieldTranslationEntry,
+  FieldTranslations,
+  GroupTranslations,
+  FieldDefinitionWithTranslations,
+  FieldGroupWithFields,
 };
 
 export type FieldGroupInput = {

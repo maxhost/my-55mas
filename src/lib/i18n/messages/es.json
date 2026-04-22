@@ -286,6 +286,8 @@
     "updated": "Actualizado",
     "editForm": "Editar formulario",
     "tabConfig": "Configuración",
+    "tabCatalog": "Catálogo",
+    "tabFormLegacy": "Formulario (legacy)",
     "tabForm": "Formulario",
     "configTitle": "Países y ciudades",
     "configDesc": "Configura en qué países y ciudades estará disponible este formulario.",

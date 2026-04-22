@@ -286,6 +286,8 @@
     "updated": "Updated",
     "editForm": "Edit form",
     "tabConfig": "Configuration",
+    "tabCatalog": "Catalog",
+    "tabFormLegacy": "Form (legacy)",
     "tabForm": "Form",
     "configTitle": "Countries and cities",
     "configDesc": "Configure which countries and cities this form is available in.",

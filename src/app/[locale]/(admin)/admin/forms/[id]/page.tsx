@@ -6,6 +6,7 @@ import { listRegistrationVariants } from '@/features/general-forms/actions/list-
 import { listSurveyQuestions } from '@/features/survey-questions/actions/list-survey-questions';
 import { getCountries } from '@/features/services/actions/get-countries';
 import { getCities } from '@/features/services/actions/get-cities';
+import { listFieldCatalog } from '@/features/field-catalog';
 import { PageHeader } from '@/shared/components/page-header';
 import { RegistrationFormEditor } from './registration-form-editor';
 
@@ -32,6 +33,7 @@ export default async function EditRegistrationFormPage({ params: { locale, id } 
     countries,
     allCities,
     surveyQuestions,
+    catalogResult,
     { data: configCountries },
     { data: configCities },
   ] = await Promise.all([
@@ -40,6 +42,7 @@ export default async function EditRegistrationFormPage({ params: { locale, id } 
     getCountries(locale),
     getCities(locale),
     listSurveyQuestions(),
+    listFieldCatalog(),
     supabase
       .from('registration_form_countries')
       .select('country_id')
@@ -49,6 +52,7 @@ export default async function EditRegistrationFormPage({ params: { locale, id } 
       .select('city_id')
       .eq('form_id', formRow.id),
   ]);
+  const catalogGroups = catalogResult.ok ? catalogResult.data : [];
 
   const configuredCountryIds = (configCountries ?? []).map((c) => c.country_id);
   const configuredCityIds = (configCities ?? []).map((c) => c.city_id);
@@ -84,6 +88,7 @@ export default async function EditRegistrationFormPage({ params: { locale, id } 
         configuredCountryIds={configuredCountryIds}
         configuredCityIds={configuredCityIds}
         surveyQuestions={surveyQuestionOptions}
+        catalogGroups={catalogGroups}
       />
     </div>
   );

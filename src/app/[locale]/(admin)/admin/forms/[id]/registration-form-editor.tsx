@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { RegistrationFormBuilder } from '@/features/general-forms/components/registration-form-builder';
 import { RegistrationFormConfig } from '@/features/general-forms/components/registration-form-config';
+import { CatalogFormBuilder } from '@/features/general-forms/components/catalog-form-builder';
 import type {
   FormVariantSummary,
   FormCountryOption,
@@ -14,6 +15,8 @@ import type {
 } from '@/shared/lib/forms/types';
 import type { SurveyQuestionOption } from '@/shared/components/form-builder/survey-field-config';
 import type { RegistrationFormWithTranslations } from '@/features/general-forms/types';
+import type { FieldGroupWithFields } from '@/features/field-catalog/types';
+import type { CatalogFormSchema } from '@/shared/lib/field-catalog/schema-types';
 
 type Props = {
   formId: string;
@@ -26,13 +29,14 @@ type Props = {
   configuredCountryIds: string[];
   configuredCityIds: string[];
   surveyQuestions: SurveyQuestionOption[];
+  catalogGroups: FieldGroupWithFields[];
 };
 
 export function RegistrationFormEditor({
   formId, formSlug, targetRole, form, formVariants,
   allCountries, allCities,
   configuredCountryIds, configuredCityIds,
-  surveyQuestions,
+  surveyQuestions, catalogGroups,
 }: Props) {
   const t = useTranslations('AdminForms');
   const tc = useTranslations('Common');
@@ -49,10 +53,11 @@ export function RegistrationFormEditor({
   const serviceCities = allCities.filter((c) => configuredCityIds.includes(c.id));
 
   return (
-    <Tabs defaultValue="config">
+    <Tabs defaultValue="catalog">
       <TabsList>
         <TabsTrigger value="config">{t('tabConfig')}</TabsTrigger>
-        <TabsTrigger value="form">{t('tabForm')}</TabsTrigger>
+        <TabsTrigger value="catalog">{t('tabCatalog')}</TabsTrigger>
+        <TabsTrigger value="form">{t('tabFormLegacy')}</TabsTrigger>
       </TabsList>
 
       <TabsContent value="config" className="space-y-6 pt-6">
@@ -81,6 +86,14 @@ export function RegistrationFormEditor({
           configuredCountryIds={configuredCountryIds}
           configuredCityIds={configuredCityIds}
           formVariants={formVariants}
+        />
+      </TabsContent>
+
+      <TabsContent value="catalog" className="pt-6">
+        <CatalogFormBuilder
+          formId={formId}
+          initialSchema={(form?.schema as unknown as CatalogFormSchema) ?? null}
+          groups={catalogGroups}
         />
       </TabsContent>
 

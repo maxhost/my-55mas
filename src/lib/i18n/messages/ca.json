@@ -286,6 +286,8 @@
     "updated": "Actualitzat",
     "editForm": "Editar formulari",
     "tabConfig": "Configuració",
+    "tabCatalog": "Catàleg",
+    "tabFormLegacy": "Formulari (legacy)",
     "tabForm": "Formulari",
     "configTitle": "Països i ciutats",
     "configDesc": "Configureu en quins països i ciutats estarà disponible aquest formulari.",
