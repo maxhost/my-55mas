@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       categories: {
@@ -348,6 +323,147 @@ export type Database = {
             referencedColumns: ["code"]
           },
         ]
+      }
+      form_field_definition_translations: {
+        Row: {
+          description: string | null
+          field_id: string
+          label: string
+          locale: string
+          option_labels: Json | null
+          placeholder: string | null
+        }
+        Insert: {
+          description?: string | null
+          field_id: string
+          label: string
+          locale: string
+          option_labels?: Json | null
+          placeholder?: string | null
+        }
+        Update: {
+          description?: string | null
+          field_id?: string
+          label?: string
+          locale?: string
+          option_labels?: Json | null
+          placeholder?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_field_definition_translations_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "form_field_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_field_definitions: {
+        Row: {
+          created_at: string | null
+          group_id: string
+          id: string
+          input_type: string
+          is_active: boolean
+          key: string
+          options: Json | null
+          options_source: string | null
+          persistence_target: Json | null
+          persistence_type: string
+          sort_order: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          group_id: string
+          id?: string
+          input_type: string
+          is_active?: boolean
+          key: string
+          options?: Json | null
+          options_source?: string | null
+          persistence_target?: Json | null
+          persistence_type: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          group_id?: string
+          id?: string
+          input_type?: string
+          is_active?: boolean
+          key?: string
+          options?: Json | null
+          options_source?: string | null
+          persistence_target?: Json | null
+          persistence_type?: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_field_definitions_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "form_field_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_field_group_translations: {
+        Row: {
+          group_id: string
+          locale: string
+          name: string
+        }
+        Insert: {
+          group_id: string
+          locale: string
+          name: string
+        }
+        Update: {
+          group_id?: string
+          locale?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_field_group_translations_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "form_field_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_field_groups: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean
+          slug: string
+          sort_order: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          slug: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          slug?: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       languages: {
         Row: {
@@ -2603,6 +2719,48 @@ export type Database = {
           },
         ]
       }
+      user_form_responses: {
+        Row: {
+          created_at: string | null
+          field_definition_id: string
+          id: string
+          updated_at: string | null
+          user_id: string
+          value: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          field_definition_id: string
+          id?: string
+          updated_at?: string | null
+          user_id: string
+          value?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          field_definition_id?: string
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+          value?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_form_responses_field_definition_id_fkey"
+            columns: ["field_definition_id"]
+            isOneToOne: false
+            referencedRelation: "form_field_definitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_form_responses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -2901,10 +3059,8 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },
 } as const
+
