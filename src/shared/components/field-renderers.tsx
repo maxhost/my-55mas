@@ -205,7 +205,7 @@ export function renderMultiselectDropdown({
       >
         <SelectTrigger
           aria-label={field.label}
-          className={`h-auto min-h-9 w-full justify-between py-1 ${errorClass}`}
+          className={`data-[size=default]:h-auto min-h-9 w-full justify-between whitespace-normal py-1 ${errorClass}`}
         >
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
             {selected.length === 0 ? (
