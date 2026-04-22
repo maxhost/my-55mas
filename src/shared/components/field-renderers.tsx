@@ -170,9 +170,9 @@ export function renderMultiselectCheckbox({ field, value, onChange }: RenderProp
   );
 }
 
-// Dropdown con chips: abrís el dropdown, elegís un item, se suma a la
-// barra de chips arriba del trigger. X en cada chip para removerlo.
-// Los items ya seleccionados no aparecen en el dropdown.
+// Dropdown con chips: barra full-width con los chips seleccionados + chevron
+// fijo a la derecha. Click en el chevron abre el dropdown con las opciones
+// no seleccionadas. X en cada chip para removerlo.
 export function renderMultiselectDropdown({
   field,
   value,
@@ -198,27 +198,34 @@ export function renderMultiselectDropdown({
     <div key={field.key} className="space-y-1">
       <Label>{labelText(field)}</Label>
       <div
-        className={`border-input bg-background flex min-h-9 flex-wrap items-center gap-1.5 rounded-lg border p-1.5 ${errorClass}`}
+        className={`border-input bg-background flex w-full min-h-9 items-center gap-1.5 rounded-lg border px-2 py-1 ${errorClass}`}
       >
-        {selected.map((opt) => (
-          <Badge
-            key={opt}
-            variant="secondary"
-            className="flex items-center gap-1 pr-1"
-          >
-            {labels[opt] ?? opt}
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-xs"
-              className="size-4"
-              onClick={() => removeValue(opt)}
-              aria-label="remove"
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
+          {selected.length === 0 && (
+            <span className="text-muted-foreground text-sm">
+              {field.placeholder || selectPlaceholder}
+            </span>
+          )}
+          {selected.map((opt) => (
+            <Badge
+              key={opt}
+              variant="secondary"
+              className="flex items-center gap-1 pr-1"
             >
-              <X className="size-3" />
-            </Button>
-          </Badge>
-        ))}
+              {labels[opt] ?? opt}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-xs"
+                className="size-4"
+                onClick={() => removeValue(opt)}
+                aria-label="remove"
+              >
+                <X className="size-3" />
+              </Button>
+            </Badge>
+          ))}
+        </div>
         <Select
           value=""
           onValueChange={(v) => {
@@ -226,12 +233,11 @@ export function renderMultiselectDropdown({
             addValue(v);
           }}
         >
-          <SelectTrigger className="h-7 min-w-[140px] border-0 px-2 shadow-none focus-visible:ring-0">
-            <SelectValue placeholder={field.placeholder || selectPlaceholder}>
-              {/* siempre vacío: el valor se traslada a los chips */}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
+          <SelectTrigger
+            aria-label={field.label}
+            className="size-7 shrink-0 border-0 bg-transparent p-0 shadow-none focus-visible:border-transparent focus-visible:ring-0"
+          />
+          <SelectContent align="end">
             {available.length === 0 ? (
               <div className="text-muted-foreground p-2 text-xs">
                 (sin más opciones)
