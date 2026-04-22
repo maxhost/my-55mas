@@ -14,15 +14,22 @@ import type {
   FieldDefinitionWithTranslations,
   FieldGroupWithFields,
 } from '../types';
+import type { SubtypeGroupOption } from '@/shared/lib/field-catalog/subtype-groups';
 import { FieldDefinitionSheet } from './field-definition-sheet';
 
 type Props = {
   group: FieldGroupWithFields;
   locale: CatalogLocale;
+  subtypeGroups: SubtypeGroupOption[];
   onEditGroup: () => void;
 };
 
-export function FieldGroupSection({ group, locale, onEditGroup }: Props) {
+export function FieldGroupSection({
+  group,
+  locale,
+  subtypeGroups,
+  onEditGroup,
+}: Props) {
   const t = useTranslations('AdminFieldCatalog');
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -136,12 +143,14 @@ export function FieldGroupSection({ group, locale, onEditGroup }: Props) {
         onOpenChange={setAddingField}
         groupId={group.id}
         field={null}
+        subtypeGroups={subtypeGroups}
       />
       <FieldDefinitionSheet
         open={!!editingField}
         onOpenChange={(o) => !o && setEditingField(null)}
         groupId={group.id}
         field={editingField}
+        subtypeGroups={subtypeGroups}
       />
     </>
   );

@@ -36,6 +36,7 @@ import {
   type FieldTranslationEntry,
   type FieldTranslations,
 } from '../types';
+import type { SubtypeGroupOption } from '@/shared/lib/field-catalog/subtype-groups';
 import { PersistenceTargetFields } from './persistence-target-fields';
 import { FieldTranslationTabs } from './field-translation-tabs';
 
@@ -44,6 +45,7 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   groupId: string;
   field: FieldDefinitionWithTranslations | null;
+  subtypeGroups: SubtypeGroupOption[];
 };
 
 const emptyTrEntry: FieldTranslationEntry = {
@@ -80,6 +82,7 @@ export function FieldDefinitionSheet({
   onOpenChange,
   groupId,
   field,
+  subtypeGroups,
 }: Props) {
   const t = useTranslations('AdminFieldCatalog');
   const router = useRouter();
@@ -158,8 +161,14 @@ export function FieldDefinitionSheet({
     });
   };
 
+  // Las opciones se editan a mano solo cuando la persistencia no las resuelve
+  // dinámicamente. subtype carga sus opciones del grupo referenciado;
+  // service_select las va a cargar del contexto del talent (fuera v1).
+  const isDynamicOptions =
+    persistenceType === 'subtype' || persistenceType === 'service_select';
   const hasOptions =
-    inputType === 'single_select' || inputType === 'multiselect';
+    (inputType === 'single_select' || inputType === 'multiselect') &&
+    !isDynamicOptions;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -228,6 +237,7 @@ export function FieldDefinitionSheet({
             persistenceType={persistenceType}
             target={target}
             onChange={setTarget}
+            subtypeGroups={subtypeGroups}
           />
 
           {hasOptions && (

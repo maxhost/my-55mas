@@ -15,6 +15,8 @@ import type {
 import type { StepAction } from '@/shared/lib/forms/types';
 import { loadFormValues } from './load-form-values';
 import type { Sb } from './persistence/context';
+import { loadSubtypeOptionsForGroup } from './subtype-groups';
+import type { SubtypeTarget } from './types';
 
 const FALLBACK_LOCALE = 'es';
 
@@ -55,6 +57,8 @@ export async function resolveForm(input: ResolveFormInput): Promise<ResolvedForm
     locale
   );
 
+  await applySubtypeOptions(supabase, resolvedFields, locale);
+
   const currentValues = await loadFormValues(supabase, userId, resolvedFields);
   applyCurrentValues(resolvedFields, currentValues);
 
@@ -81,6 +85,45 @@ function resolveActions(
     label: labels[a.key] ?? a.key,
     redirect_url: a.redirect_url,
   }));
+}
+
+// Para fields con persistence_type='subtype' las options no se guardan en
+// el catálogo — son dinámicas (los subtypes del grupo apuntado por
+// persistence_target.subtype_group). El renderer consume field.options +
+// field.option_labels como un multiselect genérico, así que las cargamos
+// aquí y las inyectamos. Agrupamos queries por slug para evitar N+1.
+async function applySubtypeOptions(
+  supabase: Sb,
+  fields: ResolvedField[],
+  locale: string
+): Promise<void> {
+  const slugs = new Set<string>();
+  for (const f of fields) {
+    if (f.persistence_type === 'subtype') {
+      const target = f.persistence_target as SubtypeTarget | null;
+      if (target?.subtype_group) slugs.add(target.subtype_group);
+    }
+  }
+  if (slugs.size === 0) return;
+
+  const cache = new Map<string, { ids: string[]; labels: Record<string, string> }>();
+  await Promise.all(
+    Array.from(slugs).map(async (slug) => {
+      const options = await loadSubtypeOptionsForGroup(supabase, slug, locale);
+      const labels: Record<string, string> = {};
+      for (const o of options) labels[o.id] = o.name;
+      cache.set(slug, { ids: options.map((o) => o.id), labels });
+    })
+  );
+
+  for (const f of fields) {
+    if (f.persistence_type !== 'subtype') continue;
+    const target = f.persistence_target as SubtypeTarget | null;
+    const entry = target?.subtype_group ? cache.get(target.subtype_group) : undefined;
+    if (!entry) continue;
+    f.options = entry.ids;
+    f.option_labels = { ...(f.option_labels ?? {}), ...entry.labels };
+  }
 }
 
 // ── Queries ─────────────────────────────────────────

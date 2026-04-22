@@ -10,14 +10,16 @@ import {
   type CatalogLocale,
   type FieldGroupWithFields,
 } from '../types';
+import type { SubtypeGroupOption } from '@/shared/lib/field-catalog/subtype-groups';
 import { FieldGroupSection } from './field-group-section';
 import { FieldGroupSheet } from './field-group-sheet';
 
 type Props = {
   initialGroups: FieldGroupWithFields[];
+  subtypeGroups: SubtypeGroupOption[];
 };
 
-export function FieldCatalogManager({ initialGroups }: Props) {
+export function FieldCatalogManager({ initialGroups, subtypeGroups }: Props) {
   const t = useTranslations('AdminFieldCatalog');
   const [locale, setLocale] = useState<CatalogLocale>('es');
   const [editingGroup, setEditingGroup] = useState<FieldGroupWithFields | null>(
@@ -56,6 +58,7 @@ export function FieldCatalogManager({ initialGroups }: Props) {
               key={group.id}
               group={group}
               locale={locale}
+              subtypeGroups={subtypeGroups}
               onEditGroup={() => setEditingGroup(group)}
             />
           ))}

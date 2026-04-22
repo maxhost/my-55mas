@@ -15,11 +15,13 @@ import type {
   PersistenceType,
 } from '@/shared/lib/field-catalog/types';
 import { USER_OWNED_DB_COLUMN_TABLES } from '@/shared/lib/field-catalog/persistence/context';
+import type { SubtypeGroupOption } from '@/shared/lib/field-catalog/subtype-groups';
 
 type Props = {
   persistenceType: PersistenceType;
   target: PersistenceTarget;
   onChange: (target: PersistenceTarget) => void;
+  subtypeGroups: SubtypeGroupOption[];
 };
 
 const AUTH_FIELDS = ['email', 'password', 'confirm_password'] as const;
@@ -29,6 +31,7 @@ export function PersistenceTargetFields({
   persistenceType,
   target,
   onChange,
+  subtypeGroups,
 }: Props) {
   const t = useTranslations('AdminFieldCatalog');
 
@@ -119,10 +122,31 @@ export function PersistenceTargetFields({
     return (
       <div className="space-y-1.5">
         <Label>{t('persistenceTargetSubtypeGroup')}</Label>
-        <Input
-          value={current.subtype_group}
-          onChange={(e) => onChange({ subtype_group: e.target.value })}
-        />
+        {subtypeGroups.length === 0 ? (
+          <p className="text-muted-foreground text-xs">
+            No hay grupos de subtypes definidos. Creá uno en /admin/subtypes.
+          </p>
+        ) : (
+          <Select
+            value={current.subtype_group}
+            onValueChange={(v) => {
+              if (v == null) return;
+              onChange({ subtype_group: v });
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Seleccioná un grupo" />
+            </SelectTrigger>
+            <SelectContent>
+              {subtypeGroups.map((g) => (
+                <SelectItem key={g.slug} value={g.slug}>
+                  {g.name}{' '}
+                  <span className="text-muted-foreground text-xs">({g.slug})</span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
     );
   }
