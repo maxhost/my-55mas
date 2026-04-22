@@ -9,7 +9,8 @@ export type InputType =
   | 'select'
   | 'multiselect'
   | 'textarea'
-  | 'password';
+  | 'password'
+  | 'address';
 
 export type OptionsSource = 'spoken_languages';
 
@@ -37,6 +38,7 @@ export const DB_COLUMN_REGISTRY: Record<string, TableDef> = {
       full_name: { inputType: 'text', labelKey: 'DbColumns.fullName' },
       phone: { inputType: 'text', labelKey: 'DbColumns.phone' },
       nif: { inputType: 'text', labelKey: 'DbColumns.nif' },
+      address: { inputType: 'address', labelKey: 'DbColumns.address' },
       preferred_contact: {
         inputType: 'select',
         labelKey: 'DbColumns.preferredContact',
@@ -58,8 +60,6 @@ export const DB_COLUMN_REGISTRY: Record<string, TableDef> = {
   talent_profiles: {
     labelKey: 'DbTables.talentProfiles',
     columns: {
-      address: { inputType: 'text', labelKey: 'DbColumns.address' },
-      postal_code: { inputType: 'text', labelKey: 'DbColumns.postalCode' },
       has_car: { inputType: 'boolean', labelKey: 'DbColumns.hasCar' },
       preferred_payment: {
         inputType: 'select',

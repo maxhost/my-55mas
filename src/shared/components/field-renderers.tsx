@@ -10,6 +10,10 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import type { ResolvedField } from '@/shared/lib/field-catalog/resolved-types';
+import {
+  AddressAutocomplete,
+  type AddressValue,
+} from './address-autocomplete';
 
 // ── Types ────────────────────────────────────────────
 
@@ -133,6 +137,20 @@ export function renderSingleSelect({
         <p className="text-muted-foreground text-xs">{field.description}</p>
       )}
     </div>
+  );
+}
+
+export function renderAddress({ field, value, errorClass, onChange }: RenderProps) {
+  return (
+    <AddressAutocomplete
+      value={value as AddressValue | null | undefined}
+      onChange={(next) => onChange(field.key, next)}
+      label={labelText(field)}
+      placeholder={field.placeholder}
+      description={field.description}
+      required={field.required}
+      errorClass={errorClass}
+    />
   );
 }
 
@@ -296,6 +314,8 @@ export function renderResolvedField(
       return renderMultiselectCheckbox(base);
     case 'multiselect_dropdown':
       return renderMultiselectDropdown(selectBase);
+    case 'address':
+      return renderAddress(base);
     default: {
       const _exhaustive: never = field.input_type;
       void _exhaustive;

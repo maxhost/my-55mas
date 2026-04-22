@@ -104,7 +104,7 @@ describe('formSchemaSchema — db_column duplicate detection', () => {
           key: 'step_1',
           fields: [
             { key: 'field_1', type: 'db_column', required: true, db_table: 'profiles', db_column: 'full_name' },
-            { key: 'field_2', type: 'db_column', required: false, db_table: 'talent_profiles', db_column: 'address' },
+            { key: 'field_2', type: 'db_column', required: false, db_table: 'talent_profiles', db_column: 'has_car' },
           ],
         },
       ],

@@ -11,6 +11,7 @@ export const INPUT_TYPES = [
   'single_select',
   'multiselect_checkbox',
   'multiselect_dropdown',
+  'address',
 ] as const;
 
 export type InputType = (typeof INPUT_TYPES)[number];
