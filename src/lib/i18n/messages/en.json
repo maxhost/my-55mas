@@ -390,6 +390,8 @@
     "persistenceTargetSurveyKey": "Question key",
     "persistenceTargetSubtypeGroup": "Subtype group slug",
     "optionsHint": "Comma-separated list of values (for single_select/multiselect).",
+    "optionsFromRegistry": "Options derived from the selected column (automatic):",
+    "optionsFromSource": "Options loaded dynamically from {source}.",
     "translations": "Translations",
     "label": "Label",
     "placeholder": "Placeholder",

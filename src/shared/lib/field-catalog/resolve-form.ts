@@ -17,7 +17,8 @@ import { loadFormValues } from './load-form-values';
 import type { Sb } from './persistence/context';
 import { loadSubtypeOptionsForGroup } from './subtype-groups';
 import { loadPublishedServicesForLocale } from './service-options';
-import type { SubtypeTarget } from './types';
+import { loadDbColumnOptions } from './db-column-options';
+import type { DbColumnTarget, SubtypeTarget } from './types';
 
 const FALLBACK_LOCALE = 'es';
 
@@ -61,6 +62,7 @@ export async function resolveForm(input: ResolveFormInput): Promise<ResolvedForm
   await Promise.all([
     applySubtypeOptions(supabase, resolvedFields, locale),
     applyServiceSelectOptions(supabase, resolvedFields, locale),
+    applyDbColumnOptions(supabase, resolvedFields, locale),
   ]);
 
   const currentValues = await loadFormValues(supabase, userId, resolvedFields);
@@ -128,6 +130,40 @@ async function applySubtypeOptions(
     f.options = entry.ids;
     f.option_labels = { ...(f.option_labels ?? {}), ...entry.labels };
   }
+}
+
+// Para fields db_column + (single|multi)select cuyas columnas están en el
+// DB_COLUMN_REGISTRY con options estáticas o optionsSource dinámico, las
+// options NO las tipea el admin: las resolvemos leyendo del registry (o
+// queryando la tabla source). Admin option_labels toma precedencia sobre
+// los name auto-generados — traducciones editadas por el admin persisten.
+async function applyDbColumnOptions(
+  supabase: Sb,
+  fields: ResolvedField[],
+  locale: string
+): Promise<void> {
+  const candidates = fields.filter(
+    (f) =>
+      f.persistence_type === 'db_column' &&
+      (f.input_type === 'single_select' ||
+        f.input_type === 'multiselect_checkbox' ||
+        f.input_type === 'multiselect_dropdown')
+  );
+  if (candidates.length === 0) return;
+
+  await Promise.all(
+    candidates.map(async (f) => {
+      const target = f.persistence_target as DbColumnTarget | null;
+      if (!target) return;
+      const options = await loadDbColumnOptions(supabase, target, locale);
+      if (!options || options.length === 0) return;
+      f.options = options.map((o) => o.id);
+      // Admin labels ganan; auto-labels llenan los huecos.
+      const autoLabels: Record<string, string> = {};
+      for (const o of options) autoLabels[o.id] = o.name;
+      f.option_labels = { ...autoLabels, ...(f.option_labels ?? {}) };
+    })
+  );
 }
 
 // Para fields con persistence_type='service_select' las options son todos

@@ -390,6 +390,8 @@
     "persistenceTargetSurveyKey": "Clave de pregunta",
     "persistenceTargetSubtypeGroup": "Slug del grupo de sub-tipos",
     "optionsHint": "Lista de valores separados por coma (para single_select/multiselect).",
+    "optionsFromRegistry": "Opciones derivadas de la columna seleccionada (automáticas):",
+    "optionsFromSource": "Opciones cargadas dinámicamente desde {source}.",
     "translations": "Traducciones",
     "label": "Etiqueta",
     "placeholder": "Placeholder",

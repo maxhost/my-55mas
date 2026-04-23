@@ -28,6 +28,11 @@ import {
   type PersistenceType,
   type PersistenceTarget,
 } from '@/shared/lib/field-catalog/types';
+import {
+  dbColumnHasAutoOptions,
+  getStaticDbColumnOptions,
+} from '@/shared/lib/field-catalog/db-column-options';
+import { getColumnDef } from '@/shared/lib/forms/db-column-registry';
 import { saveFieldDefinition } from '../actions/save-field-definition';
 import {
   CATALOG_LOCALES,
@@ -202,14 +207,39 @@ export function FieldDefinitionSheet({
 
   // Las opciones se editan a mano solo cuando la persistencia no las resuelve
   // dinámicamente. subtype carga sus opciones del grupo referenciado;
-  // service_select las va a cargar del contexto del talent (fuera v1).
+  // service_select las trae del catálogo de servicios. db_column con registry
+  // column que tiene options/optionsSource también es auto.
   const isDynamicOptions =
     persistenceType === 'subtype' || persistenceType === 'service_select';
+  const dbColumnTarget =
+    persistenceType === 'db_column'
+      ? (target as { table?: string; column?: string } | null)
+      : null;
+  const registryAutoOptions =
+    !!(dbColumnTarget?.table && dbColumnTarget?.column) &&
+    dbColumnHasAutoOptions({
+      table: dbColumnTarget.table,
+      column: dbColumnTarget.column,
+    });
   const takesOptions =
     inputType === 'single_select' ||
     inputType === 'multiselect_checkbox' ||
     inputType === 'multiselect_dropdown';
-  const hasOptions = takesOptions && !isDynamicOptions;
+  const hasOptions =
+    takesOptions && !isDynamicOptions && !registryAutoOptions;
+
+  // Preview de las opciones del registry (solo si son estáticas).
+  const registryPreviewOptions =
+    registryAutoOptions && dbColumnTarget?.table && dbColumnTarget?.column
+      ? getStaticDbColumnOptions({
+          table: dbColumnTarget.table,
+          column: dbColumnTarget.column,
+        })
+      : null;
+  const registryPreviewSource =
+    registryAutoOptions && dbColumnTarget?.table && dbColumnTarget?.column
+      ? getColumnDef(dbColumnTarget.table, dbColumnTarget.column)?.optionsSource
+      : undefined;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -294,6 +324,30 @@ export function FieldDefinitionSheet({
                 placeholder="a, b, c"
               />
               <p className="text-muted-foreground text-xs">{t('optionsHint')}</p>
+            </div>
+          )}
+
+          {takesOptions && registryAutoOptions && (
+            <div className="rounded-md border border-dashed p-3 text-xs">
+              <p className="text-muted-foreground mb-1 font-medium">
+                {t('optionsFromRegistry')}
+              </p>
+              {registryPreviewOptions ? (
+                <div className="flex flex-wrap gap-1">
+                  {registryPreviewOptions.map((opt) => (
+                    <span
+                      key={opt}
+                      className="bg-muted rounded px-1.5 py-0.5 font-mono"
+                    >
+                      {opt}
+                    </span>
+                  ))}
+                </div>
+              ) : registryPreviewSource ? (
+                <p className="text-muted-foreground">
+                  {t('optionsFromSource', { source: registryPreviewSource })}
+                </p>
+              ) : null}
             </div>
           )}
 

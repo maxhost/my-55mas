@@ -390,6 +390,8 @@
     "persistenceTargetSurveyKey": "Chave da pergunta",
     "persistenceTargetSubtypeGroup": "Slug do grupo de subtipos",
     "optionsHint": "Lista de valores separados por vírgula (para single_select/multiselect).",
+    "optionsFromRegistry": "Opções derivadas da coluna selecionada (automáticas):",
+    "optionsFromSource": "Opções carregadas dinamicamente de {source}.",
     "translations": "Traduções",
     "label": "Etiqueta",
     "placeholder": "Placeholder",
