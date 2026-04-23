@@ -4,7 +4,12 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { DB_COLUMN_REGISTRY, getTableDef, getColumnDef } from '@/shared/lib/forms/db-column-registry';
+import {
+  DB_COLUMN_REGISTRY,
+  getTableDef,
+  getColumnDef,
+  normalizeColumnOptions,
+} from '@/shared/lib/forms/db-column-registry';
 import { getSpokenLanguageOptions } from '@/shared/lib/spoken-languages/actions';
 import type { FormField } from '@/shared/lib/forms/types';
 
@@ -92,7 +97,9 @@ export function DbColumnFieldConfig({
 
   const handleColumnChange = (column: string) => {
     const colDef = field.db_table ? getColumnDef(field.db_table, column) : undefined;
-    const options = colDef?.options ? [...colDef.options] : undefined;
+    const options = colDef?.options
+      ? normalizeColumnOptions(colDef.options).map((o) => o.value)
+      : undefined;
     onChange({
       ...field,
       db_column: column || undefined,
@@ -148,13 +155,13 @@ export function DbColumnFieldConfig({
       {columnDef?.options && columnDef.options.length > 0 && !columnDef.optionsSource && (
         <div className="space-y-1">
           <Label className="text-xs">{t('optionLabels')}</Label>
-          {columnDef.options.map((opt) => (
-            <div key={opt} className="flex items-center gap-2">
-              <span className="text-muted-foreground w-24 truncate font-mono text-xs">{opt}</span>
+          {normalizeColumnOptions(columnDef.options).map((opt) => (
+            <div key={opt.value} className="flex items-center gap-2">
+              <span className="text-muted-foreground w-24 truncate font-mono text-xs">{opt.value}</span>
               <Input
-                value={optionLabels[`${field.key}.${opt}`] ?? ''}
-                onChange={(e) => onOptionLabelChange(`${field.key}.${opt}`, e.target.value)}
-                placeholder={opt}
+                value={optionLabels[`${field.key}.${opt.value}`] ?? ''}
+                onChange={(e) => onOptionLabelChange(`${field.key}.${opt.value}`, e.target.value)}
+                placeholder={opt.value}
                 className="h-6 text-xs"
               />
             </div>

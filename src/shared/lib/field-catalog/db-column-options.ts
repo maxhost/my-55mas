@@ -1,6 +1,10 @@
-import { getColumnDef } from '@/shared/lib/forms/db-column-registry';
+import {
+  getColumnDef,
+  normalizeColumnOptions,
+} from '@/shared/lib/forms/db-column-registry';
 import type { DbColumnTarget } from './types';
 import type { Sb } from './persistence/context';
+import { lookupMessage, snakeToCamel } from './i18n-lookup';
 
 const FALLBACK_LOCALE = 'es';
 
@@ -9,13 +13,35 @@ export type DbColumnOption = {
   name: string;
 };
 
-// Resuelve las opciones de un field db_column + (single|multi)select leyendo
-// del DB_COLUMN_REGISTRY. Dos modos:
-//   - options estáticas (ej. profiles.gender → male/female/...): id === value
-//     y name === value (admin puede mapear traducciones en option_labels).
-//   - optionsSource='spoken_languages': query dinámica con fallback locale→es.
-// Retorna null si el column no aporta options (caller decide usar options
-// manuales del admin o nada).
+// Resuelve la etiqueta traducida de una opción de db_column con cadena
+// A (explícita) → B (convención) → raw value.
+// - A: la option declaró { value, labelKey } en el registry → usar ese key.
+// - B: fallback a convención "DbColumnOptions.${camelCase(column)}_${value}"
+//   — matchea las keys existentes en src/lib/i18n/messages/*.json.
+// - Raw: si ninguna resuelve, retorna el value crudo.
+function resolveOptionLabel(
+  column: string,
+  value: string,
+  explicitKey: string | undefined,
+  locale: string
+): string {
+  if (explicitKey) {
+    const hit = lookupMessage(explicitKey, locale);
+    if (hit) return hit;
+  }
+  const conventionKey = `DbColumnOptions.${snakeToCamel(column)}_${value}`;
+  const convHit = lookupMessage(conventionKey, locale);
+  if (convHit) return convHit;
+  return value;
+}
+
+// Resuelve las opciones de un field db_column + (single|multi)select.
+// Dos modos:
+//   - options (estáticas, ahora con labelKey opcional): traducidas via
+//     lookupMessage → A+B.
+//   - optionsSource='spoken_languages': query dinámica con fallback
+//     locale→es al name de cada row.
+// Retorna null si el column no aporta options.
 export async function loadDbColumnOptions(
   supabase: Sb,
   target: DbColumnTarget,
@@ -24,8 +50,12 @@ export async function loadDbColumnOptions(
   const colDef = getColumnDef(target.table, target.column);
   if (!colDef) return null;
 
-  if (colDef.options && colDef.options.length > 0) {
-    return colDef.options.map((opt) => ({ id: opt, name: opt }));
+  if (colDef.options) {
+    const normalized = normalizeColumnOptions(colDef.options);
+    return normalized.map((opt) => ({
+      id: opt.value,
+      name: resolveOptionLabel(target.column, opt.value, opt.labelKey, locale),
+    }));
   }
 
   if (colDef.optionsSource === 'spoken_languages') {
@@ -53,14 +83,13 @@ export async function loadDbColumnOptions(
 
 // Helper para el admin — sync, lee solo registry (sin DB). Si hay
 // optionsSource, retorna null (admin no puede preview sin DB). Si hay
-// static options, retorna la lista. Para UX informativa en el sheet.
+// static options, retorna solo los values crudos.
 export function getStaticDbColumnOptions(
   target: DbColumnTarget
 ): string[] | null {
   const colDef = getColumnDef(target.table, target.column);
-  if (!colDef) return null;
-  if (colDef.options && colDef.options.length > 0) return [...colDef.options];
-  return null;
+  if (!colDef?.options) return null;
+  return normalizeColumnOptions(colDef.options).map((o) => o.value);
 }
 
 export function dbColumnHasAutoOptions(target: DbColumnTarget): boolean {

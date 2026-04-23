@@ -14,12 +14,31 @@ export type InputType =
 
 export type OptionsSource = 'spoken_languages';
 
+// Shape de una opción en el registry:
+// - forma corta string: 'male' (convención camelCase `${col}_${value}` para resolver label)
+// - forma explícita {value, labelKey}: para garantizar binding al message
+export type ColumnOption = { value: string; labelKey?: string };
+
 export type ColumnDef = {
   inputType: InputType;
   labelKey: string;
-  options?: readonly string[];
+  options?: readonly string[] | readonly ColumnOption[];
   optionsSource?: OptionsSource;
 };
+
+// Normaliza ambas shapes de options a ColumnOption[] (siempre con value).
+export function normalizeColumnOptions(
+  options:
+    | readonly string[]
+    | readonly ColumnOption[]
+    | undefined
+): ColumnOption[] {
+  if (!options || options.length === 0) return [];
+  if (typeof options[0] === 'string') {
+    return (options as readonly string[]).map((value) => ({ value }));
+  }
+  return [...(options as readonly ColumnOption[])];
+}
 
 export type TableDef = {
   labelKey: string;
@@ -42,13 +61,22 @@ export const DB_COLUMN_REGISTRY: Record<string, TableDef> = {
       preferred_contact: {
         inputType: 'select',
         labelKey: 'DbColumns.preferredContact',
-        options: ['email', 'phone', 'whatsapp'],
+        options: [
+          { value: 'email', labelKey: 'DbColumnOptions.preferredContact_email' },
+          { value: 'phone', labelKey: 'DbColumnOptions.preferredContact_phone' },
+          { value: 'whatsapp', labelKey: 'DbColumnOptions.preferredContact_whatsapp' },
+        ],
       },
       birth_date: { inputType: 'date', labelKey: 'DbColumns.birthDate' },
       gender: {
         inputType: 'select',
         labelKey: 'DbColumns.gender',
-        options: ['male', 'female', 'other', 'prefer_not_to_say'],
+        options: [
+          { value: 'male', labelKey: 'DbColumnOptions.gender_male' },
+          { value: 'female', labelKey: 'DbColumnOptions.gender_female' },
+          { value: 'other', labelKey: 'DbColumnOptions.gender_other' },
+          { value: 'prefer_not_to_say', labelKey: 'DbColumnOptions.gender_prefer_not_to_say' },
+        ],
       },
       other_language: {
         inputType: 'multiselect',
@@ -64,12 +92,21 @@ export const DB_COLUMN_REGISTRY: Record<string, TableDef> = {
       preferred_payment: {
         inputType: 'select',
         labelKey: 'DbColumns.preferredPayment',
-        options: ['bank_transfer', 'cash', 'paypal'],
+        options: [
+          { value: 'bank_transfer', labelKey: 'DbColumnOptions.preferredPayment_bank_transfer' },
+          { value: 'cash', labelKey: 'DbColumnOptions.preferredPayment_cash' },
+          { value: 'paypal', labelKey: 'DbColumnOptions.preferredPayment_paypal' },
+        ],
       },
       professional_status: {
         inputType: 'select',
         labelKey: 'DbColumns.professionalStatus',
-        options: ['employed', 'retired', 'freelance', 'unemployed'],
+        options: [
+          { value: 'employed', labelKey: 'DbColumnOptions.professionalStatus_employed' },
+          { value: 'retired', labelKey: 'DbColumnOptions.professionalStatus_retired' },
+          { value: 'freelance', labelKey: 'DbColumnOptions.professionalStatus_freelance' },
+          { value: 'unemployed', labelKey: 'DbColumnOptions.professionalStatus_unemployed' },
+        ],
       },
     },
   },
