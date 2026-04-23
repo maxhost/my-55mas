@@ -18,6 +18,17 @@ type Props = {
   onSubmit?: (formData: Record<string, unknown>) => Promise<void> | void;
 };
 
+// El form es un signup wizard si tiene algún field con persistence_type='auth'
+// (el user no existe hasta que se dispare el 'register' del último step).
+function formHasAuthFields(form: ResolvedForm): boolean {
+  for (const step of form.steps) {
+    for (const field of step.fields) {
+      if (field.persistence_type === 'auth') return true;
+    }
+  }
+  return false;
+}
+
 export function RegistrationFormEmbed({
   resolvedForm,
   targetRole,
@@ -32,6 +43,8 @@ export function RegistrationFormEmbed({
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const isSignupForm = formHasAuthFields(resolvedForm);
+
   const handleRedirect = (redirectUrl?: string) => {
     if (redirectUrl) router.push(`/${currentLocale}${redirectUrl}`);
   };
@@ -43,7 +56,22 @@ export function RegistrationFormEmbed({
     setError(null);
     setIsPending(true);
     try {
-      if (meta?.action === 'register') {
+      // Signup wizard: el user no existe aún. Normalizamos:
+      // - 'submit' o 'register' en step intermedio → avanzar sin tocar server.
+      // - 'submit' o 'register' en último step → registerUser (crear auth user).
+      const shouldRegister =
+        isSignupForm && meta?.isLastStep
+          ? true
+          : meta?.action === 'register';
+      const shouldAdvanceOnly =
+        isSignupForm && !meta?.isLastStep;
+
+      if (shouldAdvanceOnly) {
+        // Ni save ni register — solo avanzar. Data queda en FormRenderer state.
+        return true;
+      }
+
+      if (shouldRegister) {
         const result = await registerUser({
           form_data: formData,
           resolved_form: resolvedForm,
@@ -59,7 +87,7 @@ export function RegistrationFormEmbed({
           return false;
         }
         toast.success(tc('savedSuccess'));
-        if (meta.isLastStep) handleRedirect(meta.redirect_url);
+        if (meta?.isLastStep) handleRedirect(meta.redirect_url);
         return true;
       }
 
