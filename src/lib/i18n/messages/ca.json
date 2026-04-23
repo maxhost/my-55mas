@@ -400,7 +400,7 @@
     "termsTosUrl": "URL de Termes i Condicions",
     "termsPrivacyUrl": "URL de Política de Privacitat",
     "termsLabelTemplate": "Text del checkbox (utilitza {tos} i {privacy} com a marcadors)",
-    "termsTemplateHint": "Ex.: \"He llegit i accepto els {tos} i la {privacy}.\"",
+    "termsTemplateHint": "Utilitza {tos} i {privacy} com a marcadors (substituïts pels enllaços). Ex.: \"He llegit i accepto els {tos} i la {privacy}.\" Si els omets, els enllaços s'afegeixen al final automàticament.",
     "termsTosLinkText": "Text de l'enllaç Termes",
     "termsPrivacyLinkText": "Text de l'enllaç Privacitat",
     "noGroups": "No hi ha grups definits.",

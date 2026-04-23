@@ -400,7 +400,7 @@
     "termsTosUrl": "URL dos Termos e Condições",
     "termsPrivacyUrl": "URL da Política de Privacidade",
     "termsLabelTemplate": "Texto do checkbox (usa {tos} e {privacy} como marcadores)",
-    "termsTemplateHint": "Ex.: \"Li e aceito os {tos} e a {privacy}.\"",
+    "termsTemplateHint": "Usa {tos} e {privacy} como marcadores (substituídos pelos links). Ex.: \"Li e aceito os {tos} e a {privacy}.\" Se omitires, os links são anexados ao final automaticamente.",
     "termsTosLinkText": "Texto do link dos Termos",
     "termsPrivacyLinkText": "Texto do link de Privacidade",
     "noGroups": "Nenhum grupo definido.",

@@ -400,7 +400,7 @@
     "termsTosUrl": "Terms of Service URL",
     "termsPrivacyUrl": "Privacy Policy URL",
     "termsLabelTemplate": "Checkbox text (use {tos} and {privacy} as placeholders)",
-    "termsTemplateHint": "E.g., \"I have read and accept the {tos} and {privacy}.\"",
+    "termsTemplateHint": "Use {tos} and {privacy} as placeholders (replaced by links). E.g.: \"I have read and accept the {tos} and {privacy}.\" If omitted, links are appended at the end automatically.",
     "termsTosLinkText": "TOS link text",
     "termsPrivacyLinkText": "Privacy link text",
     "noGroups": "No groups defined.",

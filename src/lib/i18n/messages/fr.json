@@ -400,7 +400,7 @@
     "termsTosUrl": "URL des Conditions Générales",
     "termsPrivacyUrl": "URL de la Politique de Confidentialité",
     "termsLabelTemplate": "Texte de la case (utilise {tos} et {privacy} comme marqueurs)",
-    "termsTemplateHint": "Ex. : \"J'ai lu et j'accepte les {tos} et la {privacy}.\"",
+    "termsTemplateHint": "Utilise {tos} et {privacy} comme marqueurs (remplacés par les liens). Ex. : \"J'ai lu et j'accepte les {tos} et la {privacy}.\" Si omis, les liens sont ajoutés à la fin automatiquement.",
     "termsTosLinkText": "Texte du lien CGU",
     "termsPrivacyLinkText": "Texte du lien Confidentialité",
     "noGroups": "Aucun groupe défini.",

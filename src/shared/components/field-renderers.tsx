@@ -177,20 +177,41 @@ export function renderTermsCheckbox({ field, value, onChange }: RenderProps) {
   // Split por placeholders {tos} y {privacy} manteniendo los delimitadores
   // para poder intercalar los <a> en su posición exacta dentro del texto.
   const template = field.label || '';
-  const parts = template.split(/(\{tos\}|\{privacy\})/);
-  const nodes: ReactNode[] = parts.map((part, i) => {
-    if (part === '{tos}') {
-      return renderLinkOrText(`tos-${i}`, config.tos_url, linkLabels.tos ?? '');
-    }
-    if (part === '{privacy}') {
-      return renderLinkOrText(
-        `priv-${i}`,
-        config.privacy_url,
-        linkLabels.privacy ?? ''
-      );
-    }
-    return part;
-  });
+  const hasTosPh = template.includes('{tos}');
+  const hasPrivacyPh = template.includes('{privacy}');
+
+  let nodes: ReactNode[];
+  if (hasTosPh || hasPrivacyPh) {
+    const parts = template.split(/(\{tos\}|\{privacy\})/);
+    nodes = parts.map((part, i) => {
+      if (part === '{tos}') {
+        return renderLinkOrText(`tos-${i}`, config.tos_url, linkLabels.tos ?? '');
+      }
+      if (part === '{privacy}') {
+        return renderLinkOrText(
+          `priv-${i}`,
+          config.privacy_url,
+          linkLabels.privacy ?? ''
+        );
+      }
+      return part;
+    });
+  } else {
+    // Fallback: template sin placeholders → auto-append de los links al final.
+    // Evita que un admin que olvidó los {tos}/{privacy} tenga links
+    // silenciosamente perdidos — robustez por diseño.
+    const tosNode = renderLinkOrText('tos-append', config.tos_url, linkLabels.tos ?? '');
+    const privacyNode = renderLinkOrText(
+      'priv-append',
+      config.privacy_url,
+      linkLabels.privacy ?? ''
+    );
+    nodes = [template];
+    if (tosNode) nodes.push(' ', tosNode);
+    if (tosNode && privacyNode) nodes.push(' · ');
+    else if (privacyNode) nodes.push(' ');
+    if (privacyNode) nodes.push(privacyNode);
+  }
 
   return (
     <div key={field.key} className="space-y-1">
