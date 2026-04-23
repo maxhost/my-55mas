@@ -79,15 +79,25 @@ export function renderNumber({ field, value, errorClass, onChange }: RenderProps
 }
 
 export function renderBoolean({ field, value, onChange }: RenderProps) {
+  // Mismo shell visual que renderTermsCheckbox (items-start, text-sm,
+  // mt-0.5 en el input para alinear con texto que puede wrappear).
   return (
-    <div key={field.key} className="flex items-center gap-2">
-      <input
-        type="checkbox"
-        checked={!!value}
-        onChange={(e) => onChange(field.key, e.target.checked)}
-        className="h-4 w-4"
-      />
-      <Label>{labelText(field)}</Label>
+    <div key={field.key} className="space-y-1">
+      <label className="flex items-start gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={!!value}
+          onChange={(e) => onChange(field.key, e.target.checked)}
+          className="mt-0.5 h-4 w-4"
+        />
+        <span>
+          {field.label}
+          {field.required && <span aria-hidden="true"> *</span>}
+        </span>
+      </label>
+      {field.description && (
+        <p className="text-muted-foreground text-xs">{field.description}</p>
+      )}
     </div>
   );
 }
