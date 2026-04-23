@@ -1,5 +1,9 @@
 import type { SubtypeTarget } from '../types';
-import { PersistenceError, type Sb } from './context';
+import {
+  PersistenceError,
+  resolveTalentProfileId,
+  type Sb,
+} from './context';
 
 // Resuelve slug del grupo → lista de subtype_ids que pertenecen al grupo.
 async function loadGroupSubtypeIds(
@@ -41,12 +45,14 @@ export async function readSubtype(
   userId: string,
   target: SubtypeTarget
 ): Promise<string[]> {
+  const talentId = await resolveTalentProfileId(supabase, userId);
+  if (!talentId) return [];
   const groupSubtypeIds = await loadGroupSubtypeIds(supabase, target.subtype_group);
   if (groupSubtypeIds.length === 0) return [];
   const { data, error } = await supabase
     .from('talent_service_subtypes')
     .select('subtype_id')
-    .eq('talent_id', userId)
+    .eq('talent_id', talentId)
     .in('subtype_id', groupSubtypeIds);
   if (error) {
     throw new PersistenceError(
@@ -59,18 +65,27 @@ export async function readSubtype(
 
 // Sync dentro del grupo: delete solo subtypes del grupo + insert nuevos.
 // Otros grupos (del mismo talent) quedan intactos.
+// talent_service_subtypes.talent_id FK apunta a talent_profiles.id, no a
+// auth.users.id — resolvemos talent_profiles.id antes de escribir.
 export async function writeSubtype(
   supabase: Sb,
   userId: string,
   subtypeIds: string[],
   target: SubtypeTarget
 ): Promise<void> {
+  const talentId = await resolveTalentProfileId(supabase, userId);
+  if (!talentId) {
+    throw new PersistenceError(
+      `subtype write requires talent_profiles row for user ${userId}`,
+      'missing_context'
+    );
+  }
   const groupSubtypeIds = await loadGroupSubtypeIds(supabase, target.subtype_group);
   if (groupSubtypeIds.length > 0) {
     const { error: delError } = await supabase
       .from('talent_service_subtypes')
       .delete()
-      .eq('talent_id', userId)
+      .eq('talent_id', talentId)
       .in('subtype_id', groupSubtypeIds);
     if (delError) {
       throw new PersistenceError(
@@ -80,7 +95,10 @@ export async function writeSubtype(
     }
   }
   if (subtypeIds.length === 0) return;
-  const rows = subtypeIds.map((subtype_id) => ({ talent_id: userId, subtype_id }));
+  const rows = subtypeIds.map((subtype_id) => ({
+    talent_id: talentId,
+    subtype_id,
+  }));
   const { error: insError } = await supabase
     .from('talent_service_subtypes')
     .insert(rows);

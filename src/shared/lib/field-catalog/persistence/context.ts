@@ -31,3 +31,24 @@ export type UserOwnedTable = keyof typeof USER_OWNED_DB_COLUMN_TABLES;
 export function isUserOwnedTable(table: string): table is UserOwnedTable {
   return table in USER_OWNED_DB_COLUMN_TABLES;
 }
+
+// service_select y subtype escriben a tablas cuyo FK es talent_profiles.id
+// (NO auth.users.id). Este helper resuelve el talent_profiles.id desde el
+// userId (auth.users.id). Retorna null si el user no tiene talent_profiles.
+export async function resolveTalentProfileId(
+  supabase: Sb,
+  userId: string
+): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('talent_profiles')
+    .select('id')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error) {
+    throw new PersistenceError(
+      `read talent_profiles failed: ${error.message}`,
+      'read_failed'
+    );
+  }
+  return data?.id ?? null;
+}

@@ -67,12 +67,18 @@ export async function registerUser(input: RegisterInput) {
     .update({ preferred_locale: locale })
     .eq('id', userId);
 
-  // Phase 3 — persist remaining fields (db_column, form_response, survey, etc.)
+  // Phase 3 — persist remaining fields (db_column, form_response, survey,
+  // service_select, subtype). service_select/subtype necesitan contexto:
+  // country_id explícito. Si el form no tiene esos fields el context se
+  // ignora — agregarlo siempre si hay country_id es seguro.
   const rest = await persistFormData({
     supabase,
     userId,
     fields: nonAuthFields,
     formData: form_data,
+    context: country_id
+      ? { serviceSelect: { country_id } }
+      : undefined,
   });
   if (!rest.ok) {
     return { error: { _db: rest.errors.map((e) => e.message) } };
