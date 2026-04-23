@@ -407,6 +407,7 @@
       "duplicateKey": "Ja existeix un camp amb aquesta clau.",
       "groupNotFound": "Grup no trobat.",
       "missingLabel": "L'etiqueta és obligatòria.",
+      "missingContent": "El contingut (description en ES) és obligatori per a display_text.",
       "missingTranslation": "Falten traduccions en un o més idiomes.",
       "invalidSlug": "Slug no vàlid.",
       "invalidKey": "Clau no vàlida.",

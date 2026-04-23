@@ -53,20 +53,20 @@ export function FieldTranslationTabs({
         {CATALOG_LOCALES.map((l) => (
           <TabsContent key={l} value={l} className="space-y-2 pt-2">
             {isDisplayText ? (
-              // Modo display_text: description es el contenido principal
-              // (textarea grande). Label queda como título opcional.
+              // Modo display_text: description es el contenido (requerido en ES);
+              // label queda como título realmente opcional.
               <>
                 <Textarea
                   rows={6}
                   value={translations[l].description}
                   onChange={(e) => setField(l, 'description', e.target.value)}
                   placeholder={t('displayTextBody')}
+                  required={l === 'es'}
                 />
                 <Input
                   value={translations[l].label}
                   onChange={(e) => setField(l, 'label', e.target.value)}
                   placeholder={t('displayTextTitle')}
-                  required={l === 'es'}
                 />
               </>
             ) : (

@@ -180,4 +180,33 @@ describe('fieldDefinitionInputSchema — discriminated union', () => {
     });
     expect(result.success).toBe(true);
   });
+
+  // display_text: description reemplaza a label como el campo requerido en ES.
+  it('accepts display_text with empty label when es.description is set', () => {
+    const result = fieldDefinitionInputSchema.safeParse({
+      ...baseDefinition,
+      input_type: 'display_text',
+      persistence_type: 'none',
+      persistence_target: null,
+      translations: {
+        ...fullFieldTranslations,
+        es: { ...emptyFieldTrEntry, label: '', description: 'Texto legal...' },
+      },
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects display_text when es.description is empty', () => {
+    const result = fieldDefinitionInputSchema.safeParse({
+      ...baseDefinition,
+      input_type: 'display_text',
+      persistence_type: 'none',
+      persistence_target: null,
+      translations: {
+        ...fullFieldTranslations,
+        es: { ...emptyFieldTrEntry, label: 'Solo título', description: '' },
+      },
+    });
+    expect(result.success).toBe(false);
+  });
 });

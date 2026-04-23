@@ -407,6 +407,7 @@
       "duplicateKey": "A field with that key already exists.",
       "groupNotFound": "Group not found.",
       "missingLabel": "Label is required.",
+      "missingContent": "Content (ES description) is required for display_text.",
       "missingTranslation": "Missing translations in one or more languages.",
       "invalidSlug": "Invalid slug.",
       "invalidKey": "Invalid key.",

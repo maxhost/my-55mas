@@ -312,6 +312,7 @@ function mapErrorKey(error: string): string {
   if (error === 'duplicateKey') return 'duplicateKey';
   if (error === 'groupNotFound') return 'groupNotFound';
   if (error.includes('invalidKey') || error.includes('key:')) return 'invalidKey';
+  if (error.includes('missingContent')) return 'missingContent';
   if (error.includes('missingLabel') || error.includes('translations'))
     return 'missingLabel';
   return 'saveFailed';

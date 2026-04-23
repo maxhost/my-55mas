@@ -20,12 +20,10 @@ const groupTranslationsShape = CATALOG_LOCALES.reduce(
 );
 export const groupTranslationsSchema = z.object(groupTranslationsShape);
 
-const fieldTranslationEntryWithLabelSchema = z.object({
-  label: z.string().min(1, 'missingLabel'),
-  placeholder: z.string(),
-  description: z.string(),
-  option_labels: z.record(z.string(), z.string()).nullable(),
-});
+// Todas las entries son opcionales a nivel estructural. La regla "ES debe
+// tener contenido" se aplica al final del discriminated union con un
+// superRefine que conoce el input_type (display_text exige description,
+// el resto exige label).
 const fieldTranslationEntryOptionalSchema = z.object({
   label: z.string(),
   placeholder: z.string(),
@@ -35,15 +33,12 @@ const fieldTranslationEntryOptionalSchema = z.object({
 
 const fieldTranslationsShape = CATALOG_LOCALES.reduce(
   (acc, locale) => {
-    acc[locale] =
-      locale === 'es'
-        ? fieldTranslationEntryWithLabelSchema
-        : fieldTranslationEntryOptionalSchema;
+    acc[locale] = fieldTranslationEntryOptionalSchema;
     return acc;
   },
   {} as Record<
     (typeof CATALOG_LOCALES)[number],
-    typeof fieldTranslationEntryWithLabelSchema
+    typeof fieldTranslationEntryOptionalSchema
   >
 );
 export const fieldTranslationsSchema = z.object(fieldTranslationsShape);
@@ -90,9 +85,8 @@ const commonDefinitionFields = {
   translations: fieldTranslationsSchema,
 };
 
-export const fieldDefinitionInputSchema = z.discriminatedUnion(
-  'persistence_type',
-  [
+export const fieldDefinitionInputSchema = z
+  .discriminatedUnion('persistence_type', [
     z.object({
       ...commonDefinitionFields,
       persistence_type: z.literal('db_column'),
@@ -128,8 +122,29 @@ export const fieldDefinitionInputSchema = z.discriminatedUnion(
       persistence_type: z.literal('none'),
       persistence_target: z.null(),
     }),
-  ]
-);
+  ])
+  .superRefine((data, ctx) => {
+    // ES es fallback obligatorio. Qué campo ES es obligatorio depende del
+    // input_type: display_text → description (es el contenido), resto → label.
+    const es = data.translations.es;
+    if (data.input_type === 'display_text') {
+      if (!es.description || es.description.trim() === '') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['translations', 'es', 'description'],
+          message: 'missingContent',
+        });
+      }
+    } else {
+      if (!es.label || es.label.trim() === '') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['translations', 'es', 'label'],
+          message: 'missingLabel',
+        });
+      }
+    }
+  });
 
 // ── Public sentinels ────────────────────────────────
 

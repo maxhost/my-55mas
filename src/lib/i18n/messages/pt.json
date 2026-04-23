@@ -407,6 +407,7 @@
       "duplicateKey": "Já existe um campo com essa chave.",
       "groupNotFound": "Grupo não encontrado.",
       "missingLabel": "A etiqueta é obrigatória.",
+      "missingContent": "O conteúdo (description em ES) é obrigatório para display_text.",
       "missingTranslation": "Faltam traduções em um ou mais idiomas.",
       "invalidSlug": "Slug inválido.",
       "invalidKey": "Chave inválida.",
