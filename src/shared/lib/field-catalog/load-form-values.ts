@@ -16,13 +16,16 @@ export type LoadedValues = Record<string, unknown>;
 
 // Lee valores actuales del usuario por field_definition_id.
 // Despacha según persistence_type al adapter correspondiente.
-// Auth siempre retorna undefined (nunca pre-fill — ver auth.ts).
+// Auth retorna el email del user actual (vía session) si hay userId;
+// undefined en contextos de signup.
 export async function loadFormValues(
   supabase: Sb,
   userId: string | null,
   fields: ResolvedField[]
 ): Promise<LoadedValues> {
-  if (!userId) return {};
+  // Nota: antes retornábamos {} si userId null. Ahora permitimos que los
+  // adapters decidan (auth en signup flow SÍ es consultado y retorna
+  // undefined limpio).
   const entries = await Promise.all(
     fields.map(async (field): Promise<[string, unknown]> => {
       const value = await readOne(supabase, userId, field);
@@ -34,21 +37,26 @@ export async function loadFormValues(
 
 async function readOne(
   supabase: Sb,
-  userId: string,
+  userId: string | null,
   field: ResolvedField
 ): Promise<unknown> {
   switch (field.persistence_type) {
     case 'db_column':
+      if (!userId) return undefined;
       return readDbColumn(supabase, userId, field.persistence_target as DbColumnTarget);
     case 'auth':
-      return readAuth();
+      return readAuth(supabase, userId);
     case 'form_response':
+      if (!userId) return undefined;
       return readFormResponse(supabase, userId, field.field_definition_id);
     case 'survey':
+      if (!userId) return undefined;
       return readSurvey(supabase, userId, field.persistence_target as SurveyTarget);
     case 'service_select':
+      if (!userId) return undefined;
       return readServiceSelect(supabase, userId);
     case 'subtype':
+      if (!userId) return undefined;
       return readSubtype(supabase, userId, field.persistence_target as SubtypeTarget);
     case 'none':
       return undefined;

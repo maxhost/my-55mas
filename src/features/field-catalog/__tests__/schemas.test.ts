@@ -258,4 +258,49 @@ describe('fieldDefinitionInputSchema — discriminated union', () => {
     });
     expect(result.success).toBe(false);
   });
+
+  // config.allow_change: solo válido en email + auth
+  it('accepts config.allow_change=true for email + auth', () => {
+    const result = fieldDefinitionInputSchema.safeParse({
+      ...baseDefinition,
+      input_type: 'email',
+      persistence_type: 'auth',
+      persistence_target: { auth_field: 'email' },
+      config: { allow_change: true },
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts config.allow_change=false for any input_type', () => {
+    const result = fieldDefinitionInputSchema.safeParse({
+      ...baseDefinition,
+      input_type: 'text',
+      persistence_type: 'form_response',
+      persistence_target: null,
+      config: { allow_change: false },
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects config.allow_change=true on non-email auth field', () => {
+    const result = fieldDefinitionInputSchema.safeParse({
+      ...baseDefinition,
+      input_type: 'text',
+      persistence_type: 'form_response',
+      persistence_target: null,
+      config: { allow_change: true },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects config.allow_change with non-boolean value', () => {
+    const result = fieldDefinitionInputSchema.safeParse({
+      ...baseDefinition,
+      input_type: 'email',
+      persistence_type: 'auth',
+      persistence_target: { auth_field: 'email' },
+      config: { allow_change: 'yes' },
+    });
+    expect(result.success).toBe(false);
+  });
 });

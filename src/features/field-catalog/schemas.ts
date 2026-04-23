@@ -181,6 +181,30 @@ export const fieldDefinitionInputSchema = z
         });
       }
     }
+
+    // config.allow_change sólo tiene sentido en email + auth (dispara
+    // supabase.auth.updateUser). Rechazamos valores seteados fuera de ese
+    // combo para evitar configuraciones confusas o silent no-ops.
+    if (data.config && 'allow_change' in data.config) {
+      const allowChange = (data.config as { allow_change?: unknown })
+        .allow_change;
+      if (typeof allowChange !== 'boolean') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['config', 'allow_change'],
+          message: 'invalidAllowChange',
+        });
+      } else if (
+        allowChange === true &&
+        !(data.input_type === 'email' && data.persistence_type === 'auth')
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['config', 'allow_change'],
+          message: 'allowChangeOnlyForEmailAuth',
+        });
+      }
+    }
   });
 
 // ── Public sentinels ────────────────────────────────

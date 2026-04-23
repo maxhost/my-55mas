@@ -7,6 +7,7 @@ import type {
 } from './types';
 import { writeDbColumn } from './persistence/db-column';
 import {
+  readAuth as readAuthEmail,
   writeAuth,
   type AuthFields,
   type AuthSignUpOptions,
@@ -54,12 +55,28 @@ export async function persistFormData(
   let userId = input.userId;
   if (authFields.length > 0) {
     const collected = collectAuthFields(authFields, formData);
+    // En edit flow (userId presente) leemos el email actual una vez para
+    // que writeAuth pueda detectar cambios sin otra round-trip.
+    const currentEmail = userId
+      ? await readAuthEmail(supabase, userId)
+      : null;
+    // allow_change por field — sólo aplicable al email auth field.
+    // Tomamos el primer email field (solo debería haber uno).
+    const emailField = authFields.find((f) => {
+      const target = f.persistence_target as { auth_field?: string } | null;
+      return target?.auth_field === 'email';
+    });
+    const allowChange = Boolean(
+      (emailField?.config as { allow_change?: boolean } | null | undefined)
+        ?.allow_change
+    );
     try {
-      const result = await writeAuth(
-        supabase,
-        collected,
-        context?.authSignUpOptions
-      );
+      const result = await writeAuth(supabase, collected, {
+        signUp: context?.authSignUpOptions,
+        currentUserId: userId,
+        currentEmail,
+        allowChange,
+      });
       userId = result.userId;
     } catch (err) {
       return { ok: false, errors: [{ message: errMsg(err) }] };
