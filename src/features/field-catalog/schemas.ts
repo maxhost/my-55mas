@@ -80,6 +80,7 @@ const commonDefinitionFields = {
   input_type: z.enum(INPUT_TYPES),
   options: z.array(z.string()).nullable(),
   options_source: z.string().nullable(),
+  config: z.record(z.string(), z.unknown()).nullable(),
   sort_order: z.number().int().min(0),
   is_active: z.boolean(),
   translations: fieldTranslationsSchema,
@@ -141,6 +142,42 @@ export const fieldDefinitionInputSchema = z
           code: z.ZodIssueCode.custom,
           path: ['translations', 'es', 'label'],
           message: 'missingLabel',
+        });
+      }
+    }
+
+    // terms_checkbox: config.tos_url y/o config.privacy_url deben ser
+    // URLs válidas si están presentes. Al menos una es obligatoria (sin
+    // URLs el field no tiene sentido — es un checkbox legal sin enlaces).
+    if (data.input_type === 'terms_checkbox') {
+      const cfg = (data.config ?? {}) as {
+        tos_url?: unknown;
+        privacy_url?: unknown;
+      };
+      const tos =
+        typeof cfg.tos_url === 'string' ? cfg.tos_url.trim() : '';
+      const privacy =
+        typeof cfg.privacy_url === 'string' ? cfg.privacy_url.trim() : '';
+      if (!tos && !privacy) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['config'],
+          message: 'missingTermsUrls',
+        });
+      }
+      const urlRegex = /^https?:\/\/.+/i;
+      if (tos && !urlRegex.test(tos)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['config', 'tos_url'],
+          message: 'invalidUrl',
+        });
+      }
+      if (privacy && !urlRegex.test(privacy)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['config', 'privacy_url'],
+          message: 'invalidUrl',
         });
       }
     }

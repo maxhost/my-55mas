@@ -43,6 +43,7 @@ export type FieldDefinitionInput = {
   persistence_target: PersistenceTarget;
   options: string[] | null;
   options_source: string | null;
+  config: Record<string, unknown> | null;
   sort_order: number;
   is_active: boolean;
   translations: FieldTranslations;

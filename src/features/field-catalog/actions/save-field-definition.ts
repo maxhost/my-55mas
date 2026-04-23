@@ -61,6 +61,7 @@ export async function saveFieldDefinition(
     persistence_target: def.persistence_target as Json,
     options: def.options as Json,
     options_source: def.options_source,
+    config: (def.config ?? null) as Json,
     sort_order: def.sort_order,
     is_active: def.is_active,
   };

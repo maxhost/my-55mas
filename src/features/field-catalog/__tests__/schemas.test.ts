@@ -39,6 +39,7 @@ const baseDefinition = {
   group_id: '11111111-1111-1111-1111-111111111111',
   key: 'phone',
   input_type: 'text' as const,
+  config: null,
   options: null,
   options_source: null,
   sort_order: 0,
@@ -206,6 +207,54 @@ describe('fieldDefinitionInputSchema — discriminated union', () => {
         ...fullFieldTranslations,
         es: { ...emptyFieldTrEntry, label: 'Solo título', description: '' },
       },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  // terms_checkbox: al menos una URL + URLs válidas
+  it('accepts terms_checkbox with only tos_url', () => {
+    const result = fieldDefinitionInputSchema.safeParse({
+      ...baseDefinition,
+      input_type: 'terms_checkbox',
+      persistence_type: 'form_response',
+      persistence_target: null,
+      config: { tos_url: 'https://example.com/tos' },
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts terms_checkbox with both urls', () => {
+    const result = fieldDefinitionInputSchema.safeParse({
+      ...baseDefinition,
+      input_type: 'terms_checkbox',
+      persistence_type: 'form_response',
+      persistence_target: null,
+      config: {
+        tos_url: 'https://example.com/tos',
+        privacy_url: 'https://example.com/privacy',
+      },
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects terms_checkbox without any url', () => {
+    const result = fieldDefinitionInputSchema.safeParse({
+      ...baseDefinition,
+      input_type: 'terms_checkbox',
+      persistence_type: 'form_response',
+      persistence_target: null,
+      config: {},
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects terms_checkbox with invalid url scheme', () => {
+    const result = fieldDefinitionInputSchema.safeParse({
+      ...baseDefinition,
+      input_type: 'terms_checkbox',
+      persistence_type: 'form_response',
+      persistence_target: null,
+      config: { tos_url: 'ftp://example.com/tos' },
     });
     expect(result.success).toBe(false);
   });

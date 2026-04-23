@@ -95,6 +95,8 @@ export function FieldDefinitionSheet({
     useState<PersistenceType>('form_response');
   const [target, setTarget] = useState<PersistenceTarget>(null);
   const [optionsText, setOptionsText] = useState('');
+  const [tosUrl, setTosUrl] = useState('');
+  const [privacyUrl, setPrivacyUrl] = useState('');
   const [sortOrder, setSortOrder] = useState(0);
   const [isActive, setIsActive] = useState(true);
   const [translations, setTranslations] = useState<FieldTranslations>(
@@ -110,6 +112,12 @@ export function FieldDefinitionSheet({
     setPersistenceType(pt);
     setTarget(field?.persistence_target ?? defaultTarget(pt));
     setOptionsText(field?.options?.join(', ') ?? '');
+    const cfg = (field?.config ?? {}) as {
+      tos_url?: string;
+      privacy_url?: string;
+    };
+    setTosUrl(typeof cfg.tos_url === 'string' ? cfg.tos_url : '');
+    setPrivacyUrl(typeof cfg.privacy_url === 'string' ? cfg.privacy_url : '');
     setSortOrder(field?.sort_order ?? 0);
     setIsActive(field?.is_active ?? true);
     setTranslations(field?.translations ?? emptyTranslations());
@@ -127,6 +135,12 @@ export function FieldDefinitionSheet({
     if (next === 'display_text') {
       setPersistenceType('none');
       setTarget(null);
+    } else if (next === 'terms_checkbox') {
+      // terms_checkbox persiste un boolean; default sensato es form_response.
+      if (persistenceType === 'none') {
+        setPersistenceType('form_response');
+        setTarget(null);
+      }
     } else if (persistenceType === 'none') {
       // Si venían de display_text y cambian a otro input_type, reseteamos
       // a un persistence sensato.
@@ -147,6 +161,15 @@ export function FieldDefinitionSheet({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    // config se persiste solo si el input_type lo usa (terms_checkbox).
+    let config: Record<string, unknown> | null = null;
+    if (inputType === 'terms_checkbox') {
+      const cfg: Record<string, unknown> = {};
+      if (tosUrl.trim()) cfg.tos_url = tosUrl.trim();
+      if (privacyUrl.trim()) cfg.privacy_url = privacyUrl.trim();
+      config = cfg;
+    }
+
     const input = {
       id: field?.id ?? null,
       group_id: groupId,
@@ -156,6 +179,7 @@ export function FieldDefinitionSheet({
       persistence_target: target,
       options: parseOptions(),
       options_source: null,
+      config,
       sort_order: sortOrder,
       is_active: isActive,
       translations,
@@ -273,10 +297,37 @@ export function FieldDefinitionSheet({
             </div>
           )}
 
+          {inputType === 'terms_checkbox' && (
+            <div className="space-y-3 rounded-md border border-dashed p-3">
+              <p className="text-muted-foreground text-xs">
+                {t('termsConfigHint')}
+              </p>
+              <div className="space-y-2">
+                <Label>{t('termsTosUrl')}</Label>
+                <Input
+                  type="url"
+                  value={tosUrl}
+                  onChange={(e) => setTosUrl(e.target.value)}
+                  placeholder="https://..."
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>{t('termsPrivacyUrl')}</Label>
+                <Input
+                  type="url"
+                  value={privacyUrl}
+                  onChange={(e) => setPrivacyUrl(e.target.value)}
+                  placeholder="https://..."
+                />
+              </div>
+            </div>
+          )}
+
           <FieldTranslationTabs
             translations={translations}
             onChange={setTranslations}
             isDisplayText={inputType === 'display_text'}
+            isTermsCheckbox={inputType === 'terms_checkbox'}
           />
 
           <div className="space-y-2">
@@ -313,6 +364,8 @@ function mapErrorKey(error: string): string {
   if (error === 'groupNotFound') return 'groupNotFound';
   if (error.includes('invalidKey') || error.includes('key:')) return 'invalidKey';
   if (error.includes('missingContent')) return 'missingContent';
+  if (error.includes('missingTermsUrls')) return 'missingTermsUrls';
+  if (error.includes('invalidUrl')) return 'invalidUrl';
   if (error.includes('missingLabel') || error.includes('translations'))
     return 'missingLabel';
   return 'saveFailed';

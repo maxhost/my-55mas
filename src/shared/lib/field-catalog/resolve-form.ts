@@ -165,7 +165,7 @@ async function loadDefinitions(
   const { data, error } = await supabase
     .from('form_field_definitions')
     .select(
-      'id, group_id, key, input_type, persistence_type, persistence_target, options, options_source, sort_order, is_active'
+      'id, group_id, key, input_type, persistence_type, persistence_target, options, options_source, config, sort_order, is_active'
     )
     .in('id', fieldIds);
   if (error) throw new Error(`load definitions: ${error.message}`);
@@ -178,6 +178,7 @@ async function loadDefinitions(
     persistence_target: row.persistence_target as PersistenceTarget,
     options: row.options as string[] | null,
     options_source: row.options_source,
+    config: row.config as Record<string, unknown> | null,
     sort_order: row.sort_order,
     is_active: row.is_active,
   }));
@@ -279,6 +280,7 @@ function buildResolvedField(
     options: def.options,
     options_source: def.options_source,
     option_labels: tr?.option_labels ?? undefined,
+    config: def.config,
   };
 }
 

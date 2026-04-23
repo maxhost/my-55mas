@@ -1,4 +1,9 @@
-import type { InputType, PersistenceType, PersistenceTarget } from './types';
+import type {
+  FieldConfig,
+  InputType,
+  PersistenceType,
+  PersistenceTarget,
+} from './types';
 import type { StepActionType } from '@/shared/lib/forms/types';
 
 // ── Resolved Field (ready for rendering) ─────────────
@@ -20,6 +25,7 @@ export type ResolvedField = {
   options: string[] | null;
   options_source: string | null;
   option_labels?: Record<string, string>;
+  config?: FieldConfig | null;
   current_value?: unknown;
 };
 

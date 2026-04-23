@@ -58,7 +58,7 @@ export async function listFieldCatalog(): Promise<ListFieldCatalogResult> {
   const { data: defs, error: dErr } = await supabase
     .from('form_field_definitions')
     .select(
-      'id, group_id, key, input_type, persistence_type, persistence_target, options, options_source, sort_order, is_active, form_field_definition_translations(locale, label, placeholder, description, option_labels)'
+      'id, group_id, key, input_type, persistence_type, persistence_target, options, options_source, config, sort_order, is_active, form_field_definition_translations(locale, label, placeholder, description, option_labels)'
     )
     .order('sort_order', { ascending: true });
   if (dErr) return { ok: false, error: dErr.message };
@@ -94,6 +94,7 @@ export async function listFieldCatalog(): Promise<ListFieldCatalogResult> {
       persistence_target: def.persistence_target as PersistenceTarget,
       options: def.options as string[] | null,
       options_source: def.options_source,
+      config: def.config as Record<string, unknown> | null,
       sort_order: def.sort_order,
       is_active: def.is_active,
       translations,

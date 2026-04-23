@@ -18,12 +18,16 @@ type Props = {
   // display_text usa description como contenido principal — el tab se
   // reordena (description primero, label opcional como título).
   isDisplayText?: boolean;
+  // terms_checkbox usa label como template con placeholders {tos}/{privacy}
+  // y option_labels { tos, privacy } para los textos de los links.
+  isTermsCheckbox?: boolean;
 };
 
 export function FieldTranslationTabs({
   translations,
   onChange,
   isDisplayText,
+  isTermsCheckbox,
 }: Props) {
   const t = useTranslations('AdminFieldCatalog');
 
@@ -35,6 +39,24 @@ export function FieldTranslationTabs({
     onChange({
       ...translations,
       [locale]: { ...translations[locale], [key]: value },
+    });
+  };
+
+  const setLinkLabel = (
+    locale: CatalogLocale,
+    linkKey: 'tos' | 'privacy',
+    value: string
+  ) => {
+    const current = translations[locale].option_labels ?? {};
+    const next: Record<string, string> = { ...current };
+    if (value) next[linkKey] = value;
+    else delete next[linkKey];
+    onChange({
+      ...translations,
+      [locale]: {
+        ...translations[locale],
+        option_labels: Object.keys(next).length > 0 ? next : null,
+      },
     });
   };
 
@@ -52,7 +74,34 @@ export function FieldTranslationTabs({
         </TabsList>
         {CATALOG_LOCALES.map((l) => (
           <TabsContent key={l} value={l} className="space-y-2 pt-2">
-            {isDisplayText ? (
+            {isTermsCheckbox ? (
+              // Modo terms_checkbox: label es el template (con {tos}/{privacy});
+              // option_labels.{tos,privacy} son los textos de cada link.
+              <>
+                <Textarea
+                  rows={3}
+                  value={translations[l].label}
+                  onChange={(e) => setField(l, 'label', e.target.value)}
+                  placeholder={t('termsLabelTemplate')}
+                  required={l === 'es'}
+                />
+                <p className="text-muted-foreground text-xs">
+                  {t('termsTemplateHint')}
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input
+                    value={translations[l].option_labels?.tos ?? ''}
+                    onChange={(e) => setLinkLabel(l, 'tos', e.target.value)}
+                    placeholder={t('termsTosLinkText')}
+                  />
+                  <Input
+                    value={translations[l].option_labels?.privacy ?? ''}
+                    onChange={(e) => setLinkLabel(l, 'privacy', e.target.value)}
+                    placeholder={t('termsPrivacyLinkText')}
+                  />
+                </div>
+              </>
+            ) : isDisplayText ? (
               // Modo display_text: description es el contenido (requerido en ES);
               // label queda como título realmente opcional.
               <>

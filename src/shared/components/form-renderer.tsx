@@ -43,6 +43,8 @@ function buildInitialData(form: ResolvedForm): Record<string, unknown> {
 
 function isRequiredEmpty(field: ResolvedField, value: unknown): boolean {
   if (!field.required) return false;
+  // terms_checkbox: "no aceptado" (undefined, false) bloquea. Solo true vale.
+  if (field.input_type === 'terms_checkbox') return value !== true;
   if (value === undefined || value === null || value === '') return true;
   if (Array.isArray(value) && value.length === 0) return true;
   return false;

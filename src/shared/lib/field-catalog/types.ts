@@ -13,6 +13,7 @@ export const INPUT_TYPES = [
   'multiselect_dropdown',
   'address',
   'display_text',
+  'terms_checkbox',
 ] as const;
 
 export type InputType = (typeof INPUT_TYPES)[number];
@@ -78,6 +79,16 @@ export type FieldGroupWithTranslations = FieldGroup & {
 
 // ── Field Definition ─────────────────────────────────
 
+// Configuración específica por input_type (no traducible). Nulo para la
+// mayoría; usado por terms_checkbox con { tos_url, privacy_url } y futuros
+// input types que necesiten settings globales al field.
+export type FieldConfig = Record<string, unknown>;
+
+export type TermsCheckboxConfig = {
+  tos_url?: string;
+  privacy_url?: string;
+};
+
 export type FieldDefinition = {
   id: string;
   group_id: string;
@@ -87,6 +98,7 @@ export type FieldDefinition = {
   persistence_target: PersistenceTarget;
   options: string[] | null;
   options_source: string | null;
+  config: FieldConfig | null;
   sort_order: number;
   is_active: boolean;
 };

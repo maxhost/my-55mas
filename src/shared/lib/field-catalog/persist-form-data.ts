@@ -95,6 +95,14 @@ function validateRequired(
     // display_text / persistence_type='none' no tienen valor que validar.
     if (field.persistence_type === 'none') continue;
     const value = formData[field.key];
+    // terms_checkbox exige exactamente true — truthy no alcanza (false es
+    // "no acepto" y debe bloquear el submit).
+    if (field.input_type === 'terms_checkbox') {
+      if (value !== true) {
+        errors.push({ field: field.key, message: 'termsNotAccepted' });
+      }
+      continue;
+    }
     if (value === undefined || value === null || value === '') {
       errors.push({ field: field.key, message: 'required' });
     }

@@ -361,6 +361,7 @@ export type Database = {
       }
       form_field_definitions: {
         Row: {
+          config: Json | null
           created_at: string | null
           group_id: string
           id: string
@@ -375,6 +376,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          config?: Json | null
           created_at?: string | null
           group_id: string
           id?: string
@@ -389,6 +391,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          config?: Json | null
           created_at?: string | null
           group_id?: string
           id?: string
