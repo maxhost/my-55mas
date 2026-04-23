@@ -43,6 +43,10 @@ function buildInitialData(form: ResolvedForm): Record<string, unknown> {
 
 function isRequiredEmpty(field: ResolvedField, value: unknown): boolean {
   if (!field.required) return false;
+  // Fields presentacionales (display_text, persistence='none') no capturan
+  // valor — required en ellos es un no-op. Coherente con validateRequired
+  // del server (persist-form-data).
+  if (field.persistence_type === 'none') return false;
   // terms_checkbox: "no aceptado" (undefined, false) bloquea. Solo true vale.
   if (field.input_type === 'terms_checkbox') return value !== true;
   if (value === undefined || value === null || value === '') return true;
