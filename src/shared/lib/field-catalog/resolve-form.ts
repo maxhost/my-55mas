@@ -16,6 +16,7 @@ import type { StepAction } from '@/shared/lib/forms/types';
 import { loadFormValues } from './load-form-values';
 import type { Sb } from './persistence/context';
 import { loadSubtypeOptionsForGroup } from './subtype-groups';
+import { loadPublishedServicesForLocale } from './service-options';
 import type { SubtypeTarget } from './types';
 
 const FALLBACK_LOCALE = 'es';
@@ -57,7 +58,10 @@ export async function resolveForm(input: ResolveFormInput): Promise<ResolvedForm
     locale
   );
 
-  await applySubtypeOptions(supabase, resolvedFields, locale);
+  await Promise.all([
+    applySubtypeOptions(supabase, resolvedFields, locale),
+    applyServiceSelectOptions(supabase, resolvedFields, locale),
+  ]);
 
   const currentValues = await loadFormValues(supabase, userId, resolvedFields);
   applyCurrentValues(resolvedFields, currentValues);
@@ -123,6 +127,31 @@ async function applySubtypeOptions(
     if (!entry) continue;
     f.options = entry.ids;
     f.option_labels = { ...(f.option_labels ?? {}), ...entry.labels };
+  }
+}
+
+// Para fields con persistence_type='service_select' las options son todos
+// los servicios published (sin filtro de país — matchea el legacy
+// getServiceOptionsForForm). Carga única por resolveForm y se inyecta a
+// todos los fields service_select presentes en el schema.
+async function applyServiceSelectOptions(
+  supabase: Sb,
+  fields: ResolvedField[],
+  locale: string
+): Promise<void> {
+  const hasServiceSelect = fields.some(
+    (f) => f.persistence_type === 'service_select'
+  );
+  if (!hasServiceSelect) return;
+  const services = await loadPublishedServicesForLocale(supabase, locale);
+  const ids = services.map((s) => s.id);
+  const labels: Record<string, string> = {};
+  for (const s of services) labels[s.id] = s.name;
+
+  for (const f of fields) {
+    if (f.persistence_type !== 'service_select') continue;
+    f.options = ids;
+    f.option_labels = { ...(f.option_labels ?? {}), ...labels };
   }
 }
 
