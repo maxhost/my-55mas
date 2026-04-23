@@ -394,6 +394,8 @@
     "label": "Etiqueta",
     "placeholder": "Placeholder",
     "descriptionLabel": "Descripció",
+    "displayTextBody": "Text informatiu a mostrar a l'usuari",
+    "displayTextTitle": "Títol (opcional)",
     "noGroups": "No hi ha grups definits.",
     "noFields": "Sense camps en aquest grup.",
     "toggleOn": "Activar",

@@ -394,6 +394,8 @@
     "label": "Etiqueta",
     "placeholder": "Placeholder",
     "descriptionLabel": "Descripción",
+    "displayTextBody": "Texto informativo a mostrar al usuario",
+    "displayTextTitle": "Título (opcional)",
     "noGroups": "No hay grupos definidos.",
     "noFields": "Sin campos en este grupo.",
     "toggleOn": "Activar",

@@ -120,6 +120,21 @@ export function FieldDefinitionSheet({
     setTarget(defaultTarget(next));
   };
 
+  const handleInputTypeChange = (next: InputType) => {
+    setInputType(next);
+    // display_text es meramente presentacional → forzamos persistence='none'.
+    // El user no puede elegir otro persistence_type para un display_text.
+    if (next === 'display_text') {
+      setPersistenceType('none');
+      setTarget(null);
+    } else if (persistenceType === 'none') {
+      // Si venían de display_text y cambian a otro input_type, reseteamos
+      // a un persistence sensato.
+      setPersistenceType('form_response');
+      setTarget(null);
+    }
+  };
+
   const parseOptions = (): string[] | null => {
     const trimmed = optionsText.trim();
     if (!trimmed) return null;
@@ -197,7 +212,7 @@ export function FieldDefinitionSheet({
               value={inputType}
               onValueChange={(v) => {
                 if (v == null) return;
-                setInputType(v as InputType);
+                handleInputTypeChange(v as InputType);
               }}
             >
               <SelectTrigger className="w-full">
@@ -213,34 +228,38 @@ export function FieldDefinitionSheet({
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label>{t('persistenceType')}</Label>
-            <Select
-              value={persistenceType}
-              onValueChange={(v) => {
-                if (v == null) return;
-                handlePersistenceTypeChange(v as PersistenceType);
-              }}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PERSISTENCE_TYPES.map((pt) => (
-                  <SelectItem key={pt} value={pt}>
-                    {pt}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {inputType !== 'display_text' && (
+            <div className="space-y-2">
+              <Label>{t('persistenceType')}</Label>
+              <Select
+                value={persistenceType}
+                onValueChange={(v) => {
+                  if (v == null) return;
+                  handlePersistenceTypeChange(v as PersistenceType);
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PERSISTENCE_TYPES.filter((pt) => pt !== 'none').map((pt) => (
+                    <SelectItem key={pt} value={pt}>
+                      {pt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
-          <PersistenceTargetFields
-            persistenceType={persistenceType}
-            target={target}
-            onChange={setTarget}
-            subtypeGroups={subtypeGroups}
-          />
+          {inputType !== 'display_text' && (
+            <PersistenceTargetFields
+              persistenceType={persistenceType}
+              target={target}
+              onChange={setTarget}
+              subtypeGroups={subtypeGroups}
+            />
+          )}
 
           {hasOptions && (
             <div className="space-y-2">
@@ -257,6 +276,7 @@ export function FieldDefinitionSheet({
           <FieldTranslationTabs
             translations={translations}
             onChange={setTranslations}
+            isDisplayText={inputType === 'display_text'}
           />
 
           <div className="space-y-2">

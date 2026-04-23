@@ -140,6 +140,23 @@ export function renderSingleSelect({
   );
 }
 
+// Texto estático para mostrar al usuario (legales, disclaimers, instrucciones).
+// No es input: no captura valor, no persiste. El contenido vive en
+// translations.description del catálogo, con fallback a label. Respeta saltos
+// de línea del original (whitespace-pre-line).
+export function renderDisplayText({ field }: RenderProps) {
+  const content = field.description ?? field.label ?? '';
+  if (!content) return null;
+  return (
+    <div
+      key={field.key}
+      className="text-muted-foreground text-sm whitespace-pre-line"
+    >
+      {content}
+    </div>
+  );
+}
+
 export function renderAddress({ field, value, errorClass, onChange }: RenderProps) {
   return (
     <AddressAutocomplete
@@ -316,6 +333,8 @@ export function renderResolvedField(
       return renderMultiselectDropdown(selectBase);
     case 'address':
       return renderAddress(base);
+    case 'display_text':
+      return renderDisplayText(base);
     default: {
       const _exhaustive: never = field.input_type;
       void _exhaustive;

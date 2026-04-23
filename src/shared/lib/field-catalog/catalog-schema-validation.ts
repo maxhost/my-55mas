@@ -64,6 +64,11 @@ export const fieldDefinitionSchema = z.discriminatedUnion('persistence_type', [
     persistence_type: z.literal('subtype'),
     persistence_target: subtypeTargetSchema,
   }),
+  z.object({
+    ...baseDefinitionFields,
+    persistence_type: z.literal('none'),
+    persistence_target: z.null(),
+  }),
 ]);
 
 // ── Catalog Form Schema (referenced by registration_forms.schema etc.) ──

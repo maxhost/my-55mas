@@ -123,6 +123,11 @@ export const fieldDefinitionInputSchema = z.discriminatedUnion(
       persistence_type: z.literal('subtype'),
       persistence_target: subtypeTargetSchema,
     }),
+    z.object({
+      ...commonDefinitionFields,
+      persistence_type: z.literal('none'),
+      persistence_target: z.null(),
+    }),
   ]
 );
 

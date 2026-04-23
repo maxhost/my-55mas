@@ -12,6 +12,7 @@ export const INPUT_TYPES = [
   'multiselect_checkbox',
   'multiselect_dropdown',
   'address',
+  'display_text',
 ] as const;
 
 export type InputType = (typeof INPUT_TYPES)[number];
@@ -25,6 +26,7 @@ export const PERSISTENCE_TYPES = [
   'survey',
   'service_select',
   'subtype',
+  'none',
 ] as const;
 
 export type PersistenceType = (typeof PERSISTENCE_TYPES)[number];

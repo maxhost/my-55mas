@@ -394,6 +394,8 @@
     "label": "Label",
     "placeholder": "Placeholder",
     "descriptionLabel": "Description",
+    "displayTextBody": "Informational text shown to the user",
+    "displayTextTitle": "Title (optional)",
     "noGroups": "No groups defined.",
     "noFields": "No fields in this group.",
     "toggleOn": "Activate",

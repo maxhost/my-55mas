@@ -50,6 +50,8 @@ async function readOne(
       return readServiceSelect(supabase, userId);
     case 'subtype':
       return readSubtype(supabase, userId, field.persistence_target as SubtypeTarget);
+    case 'none':
+      return undefined;
     default:
       return undefined;
   }

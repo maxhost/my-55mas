@@ -92,6 +92,8 @@ function validateRequired(
   const errors: { field: string; message: string }[] = [];
   for (const field of fields) {
     if (!field.required) continue;
+    // display_text / persistence_type='none' no tienen valor que validar.
+    if (field.persistence_type === 'none') continue;
     const value = formData[field.key];
     if (value === undefined || value === null || value === '') {
       errors.push({ field: field.key, message: 'required' });
@@ -164,6 +166,8 @@ async function writeOne(
         field.persistence_target as SubtypeTarget
       );
     case 'auth':
+      return;
+    case 'none':
       return;
     default:
       throw new PersistenceError(
