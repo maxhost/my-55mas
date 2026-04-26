@@ -8,6 +8,9 @@ export function mapFieldDefinitionErrorKey(error: string): string {
   if (error.includes('missingContent')) return 'missingContent';
   if (error.includes('missingTermsUrls')) return 'missingTermsUrls';
   if (error.includes('invalidUrl')) return 'invalidUrl';
+  if (error.includes('allowChangeOnlyForEmailAuth'))
+    return 'allowChangeOnlyForEmailAuth';
+  if (error.includes('invalidAllowChange')) return 'invalidAllowChange';
   if (error.includes('missingLabel') || error.includes('translations'))
     return 'missingLabel';
   return 'saveFailed';

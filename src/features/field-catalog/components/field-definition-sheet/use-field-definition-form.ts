@@ -72,6 +72,7 @@ export function useFieldDefinitionForm(input: UseFormInput) {
   const [optionsText, setOptionsText] = useState('');
   const [tosUrl, setTosUrl] = useState('');
   const [privacyUrl, setPrivacyUrl] = useState('');
+  const [allowChange, setAllowChange] = useState(false);
   const [sortOrder, setSortOrder] = useState(0);
   const [isActive, setIsActive] = useState(true);
   const [translations, setTranslations] = useState<FieldTranslations>(
@@ -90,9 +91,11 @@ export function useFieldDefinitionForm(input: UseFormInput) {
     const cfg = (field?.config ?? {}) as {
       tos_url?: string;
       privacy_url?: string;
+      allow_change?: boolean;
     };
     setTosUrl(typeof cfg.tos_url === 'string' ? cfg.tos_url : '');
     setPrivacyUrl(typeof cfg.privacy_url === 'string' ? cfg.privacy_url : '');
+    setAllowChange(cfg.allow_change === true);
     setSortOrder(field?.sort_order ?? 0);
     setIsActive(field?.is_active ?? true);
     setTranslations(field?.translations ?? emptyTranslations());
@@ -101,6 +104,9 @@ export function useFieldDefinitionForm(input: UseFormInput) {
   const handlePersistenceTypeChange = (next: PersistenceType) => {
     setPersistenceType(next);
     setTarget(defaultTarget(next));
+    // allow_change solo aplica a email+auth — reset en cualquier cambio que
+    // rompa esa combinación para evitar state stale y errores de Zod.
+    if (!(inputType === 'email' && next === 'auth')) setAllowChange(false);
   };
 
   const handleInputTypeChange = (next: InputType) => {
@@ -120,6 +126,8 @@ export function useFieldDefinitionForm(input: UseFormInput) {
       setPersistenceType('form_response');
       setTarget(null);
     }
+    // allow_change solo aplica a email+auth.
+    if (!(next === 'email' && persistenceType === 'auth')) setAllowChange(false);
   };
 
   const parseOptions = (): string[] | null => {
@@ -132,11 +140,18 @@ export function useFieldDefinitionForm(input: UseFormInput) {
   };
 
   const buildConfig = (): Record<string, unknown> | null => {
-    if (inputType !== 'terms_checkbox') return null;
     const cfg: Record<string, unknown> = {};
-    if (tosUrl.trim()) cfg.tos_url = tosUrl.trim();
-    if (privacyUrl.trim()) cfg.privacy_url = privacyUrl.trim();
-    return cfg;
+    if (inputType === 'terms_checkbox') {
+      if (tosUrl.trim()) cfg.tos_url = tosUrl.trim();
+      if (privacyUrl.trim()) cfg.privacy_url = privacyUrl.trim();
+    }
+    // Sólo persistimos allow_change=true para email+auth. Si el admin
+    // cambia a otra combinación, allowChange ya fue reseteado en los
+    // handlers, así que esto actúa como defensa de última línea.
+    if (inputType === 'email' && persistenceType === 'auth' && allowChange) {
+      cfg.allow_change = true;
+    }
+    return Object.keys(cfg).length > 0 ? cfg : null;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -181,6 +196,7 @@ export function useFieldDefinitionForm(input: UseFormInput) {
       optionsText,
       tosUrl,
       privacyUrl,
+      allowChange,
       sortOrder,
       isActive,
       translations,
@@ -193,6 +209,7 @@ export function useFieldDefinitionForm(input: UseFormInput) {
       setOptionsText,
       setTosUrl,
       setPrivacyUrl,
+      setAllowChange,
       setSortOrder,
       setIsActive,
       setTranslations,

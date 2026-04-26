@@ -22,7 +22,9 @@
     "saveError": "Error en desar",
     "createdSuccess": "Creat correctament",
     "deletedSuccess": "Eliminat correctament",
-    "copiedSuccess": "Copiat al porta-retalls"
+    "copiedSuccess": "Copiat al porta-retalls",
+    "emailChangeDefaultTitle": "Confirmar canvi d'email",
+    "emailChangeDefaultBody": "S'enviarà un enllaç de confirmació al nou email. El canvi s'aplicarà quan el confirmis des de la teva safata d'entrada."
   },
   "AdminNav": {
     "orders": "Comandes",
@@ -405,6 +407,11 @@
     "termsTemplateHint": "Utilitza {tos} i {privacy} com a marcadors (substituïts pels enllaços). Ex.: \"He llegit i accepto els {tos} i la {privacy}.\" Si els omets, els enllaços s'afegeixen al final automàticament.",
     "termsTosLinkText": "Text de l'enllaç Termes",
     "termsPrivacyLinkText": "Text de l'enllaç Privacitat",
+    "emailAllowChange": "Permetre canvi d'email",
+    "emailAllowChangeHint": "Si està marcat, l'usuari pot editar el seu email. En confirmar, s'enviarà un enllaç al nou email per completar el canvi.",
+    "emailModalTextsHint": "Textos del modal de confirmació (per locale, opcionals). Si es deixen buits, s'utilitzaran textos per defecte.",
+    "emailModalTitlePlaceholder": "Títol del modal",
+    "emailModalBodyPlaceholder": "Cos del modal (admet salts de línia)",
     "noGroups": "No hi ha grups definits.",
     "noFields": "Sense camps en aquest grup.",
     "toggleOn": "Activar",
@@ -422,6 +429,8 @@
       "missingTranslation": "Falten traduccions en un o més idiomes.",
       "invalidSlug": "Slug no vàlid.",
       "invalidKey": "Clau no vàlida.",
+      "allowChangeOnlyForEmailAuth": "«Permetre canvi d'email» només aplica a input_type=email amb persistència auth.",
+      "invalidAllowChange": "«Permetre canvi d'email» ha de ser cert o fals.",
       "saveFailed": "No s'ha pogut desar."
     }
   },

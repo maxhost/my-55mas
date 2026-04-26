@@ -16,6 +16,7 @@ import {
   renderMultiselectCheckbox,
   renderMultiselectDropdown,
 } from './field-renderers/multiselect';
+import { renderEmailAuth } from './field-renderers/email';
 
 // Re-exports para consumers externos que importen desde este path.
 export {
@@ -179,8 +180,10 @@ export function renderResolvedField(
   const base: RenderProps = { field, value, errorClass, onChange };
   const selectBase: SelectRenderProps = { ...base, selectPlaceholder };
   switch (field.input_type) {
-    case 'text':
     case 'email':
+      if (field.persistence_type === 'auth') return renderEmailAuth(base);
+      return renderText(base, 'email');
+    case 'text':
     case 'password':
     case 'date':
       return renderText(base, field.input_type);

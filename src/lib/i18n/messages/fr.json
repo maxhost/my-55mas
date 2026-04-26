@@ -22,7 +22,9 @@
     "saveError": "Erreur lors de l'enregistrement",
     "createdSuccess": "Créé avec succès",
     "deletedSuccess": "Supprimé avec succès",
-    "copiedSuccess": "Copié dans le presse-papiers"
+    "copiedSuccess": "Copié dans le presse-papiers",
+    "emailChangeDefaultTitle": "Confirmer le changement d'email",
+    "emailChangeDefaultBody": "Un lien de confirmation sera envoyé au nouvel email. Le changement prendra effet une fois confirmé depuis votre boîte de réception."
   },
   "AdminNav": {
     "orders": "Commandes",
@@ -405,6 +407,11 @@
     "termsTemplateHint": "Utilise {tos} et {privacy} comme marqueurs (remplacés par les liens). Ex. : \"J'ai lu et j'accepte les {tos} et la {privacy}.\" Si omis, les liens sont ajoutés à la fin automatiquement.",
     "termsTosLinkText": "Texte du lien CGU",
     "termsPrivacyLinkText": "Texte du lien Confidentialité",
+    "emailAllowChange": "Autoriser le changement d'email",
+    "emailAllowChangeHint": "Si coché, l'utilisateur peut modifier son email. En confirmant, un lien sera envoyé au nouvel email pour finaliser le changement.",
+    "emailModalTextsHint": "Textes du modal de confirmation (par locale, facultatifs). Si laissés vides, des textes par défaut seront utilisés.",
+    "emailModalTitlePlaceholder": "Titre du modal",
+    "emailModalBodyPlaceholder": "Corps du modal (les sauts de ligne sont pris en charge)",
     "noGroups": "Aucun groupe défini.",
     "noFields": "Aucun champ dans ce groupe.",
     "toggleOn": "Activer",
@@ -422,6 +429,8 @@
       "missingTranslation": "Traductions manquantes dans une ou plusieurs langues.",
       "invalidSlug": "Slug invalide.",
       "invalidKey": "Clé invalide.",
+      "allowChangeOnlyForEmailAuth": "« Autoriser le changement d'email » ne s'applique qu'à input_type=email avec persistance auth.",
+      "invalidAllowChange": "« Autoriser le changement d'email » doit être vrai ou faux.",
       "saveFailed": "Impossible d'enregistrer."
     }
   },

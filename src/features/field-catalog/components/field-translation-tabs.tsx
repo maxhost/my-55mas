@@ -21,6 +21,11 @@ type Props = {
   // terms_checkbox usa label como template con placeholders {tos}/{privacy}
   // y option_labels { tos, privacy } para los textos de los links.
   isTermsCheckbox?: boolean;
+  // email + auth + allow_change=true: el admin puede definir el texto del
+  // modal de confirmación per-locale usando option_labels.modal_title y
+  // option_labels.modal_body (ambos opcionales; el renderer tiene fallback
+  // a textos default).
+  isEmailWithChange?: boolean;
 };
 
 export function FieldTranslationTabs({
@@ -28,6 +33,7 @@ export function FieldTranslationTabs({
   onChange,
   isDisplayText,
   isTermsCheckbox,
+  isEmailWithChange,
 }: Props) {
   const t = useTranslations('AdminFieldCatalog');
 
@@ -42,15 +48,15 @@ export function FieldTranslationTabs({
     });
   };
 
-  const setLinkLabel = (
+  const setOptionLabel = (
     locale: CatalogLocale,
-    linkKey: 'tos' | 'privacy',
+    labelKey: string,
     value: string
   ) => {
     const current = translations[locale].option_labels ?? {};
     const next: Record<string, string> = { ...current };
-    if (value) next[linkKey] = value;
-    else delete next[linkKey];
+    if (value) next[labelKey] = value;
+    else delete next[labelKey];
     onChange({
       ...translations,
       [locale]: {
@@ -91,12 +97,12 @@ export function FieldTranslationTabs({
                 <div className="grid grid-cols-2 gap-2">
                   <Input
                     value={translations[l].option_labels?.tos ?? ''}
-                    onChange={(e) => setLinkLabel(l, 'tos', e.target.value)}
+                    onChange={(e) => setOptionLabel(l, 'tos', e.target.value)}
                     placeholder={t('termsTosLinkText')}
                   />
                   <Input
                     value={translations[l].option_labels?.privacy ?? ''}
-                    onChange={(e) => setLinkLabel(l, 'privacy', e.target.value)}
+                    onChange={(e) => setOptionLabel(l, 'privacy', e.target.value)}
                     placeholder={t('termsPrivacyLinkText')}
                   />
                 </div>
@@ -137,6 +143,28 @@ export function FieldTranslationTabs({
                   onChange={(e) => setField(l, 'description', e.target.value)}
                   placeholder={t('descriptionLabel')}
                 />
+                {isEmailWithChange && (
+                  <div className="space-y-2 rounded-md border border-dashed p-3">
+                    <p className="text-muted-foreground text-xs">
+                      {t('emailModalTextsHint')}
+                    </p>
+                    <Input
+                      value={translations[l].option_labels?.modal_title ?? ''}
+                      onChange={(e) =>
+                        setOptionLabel(l, 'modal_title', e.target.value)
+                      }
+                      placeholder={t('emailModalTitlePlaceholder')}
+                    />
+                    <Textarea
+                      rows={3}
+                      value={translations[l].option_labels?.modal_body ?? ''}
+                      onChange={(e) =>
+                        setOptionLabel(l, 'modal_body', e.target.value)
+                      }
+                      placeholder={t('emailModalBodyPlaceholder')}
+                    />
+                  </div>
+                )}
               </>
             )}
           </TabsContent>

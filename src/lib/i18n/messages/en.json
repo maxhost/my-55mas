@@ -22,7 +22,9 @@
     "saveError": "Error saving",
     "createdSuccess": "Created successfully",
     "deletedSuccess": "Deleted successfully",
-    "copiedSuccess": "Copied to clipboard"
+    "copiedSuccess": "Copied to clipboard",
+    "emailChangeDefaultTitle": "Confirm email change",
+    "emailChangeDefaultBody": "A confirmation link will be sent to the new email. The change takes effect once you confirm it from your inbox."
   },
   "AdminNav": {
     "orders": "Orders",
@@ -405,6 +407,11 @@
     "termsTemplateHint": "Use {tos} and {privacy} as placeholders (replaced by links). E.g.: \"I have read and accept the {tos} and {privacy}.\" If omitted, links are appended at the end automatically.",
     "termsTosLinkText": "TOS link text",
     "termsPrivacyLinkText": "Privacy link text",
+    "emailAllowChange": "Allow email change",
+    "emailAllowChangeHint": "When checked, the user can edit their email. Confirming sends a link to the new email to complete the change.",
+    "emailModalTextsHint": "Confirmation modal texts (per-locale, optional). If left blank, default texts are used.",
+    "emailModalTitlePlaceholder": "Modal title",
+    "emailModalBodyPlaceholder": "Modal body (line breaks supported)",
     "noGroups": "No groups defined.",
     "noFields": "No fields in this group.",
     "toggleOn": "Activate",
@@ -422,6 +429,8 @@
       "missingTranslation": "Missing translations in one or more languages.",
       "invalidSlug": "Invalid slug.",
       "invalidKey": "Invalid key.",
+      "allowChangeOnlyForEmailAuth": "\"Allow email change\" only applies to input_type=email with auth persistence.",
+      "invalidAllowChange": "\"Allow email change\" must be true or false.",
       "saveFailed": "Could not save."
     }
   },

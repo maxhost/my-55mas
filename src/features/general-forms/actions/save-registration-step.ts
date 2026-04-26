@@ -10,10 +10,11 @@ type SaveStepInput = {
   target_role: 'talent' | 'client';
 };
 
-// Persiste fields de un step post-registration (el user ya existe).
-// Auth fields se ignoran acá — se crearon en registerUser. Si hay
-// service_select fields, el adapter requiere country_id; lo resolvemos
-// desde talent_profiles para el user autenticado.
+// Persiste fields de un upsert sobre el user autenticado (action=submit).
+// Incluye auth fields: writeAuth en edit flow es no-op si el email no
+// cambió, y dispara updateUser si allow_change=true y el user lo editó.
+// Si hay service_select fields, el adapter requiere country_id; lo
+// resolvemos desde talent_profiles para el user autenticado.
 export async function saveRegistrationStep(input: SaveStepInput) {
   const { form_data, resolved_form, target_role } = input;
   const supabase = createClient();
@@ -24,8 +25,7 @@ export async function saveRegistrationStep(input: SaveStepInput) {
   if (!user) return { error: { _auth: ['User not authenticated'] } };
 
   const allFields = resolved_form.steps.flatMap((s) => s.fields);
-  const nonAuthFields = allFields.filter((f) => f.persistence_type !== 'auth');
-  const needsServiceSelect = nonAuthFields.some(
+  const needsServiceSelect = allFields.some(
     (f) => f.persistence_type === 'service_select'
   );
 
@@ -42,7 +42,7 @@ export async function saveRegistrationStep(input: SaveStepInput) {
   const result = await persistFormData({
     supabase,
     userId: user.id,
-    fields: nonAuthFields,
+    fields: allFields,
     formData: form_data,
     context: serviceSelectCountryId
       ? { serviceSelect: { country_id: serviceSelectCountryId } }

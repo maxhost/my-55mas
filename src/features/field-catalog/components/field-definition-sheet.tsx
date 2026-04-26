@@ -34,6 +34,7 @@ import type { SubtypeGroupOption } from '@/shared/lib/field-catalog/subtype-grou
 import { PersistenceTargetFields } from './persistence-target-fields';
 import { FieldTranslationTabs } from './field-translation-tabs';
 import { TermsCheckboxConfig } from './field-definition-sheet/terms-config';
+import { EmailAuthConfig } from './field-definition-sheet/email-auth-config';
 import { RegistryOptionsPreview } from './field-definition-sheet/registry-options-preview';
 import { useFieldDefinitionForm } from './field-definition-sheet/use-field-definition-form';
 
@@ -77,6 +78,8 @@ export function FieldDefinitionSheet({
     state.inputType === 'single_select' ||
     state.inputType === 'multiselect_checkbox' ||
     state.inputType === 'multiselect_dropdown';
+  const isEmailAuth =
+    state.inputType === 'email' && state.persistenceType === 'auth';
   const hasOptions = takesOptions && !isDynamicOptions && !registryAutoOptions;
   const registryPreviewOptions =
     registryAutoOptions && dbColumnTarget?.table && dbColumnTarget?.column
@@ -192,11 +195,19 @@ export function FieldDefinitionSheet({
             />
           )}
 
+          {isEmailAuth && (
+            <EmailAuthConfig
+              allowChange={state.allowChange}
+              onAllowChangeChange={setters.setAllowChange}
+            />
+          )}
+
           <FieldTranslationTabs
             translations={state.translations}
             onChange={setters.setTranslations}
             isDisplayText={state.inputType === 'display_text'}
             isTermsCheckbox={state.inputType === 'terms_checkbox'}
+            isEmailWithChange={isEmailAuth && state.allowChange}
           />
 
           <div className="space-y-2">
