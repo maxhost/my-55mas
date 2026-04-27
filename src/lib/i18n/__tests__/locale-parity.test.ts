@@ -90,6 +90,19 @@ describe('locale parity — todas las claves deben existir en los 5 locales', ()
       'Embed.unavailable.noActiveForm',
       'Embed.unavailable.emptySchema',
       'Embed.unavailable.legacySchema',
+      // Onboarding services step 3 (S5+S8 del feature onboarding-services).
+      'OnboardingServices.commitSelection',
+      'OnboardingServices.commitPending',
+      'OnboardingServices.commitInFlight',
+      'OnboardingServices.commitSuccess',
+      'OnboardingServices.commitError',
+      'OnboardingServices.statusPending',
+      'OnboardingServices.statusSaved',
+      'OnboardingServices.emptyState',
+      'OnboardingServices.atLeastOneService',
+      'OnboardingServices.saveAllServicesFirst',
+      'OnboardingServices.savedCount',
+      'OnboardingServices.accordionTitle',
     ];
     for (const locale of Object.keys(LOCALES)) {
       const keys = localeKeys[locale];

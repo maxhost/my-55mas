@@ -35,6 +35,20 @@
       "legacySchema": "This form is in an outdated format. Please contact the administrator."
     }
   },
+  "OnboardingServices": {
+    "commitSelection": "Apply selection",
+    "commitPending": "Pending changes — apply to configure them",
+    "commitInFlight": "Applying…",
+    "commitSuccess": "Selection applied",
+    "commitError": "Could not apply. Please try again.",
+    "statusPending": "Pending",
+    "statusSaved": "Saved",
+    "emptyState": "You haven't selected any services yet. Use the selector above.",
+    "atLeastOneService": "Select at least one service to continue.",
+    "saveAllServicesFirst": "Save all services before continuing.",
+    "savedCount": "{saved} of {total} services saved",
+    "accordionTitle": "Configure each service"
+  },
   "TalentServiceEmbed": {
     "unavailable": {
       "unknownSlug": "Service not found.",

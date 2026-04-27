@@ -35,6 +35,20 @@
       "legacySchema": "Aquest formulari està en un format obsolet. Contacta amb l'administrador."
     }
   },
+  "OnboardingServices": {
+    "commitSelection": "Aplicar selecció",
+    "commitPending": "Canvis pendents — aplica'ls per configurar-los",
+    "commitInFlight": "Aplicant…",
+    "commitSuccess": "Selecció aplicada",
+    "commitError": "No s'ha pogut aplicar. Torna-ho a provar.",
+    "statusPending": "Pendent",
+    "statusSaved": "Desat",
+    "emptyState": "Encara no has seleccionat cap servei. Fes servir el selector de dalt.",
+    "atLeastOneService": "Selecciona almenys un servei per continuar.",
+    "saveAllServicesFirst": "Desa tots els serveis abans de continuar.",
+    "savedCount": "{saved} de {total} serveis desats",
+    "accordionTitle": "Configura cada servei"
+  },
   "TalentServiceEmbed": {
     "unavailable": {
       "unknownSlug": "Servei no trobat.",

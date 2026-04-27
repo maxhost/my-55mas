@@ -35,6 +35,20 @@
       "legacySchema": "Este formulário está num formato obsoleto. Contacta o administrador."
     }
   },
+  "OnboardingServices": {
+    "commitSelection": "Aplicar seleção",
+    "commitPending": "Alterações pendentes — aplica para configurá-las",
+    "commitInFlight": "A aplicar…",
+    "commitSuccess": "Seleção aplicada",
+    "commitError": "Não foi possível aplicar. Tenta novamente.",
+    "statusPending": "Pendente",
+    "statusSaved": "Guardado",
+    "emptyState": "Ainda não selecionaste nenhum serviço. Usa o seletor acima.",
+    "atLeastOneService": "Seleciona pelo menos um serviço para continuar.",
+    "saveAllServicesFirst": "Guarda todos os serviços antes de continuar.",
+    "savedCount": "{saved} de {total} serviços guardados",
+    "accordionTitle": "Configura cada serviço"
+  },
   "TalentServiceEmbed": {
     "unavailable": {
       "unknownSlug": "Serviço não encontrado.",
