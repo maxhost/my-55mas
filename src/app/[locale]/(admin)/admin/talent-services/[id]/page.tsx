@@ -27,6 +27,7 @@ export default async function EditTalentServicePage({ params: { locale, id } }: 
 
   // Phase 2: ALL remaining queries in parallel (all depend only on service_id)
   const [
+    { data: service },
     { data: serviceTrans },
     form,
     formVariants,
@@ -36,6 +37,11 @@ export default async function EditTalentServicePage({ params: { locale, id } }: 
     { data: serviceCities },
     subtypeGroupsRaw,
   ] = await Promise.all([
+    supabase
+      .from('services')
+      .select('slug')
+      .eq('id', formRow.service_id)
+      .single(),
     supabase
       .from('service_translations')
       .select('name')
@@ -58,6 +64,7 @@ export default async function EditTalentServicePage({ params: { locale, id } }: 
   ]);
 
   const serviceName = serviceTrans?.name ?? formRow.service_id;
+  const serviceSlug = service?.slug ?? '';
 
   const configuredCountryIds = new Set(
     (serviceCountries ?? []).map((sc) => sc.country_id)
@@ -91,6 +98,7 @@ export default async function EditTalentServicePage({ params: { locale, id } }: 
       />
       <TalentServiceEditor
         serviceId={formRow.service_id}
+        serviceSlug={serviceSlug}
         form={form}
         formVariants={formVariants}
         serviceCountries={formCountries}

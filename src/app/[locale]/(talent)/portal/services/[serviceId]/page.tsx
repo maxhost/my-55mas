@@ -1,91 +1,66 @@
 import { redirect } from 'next/navigation';
-import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
+import { unstable_setRequestLocale } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
-import { getTalentServiceForm } from '@/features/talent-services/actions/get-talent-service-form';
-import { loadTalentFormLabels } from '@/features/talent-services/actions/load-talent-form-labels';
-import { resolveFormFromJson } from '@/shared/lib/field-catalog/resolve-form-from-json';
-import { TalentServiceRenderer } from '@/features/talent-services/components/talent-service-renderer';
+import { TalentServiceFormEmbed } from '@/features/talent-services';
 
 type Props = { params: { locale: string; serviceId: string } };
 
-export default async function TalentServiceFormPage({ params: { locale, serviceId } }: Props) {
+// Portal del talent — render del form de un servicio. El portal "es" el
+// sitio del talent: por convención, siteCountryId === talent.country_id.
+// La resolución del form (slug + variant + labels + valores) la hace el
+// embed. La page sólo provee siteCountryId + slug + locale.
+export default async function TalentServiceFormPage({
+  params: { locale, serviceId },
+}: Props) {
   unstable_setRequestLocale(locale);
-  const t = await getTranslations('TalentPortal');
   const supabase = createClient();
 
-  // Get current user
+  // Auth + talent profile gate. Mantenemos redirect en este flujo
+  // protegido (el portal ya asume talent autenticado). Si llega un user
+  // sin talent_profiles, redirige a login en vez de mostrar el mensaje
+  // inline del embed (UX del portal).
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  // Get talent profile (including city_id for form variant resolution)
   const { data: talentProfile } = await supabase
     .from('talent_profiles')
-    .select('id, city_id')
+    .select('country_id')
     .eq('user_id', user.id)
     .single();
-
   if (!talentProfile) redirect('/login');
 
-  // Get talent's service registration to find country_id
-  const { data: talentService } = await supabase
-    .from('talent_services')
-    .select('country_id')
-    .eq('talent_id', talentProfile.id)
-    .eq('service_id', serviceId)
-    .limit(1)
-    .single();
+  // Resolver service slug desde el UUID del route param. El embed
+  // requiere slug. Si el servicio no existe, el embed muestra
+  // 'unknown-slug' inline.
+  const { data: service } = await supabase
+    .from('services')
+    .select('slug')
+    .eq('id', serviceId)
+    .maybeSingle();
 
-  // Get service name
+  // Service name (best-effort, sólo para el title de la page).
   const { data: serviceTrans } = await supabase
     .from('service_translations')
     .select('name')
     .eq('service_id', serviceId)
     .eq('locale', locale)
-    .single();
+    .maybeSingle();
+  const serviceName = serviceTrans?.name ?? service?.slug ?? serviceId;
 
-  const serviceName = serviceTrans?.name ?? serviceId;
-  const countryId = talentService?.country_id ?? '';
-
-  // Load form + existing data (use talent's city, no fallback to General)
-  const formData = await getTalentServiceForm(
-    talentProfile.id,
-    serviceId,
-    countryId,
-    talentProfile.city_id,
-    locale
-  );
-
-  if (!formData) {
-    return (
-      <div className="p-8">
-        <h1 className="text-2xl font-bold">{serviceName}</h1>
-        <p className="text-muted-foreground py-4">{t('noForm')}</p>
-      </div>
-    );
-  }
-
-  const formLabels = await loadTalentFormLabels(
-    supabase,
-    formData.form.id,
-    locale
-  );
-  const resolvedForm = await resolveFormFromJson({
-    supabase,
-    schemaJson: formData.form.schema,
-    userId: user.id,
-    locale,
-    formLabels,
-  });
+  // siteCountryId: en el portal del talent, el sitio coincide con el
+  // país del talent. (Si en el futuro el portal soporta multi-country,
+  // habrá que hacer un picker explícito.)
+  const siteCountryId = talentProfile.country_id;
 
   return (
     <div className="p-8">
       <h1 className="mb-6 text-2xl font-bold">{serviceName}</h1>
-      <TalentServiceRenderer
-        talentId={talentProfile.id}
-        serviceId={serviceId}
-        countryId={countryId}
-        formId={formData.form.id}
-        resolvedForm={resolvedForm}
+      {/* Si service no existe (slug null), forzamos un slug-inválido
+          que dispare unknown-slug en el embed. */}
+      <TalentServiceFormEmbed
+        slug={service?.slug ?? '__missing__'}
+        siteCountryId={siteCountryId ?? ''}
+        locale={locale}
       />
     </div>
   );

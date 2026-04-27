@@ -253,3 +253,62 @@ describe('validateCatalogFormSchema wrapper', () => {
     expect(result.ok).toBe(false);
   });
 });
+
+describe('validateCatalogFormSchema — kind: talent-service guard', () => {
+  const schemaWithRegister = {
+    steps: [
+      {
+        key: 'step1',
+        field_refs: [],
+        actions: [{ key: 'btn1', type: 'register' as const }],
+      },
+    ],
+  };
+
+  const schemaWithSubmit = {
+    steps: [
+      {
+        key: 'step1',
+        field_refs: [],
+        actions: [{ key: 'btn1', type: 'submit' as const }],
+      },
+    ],
+  };
+
+  it('accepts register action in registration context (default kind)', () => {
+    expect(validateCatalogFormSchema(schemaWithRegister).ok).toBe(true);
+    expect(
+      validateCatalogFormSchema(schemaWithRegister, { kind: 'registration' }).ok
+    ).toBe(true);
+  });
+
+  it('rejects register action in talent-service context', () => {
+    const result = validateCatalogFormSchema(schemaWithRegister, {
+      kind: 'talent-service',
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      const issues = result.errors.issues;
+      expect(issues.some((i) => i.message.includes('register'))).toBe(true);
+    }
+  });
+
+  it('accepts submit action in talent-service context', () => {
+    expect(
+      validateCatalogFormSchema(schemaWithSubmit, { kind: 'talent-service' }).ok
+    ).toBe(true);
+  });
+
+  it('rejects register even when nested in any step', () => {
+    const result = validateCatalogFormSchema(
+      {
+        steps: [
+          { key: 's1', field_refs: [], actions: [{ key: 'b1', type: 'submit' }] },
+          { key: 's2', field_refs: [], actions: [{ key: 'b2', type: 'register' }] },
+        ],
+      },
+      { kind: 'talent-service' }
+    );
+    expect(result.ok).toBe(false);
+  });
+});

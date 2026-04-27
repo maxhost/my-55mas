@@ -10,6 +10,7 @@ import {
   saveFormWithTranslationsSchema,
   type SaveFormWithTranslationsInput,
 } from '@/shared/lib/forms/schemas';
+import { validateCatalogFormSchema } from '@/shared/lib/field-catalog/catalog-schema-validation';
 
 export async function saveTalentForm(input: SaveFormInput) {
   const parsed = saveFormSchema.safeParse(input);
@@ -18,6 +19,21 @@ export async function saveTalentForm(input: SaveFormInput) {
   }
 
   const { service_id, city_id, schema } = parsed.data;
+
+  // Talent context guard: el action 'register' no aplica acá. Si el
+  // schema lo contiene (form viejo o malconfigurado), rechazamos al
+  // guardar. Forms con sólo 'submit'/'next'/'back' pasan limpio.
+  const catalogValidation = validateCatalogFormSchema(schema, {
+    kind: 'talent-service',
+  });
+  if (!catalogValidation.ok) {
+    return {
+      error: {
+        _schema: catalogValidation.errors.issues.map((i) => i.message),
+      },
+    };
+  }
+
   const supabase = createClient();
 
   let query = supabase

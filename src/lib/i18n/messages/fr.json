@@ -35,6 +35,25 @@
       "legacySchema": "Ce formulaire est dans un format obsolète. Contactez l'administrateur."
     }
   },
+  "TalentServiceEmbed": {
+    "unavailable": {
+      "unknownSlug": "Service introuvable.",
+      "serviceNotActive": "Ce service n'est pas disponible.",
+      "countryMismatch": "Ce service n'est pas disponible dans votre pays.",
+      "talentCountryNotSet": "Veuillez renseigner votre pays dans votre profil pour continuer.",
+      "cityNotConfigured": "Ce service n'est pas disponible dans votre ville.",
+      "noActiveForm": "Formulaire non disponible.",
+      "emptySchema": "Ce formulaire n'a pas encore de contenu.",
+      "legacySchema": "Ce formulaire est dans un format obsolète. Contactez l'administrateur.",
+      "notAuthenticated": "Connectez-vous pour continuer.",
+      "noTalentProfile": "Veuillez compléter votre profil de talent pour continuer."
+    },
+    "error": {
+      "auth": "Session invalide. Veuillez vous reconnecter.",
+      "config": "Configuration de formulaire invalide.",
+      "db": "Impossible d'enregistrer. Veuillez réessayer."
+    }
+  },
   "AdminNav": {
     "orders": "Commandes",
     "archive": "Archives",
@@ -249,6 +268,9 @@
     "updated": "Mis à jour",
     "tabConfig": "Configuration",
     "tabForm": "Formulaire",
+    "tabEmbed": "Embed",
+    "embedCode": "Code d'embed",
+    "embedHint": "Collez ce snippet dans la page où vous voulez afficher le formulaire. siteCountryId doit être résolu au runtime (généralement depuis le contexte du site).",
     "cityActivation": "Activation par ville",
     "cityActivationDesc": "Activez le formulaire dans les villes où vous souhaitez que les talents le remplissent.",
     "noCities": "Aucune ville configurée pour ce service.",

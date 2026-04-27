@@ -35,6 +35,25 @@
       "legacySchema": "Aquest formulari està en un format obsolet. Contacta amb l'administrador."
     }
   },
+  "TalentServiceEmbed": {
+    "unavailable": {
+      "unknownSlug": "Servei no trobat.",
+      "serviceNotActive": "Aquest servei no està disponible.",
+      "countryMismatch": "Aquest servei no està disponible al teu país.",
+      "talentCountryNotSet": "Defineix el teu país al perfil per continuar.",
+      "cityNotConfigured": "Aquest servei no està disponible a la teva ciutat.",
+      "noActiveForm": "Formulari no disponible.",
+      "emptySchema": "Aquest formulari encara no té contingut.",
+      "legacySchema": "Aquest formulari està en un format obsolet. Contacta amb l'administrador.",
+      "notAuthenticated": "Inicia sessió per continuar.",
+      "noTalentProfile": "Completa el teu perfil de talent per continuar."
+    },
+    "error": {
+      "auth": "Sessió invàlida. Inicia sessió de nou.",
+      "config": "Configuració del formulari invàlida.",
+      "db": "No s'ha pogut desar. Torna-ho a provar."
+    }
+  },
   "AdminNav": {
     "orders": "Comandes",
     "archive": "Arxiu",
@@ -249,6 +268,9 @@
     "updated": "Actualitzat",
     "tabConfig": "Configuració",
     "tabForm": "Formulari",
+    "tabEmbed": "Embed",
+    "embedCode": "Codi de l'embed",
+    "embedHint": "Enganxa aquest snippet a la pàgina on vulguis renderitzar el formulari. siteCountryId s'ha de resoldre en runtime (típicament del context del lloc).",
     "cityActivation": "Activació per ciutat",
     "cityActivationDesc": "Activa el formulari a les ciutats on vols que els talents el completin.",
     "noCities": "No hi ha ciutats configurades per a aquest servei.",

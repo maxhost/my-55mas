@@ -35,6 +35,25 @@
       "legacySchema": "This form is in an outdated format. Please contact the administrator."
     }
   },
+  "TalentServiceEmbed": {
+    "unavailable": {
+      "unknownSlug": "Service not found.",
+      "serviceNotActive": "This service is not available.",
+      "countryMismatch": "This service is not available in your country.",
+      "talentCountryNotSet": "Please set your country in your profile to continue.",
+      "cityNotConfigured": "This service is not available in your city.",
+      "noActiveForm": "Form not available.",
+      "emptySchema": "This form has no content yet.",
+      "legacySchema": "This form is in an outdated format. Please contact the administrator.",
+      "notAuthenticated": "Please sign in to continue.",
+      "noTalentProfile": "Please complete your talent profile to continue."
+    },
+    "error": {
+      "auth": "Invalid session. Please sign in again.",
+      "config": "Invalid form configuration.",
+      "db": "Could not save. Please try again."
+    }
+  },
   "AdminNav": {
     "orders": "Orders",
     "archive": "Archive",
@@ -249,6 +268,9 @@
     "updated": "Updated",
     "tabConfig": "Settings",
     "tabForm": "Form",
+    "tabEmbed": "Embed",
+    "embedCode": "Embed code",
+    "embedHint": "Paste this snippet into the page where you want to render the form. siteCountryId must be resolved at runtime (typically from the site context).",
     "cityActivation": "Activation by city",
     "cityActivationDesc": "Enable the form in the cities where you want talents to complete it.",
     "noCities": "No cities configured for this service.",

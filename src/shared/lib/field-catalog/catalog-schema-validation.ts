@@ -101,18 +101,47 @@ void _typeCheck;
 
 // ── Public wrapper ──────────────────────────────────
 
+export type CatalogValidationKind = 'registration' | 'talent-service';
+
+export type CatalogValidationContext = {
+  kind: CatalogValidationKind;
+};
+
 export type ValidateCatalogFormSchemaResult =
   | { ok: true; data: CatalogFormSchema }
   | { ok: false; errors: z.ZodError };
 
+// Valida el schema. Si `context.kind === 'talent-service'` aplica reglas
+// extra: el action `register` no se permite (talent forms no crean usuarios;
+// el talent ya está autenticado). Default kind: 'registration'.
 export function validateCatalogFormSchema(
-  input: unknown
+  input: unknown,
+  context: CatalogValidationContext = { kind: 'registration' }
 ): ValidateCatalogFormSchemaResult {
   const result = catalogFormSchemaSchema.safeParse(input);
-  if (result.success) {
-    return { ok: true, data: result.data as CatalogFormSchema };
+  if (!result.success) return { ok: false, errors: result.error };
+
+  if (context.kind === 'talent-service') {
+    const offending: string[] = [];
+    for (const step of result.data.steps) {
+      for (const action of step.actions ?? []) {
+        if (action.type === 'register') {
+          offending.push(`${step.key}.${action.key}`);
+        }
+      }
+    }
+    if (offending.length > 0) {
+      const issue: z.ZodIssue = {
+        code: z.ZodIssueCode.custom,
+        path: ['steps'],
+        message: `register action not allowed in talent-service forms: ${offending.join(', ')}`,
+      };
+      const error = new z.ZodError([issue]);
+      return { ok: false, errors: error };
+    }
   }
-  return { ok: false, errors: result.error };
+
+  return { ok: true, data: result.data as CatalogFormSchema };
 }
 
 // Sentinel exports for downstream validation

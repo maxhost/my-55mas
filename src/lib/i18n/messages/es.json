@@ -35,6 +35,25 @@
       "legacySchema": "Este formulario está en un formato obsoleto. Contactá al administrador."
     }
   },
+  "TalentServiceEmbed": {
+    "unavailable": {
+      "unknownSlug": "Servicio no encontrado.",
+      "serviceNotActive": "Este servicio no está disponible.",
+      "countryMismatch": "Este servicio no está disponible en tu país.",
+      "talentCountryNotSet": "Completá tu país en tu perfil para continuar.",
+      "cityNotConfigured": "Este servicio no está disponible en tu ciudad.",
+      "noActiveForm": "Formulario no disponible.",
+      "emptySchema": "Este formulario aún no tiene contenido.",
+      "legacySchema": "Este formulario está en un formato obsoleto. Contactá al administrador.",
+      "notAuthenticated": "Iniciá sesión para continuar.",
+      "noTalentProfile": "Completá tu perfil de talento para continuar."
+    },
+    "error": {
+      "auth": "Sesión inválida. Iniciá sesión de nuevo.",
+      "config": "Configuración del formulario inválida.",
+      "db": "No se pudo guardar. Intentá de nuevo."
+    }
+  },
   "AdminNav": {
     "orders": "Pedidos",
     "archive": "Archivo",
@@ -249,6 +268,9 @@
     "updated": "Actualizado",
     "tabConfig": "Configuración",
     "tabForm": "Formulario",
+    "tabEmbed": "Embed",
+    "embedCode": "Código del embed",
+    "embedHint": "Pegá este snippet en la página donde querés renderizar el formulario. siteCountryId debe resolverse en runtime (típicamente del contexto del sitio).",
     "cityActivation": "Activación por ciudad",
     "cityActivationDesc": "Activa el formulario en las ciudades donde quieres que los talentos lo completen.",
     "noCities": "No hay ciudades configuradas para este servicio.",
