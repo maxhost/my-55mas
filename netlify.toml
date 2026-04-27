@@ -1,0 +1,18 @@
+[build]
+  command = "pnpm build"
+  publish = ".next"
+
+[build.environment]
+  # Next.js 14 + next-intl v3 + React 18 falla con `useContext` null
+  # errors en _not-found / _error si NODE_ENV no es 'production' al
+  # buildear. Documentado en CLAUDE.md (Gotchas).
+  NODE_ENV = "production"
+  # Pin pnpm a la versión del lockfile para que Netlify no instale otra.
+  PNPM_VERSION = "10.8.0"
+
+# Plugin oficial de Next.js: rutea middleware, RSC, SSR y route handlers
+# como Edge / Serverless Functions. Sin esto, el deploy queda estático
+# y el middleware no corre — la redirect / → /<locale> nunca dispara y
+# todas las URLs raíz devuelven 404.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
