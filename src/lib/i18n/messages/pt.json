@@ -26,6 +26,15 @@
     "emailChangeDefaultTitle": "Confirmar mudança de email",
     "emailChangeDefaultBody": "Será enviado um link de confirmação para o novo email. A mudança efetiva-se quando a confirmares a partir da tua caixa de entrada."
   },
+  "Embed": {
+    "unavailable": {
+      "unknownSlug": "Formulário não encontrado.",
+      "cityNotConfigured": "Este formulário não está disponível nesta cidade.",
+      "noActiveForm": "Formulário não disponível.",
+      "emptySchema": "Este formulário ainda não tem conteúdo.",
+      "legacySchema": "Este formulário está num formato obsoleto. Contacta o administrador."
+    }
+  },
   "AdminNav": {
     "orders": "Pedidos",
     "archive": "Arquivo",

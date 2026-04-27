@@ -1,116 +1,52 @@
-'use client';
-
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useLocale, useTranslations } from 'next-intl';
-import { toast } from 'sonner';
-import { FormRenderer, type SubmitMeta } from '@/shared/components/form-renderer';
-import type { ResolvedForm } from '@/shared/lib/field-catalog/resolved-types';
-import { registerUser } from '../actions/register-user';
-import { saveRegistrationStep } from '../actions/save-registration-step';
+import { EmbedUnavailable } from '@/shared/components/embed-unavailable';
+import { devWarn } from '@/shared/lib/embed/dev-warn';
+import { getResolvedEmbeddableForm } from '../actions/get-resolved-embeddable-form';
+import { RegistrationFormEmbedRenderer } from './registration-form-embed-renderer';
 
 type Props = {
-  resolvedForm: ResolvedForm;
-  targetRole: 'talent' | 'client';
-  submitLabel?: string;
+  // Identifier del form (registration_forms.slug). Único globalmente.
+  slug: string;
+  // City donde se embebe — usada para resolver la variant del form.
+  cityId: string;
+  // Locale activa para traducciones del form.
+  locale: string;
+  // País contexto del embedder. Usado en signup (registerUser) para
+  // pre-setear talent_profiles.country_id si el form crea un user.
   countryId?: string;
-  cityId?: string;
+  // Callback opcional invocado después de un save exitoso, antes del
+  // toast. Útil para tracking/redirect. Un error aquí no revierte el save.
   onSubmit?: (formData: Record<string, unknown>) => Promise<void> | void;
 };
 
-export function RegistrationFormEmbed({
-  resolvedForm,
-  targetRole,
-  submitLabel,
-  countryId,
+// API pública del embed de general forms. Server Component: resuelve
+// internamente el form por slug + city y delega el render al Client
+// `RegistrationFormEmbedRenderer`. Si el form no está disponible (slug
+// desconocido, city sin configurar, schema legacy, etc.) renderiza un
+// mensaje de no-disponibilidad con i18n.
+//
+// Recomendado envolver con <Suspense fallback={...}> en el embedder
+// para mejor UX de loading.
+export async function RegistrationFormEmbed({
+  slug,
   cityId,
+  locale,
+  countryId,
   onSubmit,
 }: Props) {
-  const tc = useTranslations('Common');
-  const currentLocale = useLocale();
-  const router = useRouter();
-  const [isPending, setIsPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleRedirect = (redirectUrl?: string) => {
-    if (redirectUrl) router.push(`/${currentLocale}${redirectUrl}`);
-  };
-
-  // Dispatch action-driven. next/back los maneja FormRenderer sin llegar acá.
-  // register → registerUser (crea auth user + perfil + persiste el resto).
-  // submit  → saveRegistrationStep (upsert sobre user autenticado; para auth
-  //           fields, writeAuth en edit flow es no-op si el email no cambió,
-  //           o dispara updateUser si allow_change=true y el user lo cambió).
-  const handleSubmit = async (
-    formData: Record<string, unknown>,
-    meta?: SubmitMeta
-  ): Promise<boolean> => {
-    setError(null);
-    setIsPending(true);
-    try {
-      if (meta?.action === 'register') {
-        const result = await registerUser({
-          form_data: formData,
-          resolved_form: resolvedForm,
-          locale: currentLocale,
-          target_role: targetRole,
-          country_id: countryId,
-          city_id: cityId,
-        });
-        if ('error' in result && result.error) {
-          const msg = flattenError(result.error);
-          setError(msg);
-          toast.error(msg);
-          return false;
-        }
-        toast.success(tc('savedSuccess'));
-        if (meta?.isLastStep) handleRedirect(meta.redirect_url);
-        return true;
-      }
-
-      const stepResult = await saveRegistrationStep({
-        form_data: formData,
-        resolved_form: resolvedForm,
-        target_role: targetRole,
-      });
-      if ('error' in stepResult && stepResult.error) {
-        const msg = flattenError(stepResult.error);
-        setError(msg);
-        toast.error(msg);
-        return false;
-      }
-      if (onSubmit) await onSubmit(formData);
-      toast.success(tc('savedSuccess'));
-      if (meta?.isLastStep) handleRedirect(meta?.redirect_url);
-      return true;
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : tc('saveError');
-      setError(msg);
-      toast.error(msg);
-      return false;
-    } finally {
-      setIsPending(false);
-    }
-  };
-
+  const result = await getResolvedEmbeddableForm(slug, cityId, locale);
+  if (!result.available) {
+    devWarn('RegistrationFormEmbed', { reason: result.reason, slug, cityId });
+    return (
+      <EmbedUnavailable reason={result.reason} namespace="Embed.unavailable" />
+    );
+  }
   return (
-    <div className="space-y-4">
-      {error && (
-        <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-          {error}
-        </p>
-      )}
-      <FormRenderer
-        form={resolvedForm}
-        onSubmit={handleSubmit}
-        submitLabel={submitLabel ?? (isPending ? tc('saving') : tc('save'))}
-        isPending={isPending}
-      />
-    </div>
+    <RegistrationFormEmbedRenderer
+      resolvedForm={result.resolvedForm}
+      targetRole={result.meta.targetRole}
+      countryId={countryId}
+      cityId={cityId}
+      onSubmit={onSubmit}
+    />
   );
-}
-
-function flattenError(error: Record<string, string[] | undefined>): string {
-  const msg = Object.values(error).flat().filter(Boolean)[0];
-  return msg ?? 'Error';
 }

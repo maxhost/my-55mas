@@ -41,7 +41,10 @@ export function RegistrationFormEditor({
   const t = useTranslations('AdminForms');
   const tc = useTranslations('Common');
 
-  const embedSnippet = `<RegistrationFormEmbed\n  slug="${formSlug}"\n  locale={locale}\n  onSubmit={handleSubmit}\n/>`;
+  // Snippet pegable. RegistrationFormEmbed es un Server Component; resuelve
+  // el form internamente desde slug + cityId. cityId lo provee el embedder
+  // (típicamente del contexto del sitio). countryId y onSubmit son opcionales.
+  const embedSnippet = `<RegistrationFormEmbed\n  slug="${formSlug}"\n  cityId={cityId}\n  locale={locale}\n/>`;
 
   const copyEmbed = () => {
     navigator.clipboard.writeText(embedSnippet);

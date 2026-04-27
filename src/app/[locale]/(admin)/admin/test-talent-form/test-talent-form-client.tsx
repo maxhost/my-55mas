@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from 'react';
 import { Label } from '@/components/ui/label';
 import { getResolvedEmbeddableForm } from '@/features/general-forms/actions/get-resolved-embeddable-form';
-import { RegistrationFormEmbed } from '@/features/general-forms/components/registration-form-embed';
+import { RegistrationFormEmbedRenderer } from '@/features/general-forms/components/registration-form-embed-renderer';
 import type { RegistrationFormListItem } from '@/features/general-forms/types';
 import type { ResolvedForm } from '@/shared/lib/field-catalog/resolved-types';
 
@@ -56,7 +56,7 @@ export function TestTalentFormClient({ locale, countries, cities, registrationFo
       if (result.available) {
         setForm({
           resolvedForm: result.resolvedForm,
-          targetRole: result.targetRole,
+          targetRole: result.meta.targetRole,
         });
         setStatus('loaded');
       } else {
@@ -144,7 +144,7 @@ export function TestTalentFormClient({ locale, countries, cities, registrationFo
 
       {status === 'loaded' && form && !isPending && (
         <div className="max-w-lg rounded-md border p-6">
-          <RegistrationFormEmbed
+          <RegistrationFormEmbedRenderer
             resolvedForm={form.resolvedForm}
             targetRole={form.targetRole}
             onSubmit={handleSubmit}

@@ -26,6 +26,15 @@
     "emailChangeDefaultTitle": "Confirmar canvi d'email",
     "emailChangeDefaultBody": "S'enviarà un enllaç de confirmació al nou email. El canvi s'aplicarà quan el confirmis des de la teva safata d'entrada."
   },
+  "Embed": {
+    "unavailable": {
+      "unknownSlug": "Formulari no trobat.",
+      "cityNotConfigured": "Aquest formulari no està disponible en aquesta ciutat.",
+      "noActiveForm": "Formulari no disponible.",
+      "emptySchema": "Aquest formulari encara no té contingut.",
+      "legacySchema": "Aquest formulari està en un format obsolet. Contacta amb l'administrador."
+    }
+  },
   "AdminNav": {
     "orders": "Comandes",
     "archive": "Arxiu",

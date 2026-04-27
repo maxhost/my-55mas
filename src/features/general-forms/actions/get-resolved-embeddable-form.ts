@@ -2,29 +2,40 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { resolveFormFromJson } from '@/shared/lib/field-catalog/resolve-form-from-json';
-import type { ResolvedForm } from '@/shared/lib/field-catalog/resolved-types';
+import type { EmbedResolverResult } from '@/shared/lib/embed/types';
+import {
+  isEmptySchema,
+  isLegacySchema,
+} from '@/shared/lib/embed/empty-schema-check';
 import { getEmbeddableForm } from './get-embeddable-form';
 import { loadRegistrationFormLabels } from './load-registration-form-labels';
 
-type ResolvedEmbeddableResult =
-  | { available: false }
-  | {
-      available: true;
-      resolvedForm: ResolvedForm;
-      targetRole: 'talent' | 'client';
-    };
+export type RegistrationEmbedMeta = {
+  formId: string;
+  targetRole: 'talent' | 'client';
+};
 
 // Combina getEmbeddableForm (busca slug + city) con resolveFormFromJson +
-// labels pre-cargados desde registration_form_translations. Si el schema
-// en DB aún es FormSchema legacy, retorna ResolvedForm vacío (hasta que
-// el usuario recree el form con CatalogFieldRef vía admin).
+// labels pre-cargados desde registration_form_translations. Detecta
+// schemas legacy (FormField[] inline, pre-catálogo) y schemas vacíos
+// para devolver razones explícitas en vez de un form vacío que confunda
+// al embedder.
 export async function getResolvedEmbeddableForm(
   slug: string,
   cityId: string,
   locale: string
-): Promise<ResolvedEmbeddableResult> {
+): Promise<EmbedResolverResult<RegistrationEmbedMeta>> {
   const result = await getEmbeddableForm(slug, cityId);
-  if (!result.available) return { available: false };
+  if (!result.available) {
+    return { available: false, reason: result.reason };
+  }
+
+  // Schema check ANTES del resolve — `resolveFormFromJson` retornaría
+  // `{ steps: [] }` para un schema legacy, indistinguible de un form
+  // recién creado. Detectamos la forma original.
+  if (isLegacySchema(result.form.schema)) {
+    return { available: false, reason: 'legacy-schema' };
+  }
 
   const supabase = createClient();
   const [
@@ -45,9 +56,16 @@ export async function getResolvedEmbeddableForm(
     formLabels,
   });
 
+  if (isEmptySchema(resolvedForm)) {
+    return { available: false, reason: 'empty-schema' };
+  }
+
   return {
     available: true,
     resolvedForm,
-    targetRole: result.form.target_role,
+    meta: {
+      formId: result.form.id,
+      targetRole: result.form.target_role,
+    },
   };
 }
