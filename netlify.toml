@@ -1,13 +1,14 @@
 [build]
-  command = "pnpm build"
+  # NODE_ENV=production aplicado SOLO al `pnpm build` (no al install).
+  # Si lo seteamos como env global, pnpm install salta devDependencies
+  # (tailwindcss, vitest, etc.) y el build falla con "Can't resolve
+  # 'tailwindcss'". Inline en el command sortea ese conflicto.
+  command = "NODE_ENV=production pnpm build"
   publish = ".next"
 
 [build.environment]
-  # Next.js 14 + next-intl v3 + React 18 falla con `useContext` null
-  # errors en _not-found / _error si NODE_ENV no es 'production' al
-  # buildear. Documentado en CLAUDE.md (Gotchas).
-  NODE_ENV = "production"
-  # Pin pnpm a la versión del lockfile para que Netlify no instale otra.
+  # Pin pnpm a la versión del lockfile para que Netlify use exactamente
+  # la misma resolución de deps que en local.
   PNPM_VERSION = "10.8.0"
 
 # Plugin oficial de Next.js: rutea middleware, RSC, SSR y route handlers
