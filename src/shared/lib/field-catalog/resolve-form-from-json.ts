@@ -1,4 +1,8 @@
-import { resolveForm, type FormLabels } from './resolve-form';
+import {
+  resolveForm,
+  type FormLabels,
+  type ServiceFilter,
+} from './resolve-form';
 import { validateCatalogFormSchema } from './catalog-schema-validation';
 import type { ResolvedForm } from './resolved-types';
 import type { Sb } from './persistence/context';
@@ -9,12 +13,15 @@ import type { Sb } from './persistence/context';
 // `formLabels` is the merged per-locale labels dict (locale over 'es'),
 // keyed by step.key / action.key. Missing keys fall back to the key itself
 // inside resolveForm.
+// `serviceFilter` (opcional): si está, filtra options de fields
+// service_select por (countryId, cityId, status='published').
 export async function resolveFormFromJson(input: {
   supabase: Sb;
   schemaJson: unknown;
   userId: string | null;
   locale: string;
   formLabels?: FormLabels;
+  serviceFilter?: ServiceFilter;
 }): Promise<ResolvedForm> {
   const validation = validateCatalogFormSchema(input.schemaJson);
   if (!validation.ok) {
@@ -26,5 +33,6 @@ export async function resolveFormFromJson(input: {
     userId: input.userId,
     locale: input.locale,
     formLabels: input.formLabels,
+    serviceFilter: input.serviceFilter,
   });
 }

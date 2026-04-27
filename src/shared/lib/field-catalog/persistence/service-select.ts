@@ -29,7 +29,21 @@ export async function readServiceSelect(
   return (data ?? []).map((row) => row.service_id);
 }
 
-// Sync: delete existing talent_services del user (en ese country) + insert new.
+// Sync diff-based:
+// 1. Lee current rows de talent_services para (talent_id, country_id).
+// 2. Calcula toAdd = newSet - currentSet, toRemove = currentSet - newSet.
+// 3. Insert solo toAdd, delete solo toRemove (filtrado por service_id IN toRemove).
+//
+// Idempotency: si la nueva selección es idéntica a la actual, no toca DB.
+// Esto preserva form_data, form_id, unit_price, specializations de los
+// rows existentes — clave para la UX del onboarding step 3 donde el user
+// re-commitea sin querer destruir su configuración.
+//
+// Re-elección destructiva: cuando un servicio sale de la selección, su
+// row se borra (cascade lleva talent_service_subtypes vinculados).
+// Esto es intencional — la UX confirmada acepta perder form_data del
+// servicio sacado.
+//
 // talent_services.talent_id FK apunta a talent_profiles.id (NO auth.users.id),
 // por lo que resolvemos el talent_profiles.id del user antes de escribir.
 export async function writeServiceSelect(
@@ -51,29 +65,58 @@ export async function writeServiceSelect(
       'missing_context'
     );
   }
-  const { error: delError } = await supabase
+
+  // 1. Read current rows scoped a este (talent, country).
+  const { data: currentData, error: readError } = await supabase
     .from('talent_services')
-    .delete()
+    .select('service_id')
     .eq('talent_id', talentId)
     .eq('country_id', context.country_id);
-  if (delError) {
+  if (readError) {
     throw new PersistenceError(
-      `delete talent_services failed: ${delError.message}`,
-      'write_failed'
+      `read talent_services failed: ${readError.message}`,
+      'read_failed'
     );
   }
-  if (serviceIds.length === 0) return;
-  const rows = serviceIds.map((service_id) => ({
-    talent_id: talentId,
-    service_id,
-    country_id: context.country_id,
-    is_verified: false,
-  }));
-  const { error: insError } = await supabase.from('talent_services').insert(rows);
-  if (insError) {
-    throw new PersistenceError(
-      `insert talent_services failed: ${insError.message}`,
-      'write_failed'
-    );
+  const currentIds = new Set((currentData ?? []).map((r) => r.service_id));
+  const newIds = new Set(serviceIds);
+
+  // 2. Diff.
+  const toRemove = Array.from(currentIds).filter((id) => !newIds.has(id));
+  const toAdd = Array.from(newIds).filter((id) => !currentIds.has(id));
+
+  // 3a. Delete sólo los removidos.
+  if (toRemove.length > 0) {
+    const { error: delError } = await supabase
+      .from('talent_services')
+      .delete()
+      .eq('talent_id', talentId)
+      .eq('country_id', context.country_id)
+      .in('service_id', toRemove);
+    if (delError) {
+      throw new PersistenceError(
+        `delete talent_services failed: ${delError.message}`,
+        'write_failed'
+      );
+    }
+  }
+
+  // 3b. Insert sólo los nuevos.
+  if (toAdd.length > 0) {
+    const rows = toAdd.map((service_id) => ({
+      talent_id: talentId,
+      service_id,
+      country_id: context.country_id,
+      is_verified: false,
+    }));
+    const { error: insError } = await supabase
+      .from('talent_services')
+      .insert(rows);
+    if (insError) {
+      throw new PersistenceError(
+        `insert talent_services failed: ${insError.message}`,
+        'write_failed'
+      );
+    }
   }
 }

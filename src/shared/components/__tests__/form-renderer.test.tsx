@@ -197,3 +197,194 @@ describe('FormRenderer', () => {
     expect(screen.getByText('Enviar')).toBeInTheDocument();
   });
 });
+
+describe('FormRenderer — fieldSlots (S2)', () => {
+  it('renders a static slot below the matching field, scoped by stepKey + fieldKey', () => {
+    const form = singleStep([makeField({ key: 'phone', label: 'Phone' })]);
+    render(
+      <FormRenderer
+        form={form}
+        onSubmit={vi.fn()}
+        fieldSlots={{
+          step1: { phone: <div data-testid="my-slot">slot content</div> },
+        }}
+      />
+    );
+    expect(screen.getByTestId('my-slot')).toBeInTheDocument();
+    expect(screen.getByTestId('my-slot').textContent).toBe('slot content');
+  });
+
+  it('does NOT render a slot for a different stepKey (scoping)', () => {
+    const form = singleStep([makeField({ key: 'phone' })]);
+    render(
+      <FormRenderer
+        form={form}
+        onSubmit={vi.fn()}
+        fieldSlots={{
+          'other-step': { phone: <div data-testid="should-not">x</div> },
+        }}
+      />
+    );
+    expect(screen.queryByTestId('should-not')).not.toBeInTheDocument();
+  });
+
+  it('does NOT render a slot for a different fieldKey', () => {
+    const form = singleStep([makeField({ key: 'phone' })]);
+    render(
+      <FormRenderer
+        form={form}
+        onSubmit={vi.fn()}
+        fieldSlots={{
+          step1: { 'other-field': <div data-testid="should-not">x</div> },
+        }}
+      />
+    );
+    expect(screen.queryByTestId('should-not')).not.toBeInTheDocument();
+  });
+
+  it('callback variant receives current value and full data', () => {
+    const form = singleStep([
+      makeField({ key: 'phone', label: 'Phone', current_value: '+34600' }),
+      makeField({ key: 'email', label: 'Email', current_value: 'a@b.c' }),
+    ]);
+    render(
+      <FormRenderer
+        form={form}
+        onSubmit={vi.fn()}
+        fieldSlots={{
+          step1: {
+            phone: ({ value, data }) => (
+              <div data-testid="cb-slot">
+                v={String(value)} d={JSON.stringify(data)}
+              </div>
+            ),
+          },
+        }}
+      />
+    );
+    const slot = screen.getByTestId('cb-slot');
+    expect(slot.textContent).toContain('v=+34600');
+    expect(slot.textContent).toContain('"phone":"+34600"');
+    expect(slot.textContent).toContain('"email":"a@b.c"');
+  });
+
+  it('callback re-renders with updated value as user types', () => {
+    const form = singleStep([
+      makeField({ key: 'phone', label: 'Phone' }),
+    ]);
+    render(
+      <FormRenderer
+        form={form}
+        onSubmit={vi.fn()}
+        fieldSlots={{
+          step1: {
+            phone: ({ value }) => (
+              <div data-testid="cb-slot">v={String(value ?? 'empty')}</div>
+            ),
+          },
+        }}
+      />
+    );
+    expect(screen.getByTestId('cb-slot').textContent).toBe('v=empty');
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: { value: '+34999' },
+    });
+    expect(screen.getByTestId('cb-slot').textContent).toBe('v=+34999');
+  });
+});
+
+describe('FormRenderer — actionGuards (S2)', () => {
+  function wizardWithSubmit() {
+    const form: ResolvedForm = {
+      steps: [
+        {
+          key: 'step1',
+          label: 'Step 1',
+          fields: [makeField({ key: 'a' })],
+          actions: [{ key: 'btn_submit', type: 'submit', label: 'Save' }],
+        },
+      ],
+    };
+    return form;
+  }
+
+  it('blocks submit and shows guard error message when guard returns string', () => {
+    const onSubmit = vi.fn();
+    render(
+      <FormRenderer
+        form={wizardWithSubmit()}
+        onSubmit={onSubmit}
+        actionGuards={{ step1: () => 'cannot proceed yet' }}
+      />
+    );
+    fireEvent.click(screen.getByText('Save'));
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(screen.getByText('cannot proceed yet')).toBeInTheDocument();
+  });
+
+  it('allows submit when guard returns true', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(true);
+    render(
+      <FormRenderer
+        form={wizardWithSubmit()}
+        onSubmit={onSubmit}
+        actionGuards={{ step1: () => true }}
+      />
+    );
+    fireEvent.click(screen.getByText('Save'));
+    await vi.waitFor(() => {
+      expect(onSubmit).toHaveBeenCalled();
+    });
+  });
+
+  it('does not apply guard to back action', () => {
+    const form: ResolvedForm = {
+      steps: [
+        {
+          key: 'step1',
+          label: 'Step 1',
+          fields: [makeField({ key: 'a' })],
+          actions: [{ key: 'btn_next', type: 'next', label: 'Next' }],
+        },
+        {
+          key: 'step2',
+          label: 'Step 2',
+          fields: [makeField({ key: 'b' })],
+          actions: [
+            { key: 'btn_back', type: 'back', label: 'Back' },
+            { key: 'btn_submit', type: 'submit', label: 'Save' },
+          ],
+        },
+      ],
+    };
+    render(
+      <FormRenderer
+        form={form}
+        onSubmit={vi.fn()}
+        actionGuards={{ step2: () => 'blocked' }}
+      />
+    );
+    fireEvent.click(screen.getByText('Next'));
+    expect(screen.getByText('Step 2')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Back'));
+    // Back ignored guard, advanced regardless.
+    expect(screen.getByText('Step 1')).toBeInTheDocument();
+  });
+
+  it('clears previous guard error on next action', () => {
+    let toggle = true;
+    const guard = vi.fn(() => (toggle ? 'first error' : true));
+    render(
+      <FormRenderer
+        form={wizardWithSubmit()}
+        onSubmit={vi.fn().mockResolvedValue(true)}
+        actionGuards={{ step1: guard }}
+      />
+    );
+    fireEvent.click(screen.getByText('Save'));
+    expect(screen.getByText('first error')).toBeInTheDocument();
+    toggle = false;
+    fireEvent.click(screen.getByText('Save'));
+    expect(screen.queryByText('first error')).not.toBeInTheDocument();
+  });
+});

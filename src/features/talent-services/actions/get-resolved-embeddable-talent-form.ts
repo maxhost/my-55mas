@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { resolveFormFromJson } from '@/shared/lib/field-catalog/resolve-form-from-json';
+import type { ServiceFilter } from '@/shared/lib/field-catalog/resolve-form';
 import type { EmbedResolverResult } from '@/shared/lib/embed/types';
 import {
   isEmptySchema,
@@ -22,11 +23,17 @@ export type TalentEmbedMeta = {
 // adapters lean valores actuales (ej: email del talent autenticado).
 // Acá NO decidimos country gate — eso es responsabilidad del Server
 // wrapper que llama primero a `resolveTalentAccess`.
+//
+// `serviceFilter` opcional: si está, filtra options de fields service_select
+// por (countryId, cityId, status='published'). Útil cuando el form contiene
+// un multiselect de servicios (ej: el field "Tipo de servicios" en
+// onboarding step 3).
 export async function getResolvedEmbeddableTalentForm(
   slug: string,
   cityId: string | null,
   locale: string,
-  userId: string | null
+  userId: string | null,
+  serviceFilter?: ServiceFilter
 ): Promise<EmbedResolverResult<TalentEmbedMeta>> {
   const result = await getEmbeddableTalentForm(slug, cityId);
   if (!result.available) {
@@ -46,6 +53,7 @@ export async function getResolvedEmbeddableTalentForm(
     userId,
     locale,
     formLabels,
+    serviceFilter,
   });
 
   if (isEmptySchema(resolvedForm)) {

@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { resolveFormFromJson } from '@/shared/lib/field-catalog/resolve-form-from-json';
+import type { ServiceFilter } from '@/shared/lib/field-catalog/resolve-form';
 import type { EmbedResolverResult } from '@/shared/lib/embed/types';
 import {
   isEmptySchema,
@@ -23,7 +24,8 @@ export type RegistrationEmbedMeta = {
 export async function getResolvedEmbeddableForm(
   slug: string,
   cityId: string,
-  locale: string
+  locale: string,
+  serviceFilter?: ServiceFilter
 ): Promise<EmbedResolverResult<RegistrationEmbedMeta>> {
   const result = await getEmbeddableForm(slug, cityId);
   if (!result.available) {
@@ -54,6 +56,7 @@ export async function getResolvedEmbeddableForm(
     userId: user?.id ?? null,
     locale,
     formLabels,
+    serviceFilter,
   });
 
   if (isEmptySchema(resolvedForm)) {

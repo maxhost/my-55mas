@@ -16,7 +16,10 @@ import type { StepAction } from '@/shared/lib/forms/types';
 import { loadFormValues } from './load-form-values';
 import type { Sb } from './persistence/context';
 import { loadSubtypeOptionsForGroup } from './subtype-groups';
-import { loadPublishedServicesForLocale } from './service-options';
+import {
+  loadPublishedServicesForLocale,
+  loadAvailableServicesForTalent,
+} from './service-options';
 import { loadDbColumnOptions } from './db-column-options';
 import type { DbColumnTarget, SubtypeTarget } from './types';
 
@@ -31,16 +34,28 @@ const FALLBACK_LOCALE = 'es';
  */
 export type FormLabels = Record<string, string>;
 
+// ServiceFilter: contexto del talent para filtrar service_select options.
+// Si está presente, las options del field service_select se filtran por:
+// - services.status='published'
+// - service_countries.country_id = countryId
+// - service_cities.city_id = cityId (si cityId no null)
+// Sin él, fallback al loader sin filtro (admin previews, etc.).
+export type ServiceFilter = {
+  countryId: string;
+  cityId: string | null;
+};
+
 export type ResolveFormInput = {
   supabase: Sb;
   schema: CatalogFormSchema;
   userId: string | null;
   locale: string;
   formLabels?: FormLabels;
+  serviceFilter?: ServiceFilter;
 };
 
 export async function resolveForm(input: ResolveFormInput): Promise<ResolvedForm> {
-  const { supabase, schema, userId, locale, formLabels } = input;
+  const { supabase, schema, userId, locale, formLabels, serviceFilter } = input;
   const fieldIds = collectFieldIds(schema);
   const labels: FormLabels = formLabels ?? {};
 
@@ -61,7 +76,7 @@ export async function resolveForm(input: ResolveFormInput): Promise<ResolvedForm
 
   await Promise.all([
     applySubtypeOptions(supabase, resolvedFields, locale),
-    applyServiceSelectOptions(supabase, resolvedFields, locale),
+    applyServiceSelectOptions(supabase, resolvedFields, locale, serviceFilter),
     applyDbColumnOptions(supabase, resolvedFields, locale),
   ]);
 
@@ -166,20 +181,29 @@ async function applyDbColumnOptions(
   );
 }
 
-// Para fields con persistence_type='service_select' las options son todos
-// los servicios published (sin filtro de país — matchea el legacy
-// getServiceOptionsForForm). Carga única por resolveForm y se inyecta a
-// todos los fields service_select presentes en el schema.
+// Para fields con persistence_type='service_select' las options son los
+// servicios publicados. Si `serviceFilter` está presente (flow de talent),
+// filtramos además por country_id + city_id del talent. Sin él, todos los
+// publicados (admin previews, builders sin contexto). Carga única por
+// resolveForm y se inyecta a todos los fields service_select presentes.
 async function applyServiceSelectOptions(
   supabase: Sb,
   fields: ResolvedField[],
-  locale: string
+  locale: string,
+  serviceFilter: ServiceFilter | undefined
 ): Promise<void> {
   const hasServiceSelect = fields.some(
     (f) => f.persistence_type === 'service_select'
   );
   if (!hasServiceSelect) return;
-  const services = await loadPublishedServicesForLocale(supabase, locale);
+  const services = serviceFilter
+    ? await loadAvailableServicesForTalent(
+        supabase,
+        locale,
+        serviceFilter.countryId,
+        serviceFilter.cityId
+      )
+    : await loadPublishedServicesForLocale(supabase, locale);
   const ids = services.map((s) => s.id);
   const labels: Record<string, string> = {};
   for (const s of services) labels[s.id] = s.name;

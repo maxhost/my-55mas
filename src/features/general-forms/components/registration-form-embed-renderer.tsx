@@ -4,7 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { FormRenderer, type SubmitMeta } from '@/shared/components/form-renderer';
+import {
+  FormRenderer,
+  type SubmitMeta,
+  type FieldSlots,
+  type ActionGuard,
+} from '@/shared/components/form-renderer';
 import type { ResolvedForm } from '@/shared/lib/field-catalog/resolved-types';
 import { registerUser } from '../actions/register-user';
 import { saveRegistrationStep } from '../actions/save-registration-step';
@@ -16,6 +21,9 @@ type Props = {
   countryId?: string;
   cityId?: string;
   onSubmit?: (formData: Record<string, unknown>) => Promise<void> | void;
+  // Slots y guards opcionales — passthrough al FormRenderer.
+  fieldSlots?: FieldSlots;
+  actionGuards?: Record<string, ActionGuard>;
 };
 
 // Client renderer del embed: maneja submit dispatch (register vs save),
@@ -29,6 +37,8 @@ export function RegistrationFormEmbedRenderer({
   countryId,
   cityId,
   onSubmit,
+  fieldSlots,
+  actionGuards,
 }: Props) {
   const tc = useTranslations('Common');
   const currentLocale = useLocale();
@@ -109,6 +119,8 @@ export function RegistrationFormEmbedRenderer({
         onSubmit={handleSubmit}
         submitLabel={submitLabel ?? (isPending ? tc('saving') : tc('save'))}
         isPending={isPending}
+        fieldSlots={fieldSlots}
+        actionGuards={actionGuards}
       />
     </div>
   );

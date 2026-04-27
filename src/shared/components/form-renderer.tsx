@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import type {
   ResolvedAction,
@@ -18,6 +18,28 @@ export type SubmitMeta = {
   isLastStep: boolean;
 };
 
+// FieldSlot: contenido a renderear inmediatamente debajo de un field
+// específico (matched por stepKey + fieldKey). Útil para inyectar UI
+// que coexiste con el field y necesita su valor live (callback variant).
+//
+// - ReactNode: contenido estático (típicamente Server Components
+//   pre-renderizados pasados desde una page).
+// - Callback: recibe el valor live del field y el formData completo del
+//   FormRenderer. Útil para componentes que necesitan reaccionar al
+//   estado actual del form (ej: botón "Aplicar selección").
+export type FieldSlot =
+  | ReactNode
+  | ((ctx: { value: unknown; data: Record<string, unknown> }) => ReactNode);
+
+// FieldSlots: scoped por stepKey para evitar colisión cuando un mismo
+// field_definition_id se reusa en múltiples forms con keys idénticas.
+export type FieldSlots = Record<string /* stepKey */, Record<string /* fieldKey */, FieldSlot>>;
+
+// ActionGuard: predicate que se evalúa antes de avanzar/submit de un
+// step. Retorna `true` si el step puede avanzar, o un string con el
+// mensaje de error a mostrar inline (UX) y bloquear el avance.
+export type ActionGuard = () => true | string;
+
 type Props = {
   form: ResolvedForm;
   onSubmit: (
@@ -27,6 +49,13 @@ type Props = {
   submitLabel?: string;
   isPending?: boolean;
   selectPlaceholder?: string;
+  // Slots opcionales scoped por stepKey + fieldKey. Si un slot existe
+  // para el field renderizado, se renderea inmediatamente debajo del field.
+  fieldSlots?: FieldSlots;
+  // Guards opcionales scoped por stepKey. Se evalúan antes de avanzar/
+  // submit. Si retornan string, el avance se bloquea y el mensaje se
+  // muestra inline.
+  actionGuards?: Record<string /* stepKey */, ActionGuard>;
 };
 
 function buildInitialData(form: ResolvedForm): Record<string, unknown> {
@@ -62,12 +91,24 @@ export function FormRenderer({
   submitLabel,
   isPending = false,
   selectPlaceholder = '',
+  fieldSlots,
+  actionGuards,
 }: Props) {
   const [data, setData] = useState<Record<string, unknown>>(() =>
     buildInitialData(form)
   );
   const [stepIndex, setStepIndex] = useState(0);
   const [errors, setErrors] = useState<Set<string>>(new Set());
+  const [guardError, setGuardError] = useState<string | null>(null);
+
+  const renderFieldSlot = (stepKey: string, fieldKey: string): ReactNode => {
+    const slot = fieldSlots?.[stepKey]?.[fieldKey];
+    if (slot === undefined) return null;
+    if (typeof slot === 'function') {
+      return slot({ value: data[fieldKey], data });
+    }
+    return slot;
+  };
 
   const { steps } = form;
   const isWizard = steps.some((s) => s.actions && s.actions.length > 0);
@@ -92,6 +133,7 @@ export function FormRenderer({
   };
 
   const handleAction = async (action: ResolvedAction) => {
+    setGuardError(null);
     if (action.type === 'back') {
       setStepIndex((i) => Math.max(0, i - 1));
       setErrors(new Set());
@@ -99,6 +141,17 @@ export function FormRenderer({
     }
     const currentStep = steps[stepIndex];
     if (!validateStep(currentStep)) return;
+    // ActionGuard: se evalúa post-required-validation, antes de avanzar.
+    // Aplica a next/submit/register (no a back). Si retorna string, mostrar
+    // mensaje inline y bloquear el avance.
+    const guard = actionGuards?.[currentStep.key];
+    if (guard) {
+      const guardResult = guard();
+      if (typeof guardResult === 'string') {
+        setGuardError(guardResult);
+        return;
+      }
+    }
     if (action.type === 'next') {
       setStepIndex((i) => Math.min(steps.length - 1, i + 1));
       return;
@@ -118,15 +171,23 @@ export function FormRenderer({
   const renderStep = (step: ResolvedStep) => (
     <div key={step.key} className="space-y-4">
       <h3 className="text-lg font-medium">{step.label}</h3>
-      {step.fields.map((field) =>
-        renderResolvedField(
+      {step.fields.map((field) => {
+        const slot = renderFieldSlot(step.key, field.key);
+        const fieldNode = renderResolvedField(
           field,
           data[field.key],
           errors.has(field.key) ? 'border-destructive' : '',
           setValue,
           selectPlaceholder
-        )
-      )}
+        );
+        if (slot === null) return fieldNode;
+        return (
+          <div key={field.key} className="space-y-3">
+            {fieldNode}
+            {slot}
+          </div>
+        );
+      })}
     </div>
   );
 
@@ -162,6 +223,11 @@ export function FormRenderer({
           {stepIndex + 1} / {steps.length}
         </p>
         {renderStep(currentStep)}
+        {guardError && (
+          <p className="text-destructive bg-destructive/10 rounded-md px-3 py-2 text-sm">
+            {guardError}
+          </p>
+        )}
         {renderActions(actions)}
       </div>
     );
