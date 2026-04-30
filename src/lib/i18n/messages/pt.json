@@ -47,7 +47,10 @@
     "atLeastOneService": "Seleciona pelo menos um serviço para continuar.",
     "saveAllServicesFirst": "Guarda todos os serviços antes de continuar.",
     "savedCount": "{saved} de {total} serviços guardados",
-    "accordionTitle": "Configura cada serviço"
+    "accordionTitle": "Configura cada serviço",
+    "loadingService": "A carregar serviço…",
+    "expandError": "Não foi possível carregar o serviço.",
+    "retry": "Tentar de novo"
   },
   "TalentServiceEmbed": {
     "unavailable": {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import type {
   ResolvedAction,
@@ -100,6 +100,32 @@ export function FormRenderer({
   const [stepIndex, setStepIndex] = useState(0);
   const [errors, setErrors] = useState<Set<string>>(new Set());
   const [guardError, setGuardError] = useState<string | null>(null);
+  // customErrors: errores custom impuestos por renderers vía
+  // `setFieldError(message)`. Se chequean en validateStep para bloquear
+  // avance si el renderer marca el field como inválido. Reusable para
+  // cualquier input_type que necesite reglas más allá de "required".
+  const [customErrors, setCustomErrors] = useState<Map<string, string>>(
+    () => new Map()
+  );
+
+  // Callback estable que el renderer usa para imponer/limpiar un error.
+  // useCallback para evitar re-renders innecesarios del renderer Client.
+  const makeSetFieldError = useCallback(
+    (fieldKey: string) => (message: string | null) => {
+      setCustomErrors((prev) => {
+        const next = new Map(prev);
+        if (message === null || message === '') {
+          if (!next.has(fieldKey)) return prev;
+          next.delete(fieldKey);
+        } else {
+          if (next.get(fieldKey) === message) return prev;
+          next.set(fieldKey, message);
+        }
+        return next;
+      });
+    },
+    []
+  );
 
   const renderFieldSlot = (stepKey: string, fieldKey: string): ReactNode => {
     const slot = fieldSlots?.[stepKey]?.[fieldKey];
@@ -126,7 +152,16 @@ export function FormRenderer({
   const validateStep = (step: ResolvedStep): boolean => {
     const missing = new Set<string>();
     for (const field of step.fields) {
-      if (isRequiredEmpty(field, data[field.key])) missing.add(field.key);
+      // Required check.
+      if (isRequiredEmpty(field, data[field.key])) {
+        missing.add(field.key);
+        continue;
+      }
+      // Custom error check: si el renderer impuso un error vía
+      // setFieldError, también bloquea avance.
+      if (customErrors.has(field.key)) {
+        missing.add(field.key);
+      }
     }
     setErrors(missing);
     return missing.size === 0;
@@ -173,17 +208,28 @@ export function FormRenderer({
       <h3 className="text-lg font-medium">{step.label}</h3>
       {step.fields.map((field) => {
         const slot = renderFieldSlot(step.key, field.key);
+        const customError = customErrors.get(field.key);
+        const hasError = errors.has(field.key) || Boolean(customError);
         const fieldNode = renderResolvedField(
           field,
           data[field.key],
-          errors.has(field.key) ? 'border-destructive' : '',
+          hasError ? 'border-destructive' : '',
           setValue,
-          selectPlaceholder
+          selectPlaceholder,
+          makeSetFieldError(field.key),
+          customError
         );
-        if (slot === null) return fieldNode;
+        // Render mensaje del custom error inline debajo del field si existe.
+        // Built-ins ignoran customError y el FormRenderer lo muestra acá
+        // para que cualquier renderer reciba la misma UX sin duplicar.
+        const errorMsg = customError ? (
+          <p className="text-destructive text-xs">{customError}</p>
+        ) : null;
+        if (slot === null && errorMsg === null) return fieldNode;
         return (
           <div key={field.key} className="space-y-3">
             {fieldNode}
+            {errorMsg}
             {slot}
           </div>
         );

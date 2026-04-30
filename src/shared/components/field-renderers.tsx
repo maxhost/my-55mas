@@ -226,7 +226,9 @@ export function renderResolvedField(
   value: unknown,
   errorClass: string,
   onChange: (key: string, value: unknown) => void,
-  selectPlaceholder = ''
+  selectPlaceholder = '',
+  setFieldError?: (message: string | null) => void,
+  customError?: string
 ) {
   const props: SelectRenderProps = {
     field,
@@ -234,6 +236,8 @@ export function renderResolvedField(
     errorClass,
     onChange,
     selectPlaceholder,
+    setFieldError,
+    customError,
   };
   const renderer = inputRenderers.get(field.input_type);
   if (!renderer) return null;

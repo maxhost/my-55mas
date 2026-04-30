@@ -47,7 +47,10 @@
     "atLeastOneService": "Select at least one service to continue.",
     "saveAllServicesFirst": "Save all services before continuing.",
     "savedCount": "{saved} of {total} services saved",
-    "accordionTitle": "Configure each service"
+    "accordionTitle": "Configure each service",
+    "loadingService": "Loading service…",
+    "expandError": "Could not load the service.",
+    "retry": "Retry"
   },
   "TalentServiceEmbed": {
     "unavailable": {

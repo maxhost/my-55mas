@@ -14,6 +14,12 @@ export const INPUT_TYPES = [
   'address',
   'display_text',
   'terms_checkbox',
+  // Compositive input_type: multiselect filtrado de servicios + acordeón
+  // con un TalentServiceFormEmbedRenderer por servicio elegido + status
+  // badges + bloqueo de submit. Renderer registrado por el feature
+  // talent-services vía side-effect import desde root layout. Ver
+  // docs/features/talent-services-panel.md.
+  'talent_services_panel',
 ] as const;
 
 export type InputType = (typeof INPUT_TYPES)[number];

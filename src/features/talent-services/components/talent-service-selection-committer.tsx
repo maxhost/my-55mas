@@ -14,6 +14,11 @@ type Props = {
   // Selección persistida en talent_services (snapshot del último commit).
   // Pasada desde la page Server Component.
   persistedSelection: string[];
+  // Callback opcional invocado tras commit success. Útil para que un
+  // parent renderer (ej: TalentServicesPanel) dispare un re-fetch de su
+  // estado local. router.refresh() solo no garantiza re-fetch del state
+  // de un Client component (no re-corre useEffect estable).
+  onCommitSuccess?: () => void;
 };
 
 // Botón "Aplicar selección". Visible solo cuando hay diff entre la
@@ -28,6 +33,7 @@ type Props = {
 export function TalentServiceSelectionCommitter({
   currentSelection,
   persistedSelection,
+  onCommitSuccess,
 }: Props) {
   const t = useTranslations('OnboardingServices');
   const router = useRouter();
@@ -55,6 +61,7 @@ export function TalentServiceSelectionCommitter({
       }
       toast.success(t('commitSuccess'));
       router.refresh();
+      onCommitSuccess?.();
     });
   };
 

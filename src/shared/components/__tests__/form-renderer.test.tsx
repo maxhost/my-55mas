@@ -388,3 +388,9 @@ describe('FormRenderer — actionGuards (S2)', () => {
     expect(screen.queryByText('first error')).not.toBeInTheDocument();
   });
 });
+
+// La cobertura de la infra setFieldError + customErrors se ejerce a
+// través de los tests RTL del renderer talent_services_panel (S5b),
+// que es el primer consumer real de la infra. Acá nos limitamos a
+// verificar que el FormRenderer compila con los nuevos params y que
+// los tests existentes siguen pasando (regression).

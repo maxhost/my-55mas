@@ -47,7 +47,10 @@
     "atLeastOneService": "Selecciona almenys un servei per continuar.",
     "saveAllServicesFirst": "Desa tots els serveis abans de continuar.",
     "savedCount": "{saved} de {total} serveis desats",
-    "accordionTitle": "Configura cada servei"
+    "accordionTitle": "Configura cada servei",
+    "loadingService": "Carregant servei…",
+    "expandError": "No s'ha pogut carregar el servei.",
+    "retry": "Tornar a provar"
   },
   "TalentServiceEmbed": {
     "unavailable": {

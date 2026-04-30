@@ -6,6 +6,12 @@ import { routing } from '@/lib/i18n/routing';
 import { Toaster } from '@/components/ui/sonner';
 import '@/app/globals.css';
 
+// Side-effect imports: pueblan el registry de field-renderers con los
+// renderers feature-specific. Sin esto, el dispatcher no encuentra el
+// renderer del input_type talent_services_panel y devuelve null.
+// Ver docs/features/talent-services-panel.md (sección Arquitectura).
+import '@/features/talent-services/init/register-renderers';
+
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }

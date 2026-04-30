@@ -19,3 +19,5 @@ export { TalentServicesAccordion } from './components/talent-services-accordion'
 export { TalentServiceSelectionCommitter } from './components/talent-service-selection-committer';
 export { getTalentServicesStatus } from './actions/get-talent-services-status';
 export { commitTalentServiceSelection } from './actions/commit-talent-service-selection';
+export { loadTalentServicesPanelState } from './actions/load-talent-services-panel-state';
+export { loadTalentServiceForExpand } from './actions/load-talent-service-for-expand';
