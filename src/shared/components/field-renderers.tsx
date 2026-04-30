@@ -17,12 +17,20 @@ import {
   renderMultiselectDropdown,
 } from './field-renderers/multiselect';
 import { renderEmailAuth } from './field-renderers/email';
+import {
+  inputRenderers,
+  registerInputRenderer,
+  type InputRenderer,
+} from './field-renderers/registry';
+import type { InputType } from '@/shared/lib/field-catalog/types';
 
 // Re-exports para consumers externos que importen desde este path.
 export {
   renderTermsCheckbox,
   renderMultiselectCheckbox,
   renderMultiselectDropdown,
+  registerInputRenderer,
+  inputRenderers,
 };
 export type { RenderProps, SelectRenderProps };
 
@@ -168,7 +176,50 @@ export function renderAddress({ field, value, errorClass, onChange }: RenderProp
   );
 }
 
-// ── Dispatcher ───────────────────────────────────────
+// ── Built-ins registration (module init) ─────────────
+//
+// Se ejecuta una sola vez al cargar este módulo. Cualquier consumer de
+// `renderResolvedField` ya importa este archivo, así que los built-ins
+// quedan registrados en el momento exacto en que el dispatcher se usa.
+//
+// Feature-specific renderers se registran por separado vía side-effect
+// import desde `app/[locale]/layout.tsx` (ej:
+// `import '@/features/talent-services/init/register-renderers'`).
+
+const builtIns: ReadonlyArray<[InputType, InputRenderer]> = [
+  ['text', (props) => renderText(props, 'text')],
+  [
+    'email',
+    (props) =>
+      props.field.persistence_type === 'auth'
+        ? renderEmailAuth(props)
+        : renderText(props, 'email'),
+  ],
+  ['password', (props) => renderText(props, 'password')],
+  ['date', (props) => renderText(props, 'date')],
+  ['number', (props) => renderNumber(props)],
+  ['boolean', (props) => renderBoolean(props)],
+  ['textarea', (props) => renderTextarea(props)],
+  ['single_select', (props) => renderSingleSelect(props as SelectRenderProps)],
+  ['multiselect_checkbox', (props) => renderMultiselectCheckbox(props)],
+  [
+    'multiselect_dropdown',
+    (props) => renderMultiselectDropdown(props as SelectRenderProps),
+  ],
+  ['address', (props) => renderAddress(props)],
+  ['display_text', (props) => renderDisplayText(props)],
+  ['terms_checkbox', (props) => renderTermsCheckbox(props)],
+];
+
+// Registrar built-ins. Idempotente: si por algún motivo este módulo se
+// evalúa dos veces (ej: HMR), saltamos los ya registrados.
+for (const [type, fn] of builtIns) {
+  if (!inputRenderers.has(type)) {
+    registerInputRenderer(type, fn);
+  }
+}
+
+// ── Dispatcher (registry-based lookup) ───────────────
 
 export function renderResolvedField(
   field: ResolvedField,
@@ -177,38 +228,14 @@ export function renderResolvedField(
   onChange: (key: string, value: unknown) => void,
   selectPlaceholder = ''
 ) {
-  const base: RenderProps = { field, value, errorClass, onChange };
-  const selectBase: SelectRenderProps = { ...base, selectPlaceholder };
-  switch (field.input_type) {
-    case 'email':
-      if (field.persistence_type === 'auth') return renderEmailAuth(base);
-      return renderText(base, 'email');
-    case 'text':
-    case 'password':
-    case 'date':
-      return renderText(base, field.input_type);
-    case 'number':
-      return renderNumber(base);
-    case 'boolean':
-      return renderBoolean(base);
-    case 'textarea':
-      return renderTextarea(base);
-    case 'single_select':
-      return renderSingleSelect(selectBase);
-    case 'multiselect_checkbox':
-      return renderMultiselectCheckbox(base);
-    case 'multiselect_dropdown':
-      return renderMultiselectDropdown(selectBase);
-    case 'address':
-      return renderAddress(base);
-    case 'display_text':
-      return renderDisplayText(base);
-    case 'terms_checkbox':
-      return renderTermsCheckbox(base);
-    default: {
-      const _exhaustive: never = field.input_type;
-      void _exhaustive;
-      return null;
-    }
-  }
+  const props: SelectRenderProps = {
+    field,
+    value,
+    errorClass,
+    onChange,
+    selectPlaceholder,
+  };
+  const renderer = inputRenderers.get(field.input_type);
+  if (!renderer) return null;
+  return renderer(props);
 }
