@@ -15,7 +15,6 @@ export { TalentServiceBuilder } from './components/talent-service-builder';
 export { TalentServiceConfig } from './components/talent-service-config';
 export { TalentServiceFormEmbed } from './components/talent-service-form-embed';
 export { TalentServiceFormEmbedRenderer } from './components/talent-service-form-embed-renderer';
-export { TalentServicesAccordion } from './components/talent-services-accordion';
 export { TalentServiceSelectionCommitter } from './components/talent-service-selection-committer';
 export { getTalentServicesStatus } from './actions/get-talent-services-status';
 export { commitTalentServiceSelection } from './actions/commit-talent-service-selection';

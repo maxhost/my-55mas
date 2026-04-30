@@ -103,6 +103,10 @@ describe('locale parity — todas las claves deben existir en los 5 locales', ()
       'OnboardingServices.saveAllServicesFirst',
       'OnboardingServices.savedCount',
       'OnboardingServices.accordionTitle',
+      // talent_services_panel renderer (S5b del feature talent-services-panel).
+      'OnboardingServices.loadingService',
+      'OnboardingServices.expandError',
+      'OnboardingServices.retry',
     ];
     for (const locale of Object.keys(LOCALES)) {
       const keys = localeKeys[locale];
