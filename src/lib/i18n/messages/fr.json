@@ -434,6 +434,7 @@
     "sortOrder": "Ordre",
     "inputType": "Type d'entrée",
     "persistenceType": "Type de persistance",
+    "panelLockedPersistence": "Le panneau de services persiste toujours vers talent_services. La persistance est verrouillée sur service_select.",
     "persistenceTargetTable": "Table",
     "persistenceTargetColumn": "Colonne",
     "persistenceTargetAuthField": "Champ d'auth",

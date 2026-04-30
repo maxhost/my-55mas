@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
 // Side-effect imports: simulan el bootstrap completo del root layout —
 // (a) shared registra built-ins, (b) talent-services registra su panel.
+// El init module ejecuta el registro al cargarse (top-level side effect).
 import '@/shared/components/field-renderers';
-import '../init/register-renderers';
+import '../init/talent-services-renderers-init';
 import { inputRenderers } from '@/shared/components/field-renderers/registry';
 import { INPUT_TYPES } from '@/shared/lib/field-catalog/types';
 

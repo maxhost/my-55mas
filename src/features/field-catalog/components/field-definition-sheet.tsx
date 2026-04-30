@@ -143,6 +143,10 @@ export function FieldDefinitionSheet({
                   if (v == null) return;
                   handlers.handlePersistenceTypeChange(v as PersistenceType);
                 }}
+                /* talent_services_panel forza persistence_type=service_select.
+                 * Deshabilitar el dropdown evita que el admin lo cambie y
+                 * rompa la semántica del panel. */
+                disabled={state.inputType === 'talent_services_panel'}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue />
@@ -155,6 +159,11 @@ export function FieldDefinitionSheet({
                   ))}
                 </SelectContent>
               </Select>
+              {state.inputType === 'talent_services_panel' && (
+                <p className="text-muted-foreground text-xs">
+                  {t('panelLockedPersistence')}
+                </p>
+              )}
             </div>
           )}
 

@@ -434,6 +434,7 @@
     "sortOrder": "Ordre",
     "inputType": "Tipus d'entrada",
     "persistenceType": "Tipus de persistència",
+    "panelLockedPersistence": "El panell de serveis sempre persisteix a talent_services. La persistència queda fixa a service_select.",
     "persistenceTargetTable": "Taula",
     "persistenceTargetColumn": "Columna",
     "persistenceTargetAuthField": "Camp d'auth",

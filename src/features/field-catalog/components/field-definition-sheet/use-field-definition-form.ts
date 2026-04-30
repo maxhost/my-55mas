@@ -115,6 +115,12 @@ export function useFieldDefinitionForm(input: UseFormInput) {
     if (next === 'display_text') {
       setPersistenceType('none');
       setTarget(null);
+    } else if (next === 'talent_services_panel') {
+      // El panel SIEMPRE persiste a talent_services vía writeServiceSelect.
+      // Forzamos persistence_type para evitar configuraciones erróneas
+      // que romperían la semántica (ver superRefine en schemas.ts).
+      setPersistenceType('service_select');
+      setTarget(null);
     } else if (next === 'terms_checkbox') {
       // terms_checkbox persiste boolean; default form_response.
       if (persistenceType === 'none') {

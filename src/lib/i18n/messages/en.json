@@ -434,6 +434,7 @@
     "sortOrder": "Order",
     "inputType": "Input type",
     "persistenceType": "Persistence type",
+    "panelLockedPersistence": "The services panel always persists to talent_services. Persistence is locked to service_select.",
     "persistenceTargetTable": "Table",
     "persistenceTargetColumn": "Column",
     "persistenceTargetAuthField": "Auth field",

@@ -182,6 +182,22 @@ export const fieldDefinitionInputSchema = z
       }
     }
 
+    // talent_services_panel requiere persistence_type='service_select'
+    // estrictamente. El renderer del panel persiste a `talent_services`
+    // vía writeServiceSelect — cualquier otro persistence_type rompe la
+    // semántica (ej: form_response escribiría el array de service_ids
+    // en user_form_responses, fuera del flujo del panel).
+    if (
+      data.input_type === 'talent_services_panel' &&
+      data.persistence_type !== 'service_select'
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['persistence_type'],
+        message: 'panelRequiresServiceSelect',
+      });
+    }
+
     // config.allow_change sólo tiene sentido en email + auth (dispara
     // supabase.auth.updateUser). Rechazamos valores seteados fuera de ese
     // combo para evitar configuraciones confusas o silent no-ops.

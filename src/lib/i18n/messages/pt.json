@@ -434,6 +434,7 @@
     "sortOrder": "Ordem",
     "inputType": "Tipo de input",
     "persistenceType": "Tipo de persistência",
+    "panelLockedPersistence": "O painel de serviços sempre persiste em talent_services. A persistência está fixa em service_select.",
     "persistenceTargetTable": "Tabela",
     "persistenceTargetColumn": "Coluna",
     "persistenceTargetAuthField": "Campo de auth",
