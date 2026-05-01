@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useId, useState } from 'react';
+import { useId, useState } from 'react';
+import { AddressAutofill } from '@mapbox/search-js-react';
 import { cn } from '@/lib/utils';
 
 // Same classes as shadcn Input — Mapbox AddressAutofill requires a native
-// <input> child (it cloneElement's the child to attach handlers; wrapping
-// component-libraries like @base-ui/react/input swallow those handlers),
-// so we render a raw <input> styled to match.
+// <input> child (it cloneElement's the child to attach handlers).
 const INPUT_CLASS =
   'h-9 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80';
 
@@ -17,16 +16,13 @@ export type AddressValue = {
   lng: number | null;
   mapbox_id: string | null;
   raw_text: string;
-  /** lowercase ISO 3166-1 alpha-2 from Mapbox properties.country_code */
   country_code: string;
-  /** city/locality name from Mapbox properties.place */
   city_name: string;
 };
 
 export type AddressAutocompleteProps = {
   value: AddressValue;
   onChange: (value: AddressValue) => void;
-  /** ISO 3166-1 alpha-2 codes (uppercase) — restricts suggestions to these countries. Empty array = no restriction. */
   countryCodes: string[];
   language?: string;
   placeholder?: string;
@@ -44,6 +40,8 @@ type AutofillProps = {
   children: React.ReactNode;
 };
 
+const Autofill = AddressAutofill as unknown as React.ComponentType<AutofillProps>;
+
 export function AddressAutocomplete({
   value,
   onChange,
@@ -56,19 +54,6 @@ export function AddressAutocomplete({
 }: AddressAutocompleteProps) {
   const inputId = useId();
   const [text, setText] = useState(value.raw_text || value.street || '');
-  const [Autofill, setAutofill] = useState<React.ComponentType<AutofillProps> | null>(null);
-
-  useEffect(() => {
-    if (!TOKEN) return;
-    let cancelled = false;
-    import('@mapbox/search-js-react').then((m) => {
-      if (cancelled) return;
-      setAutofill(() => m.AddressAutofill as unknown as React.ComponentType<AutofillProps>);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const handleRetrieve = (res: unknown) => {
     const r = res as {
@@ -82,11 +67,6 @@ export function AddressAutocomplete({
     if (!feature) return;
     const props = feature.properties ?? {};
     const [lng, lat] = feature.geometry?.coordinates ?? [null, null];
-    // Mapbox AddressAutofill retrieve response (search-js-react):
-    // - address_line1, address_line2: street parts
-    // - address_level2: city/locality (preferred)
-    // - place / locality: legacy fallbacks
-    // - country_code: ISO 3166-1 alpha-2 (Mapbox returns lowercase, but normalize anyway)
     const street = [props.address_line1, props.address_line2].filter(Boolean).join(', ');
     const cityName =
       props.address_level2 ?? props.place ?? props.locality ?? props.address_level3 ?? '';
@@ -130,7 +110,7 @@ export function AddressAutocomplete({
     />
   );
 
-  if (!TOKEN || !Autofill) return inputEl;
+  if (!TOKEN) return inputEl;
 
   return (
     <Autofill
