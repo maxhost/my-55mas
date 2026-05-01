@@ -1,6 +1,6 @@
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { listFiscalIdTypes } from '@/features/fiscal-id-types/actions/list-fiscal-id-types';
-import { listActiveCountries } from '@/features/fiscal-id-types/actions/list-active-countries';
+import { listActiveCountries } from '@/shared/lib/countries/list-active-countries';
 import { FiscalIdTypesEditor } from '@/features/fiscal-id-types/components/fiscal-id-types-editor';
 import { PageHeader } from '@/shared/components/page-header';
 

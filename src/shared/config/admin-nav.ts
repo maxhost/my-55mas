@@ -41,6 +41,7 @@ export const adminNavGroups: NavGroup[] = [
       { labelKey: 'subtypes', href: '/admin/subtypes', icon: 'tags' },
       { labelKey: 'talentTags', href: '/admin/talent-tags', icon: 'tags' },
       { labelKey: 'fiscalIdTypes', href: '/admin/fiscal-id-types', icon: 'id-card' },
+      { labelKey: 'formDefinitions', href: '/admin/form-definitions', icon: 'file-text' },
     ],
   },
   {

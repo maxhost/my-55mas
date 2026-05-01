@@ -9,11 +9,8 @@ import { Plus } from 'lucide-react';
 import { locales } from '@/lib/i18n/config';
 import { saveFiscalIdType } from '../actions/save-fiscal-id-type';
 import { deleteFiscalIdType } from '../actions/delete-fiscal-id-type';
-import type {
-  CountryAdminOption,
-  FiscalIdTypeInput,
-  FiscalIdTypeWithDetails,
-} from '../types';
+import type { CountryAdminOption } from '@/shared/lib/countries/types';
+import type { FiscalIdTypeInput, FiscalIdTypeWithDetails } from '../types';
 import { FiscalIdTypeRow } from './fiscal-id-type-row';
 
 type Props = {

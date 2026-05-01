@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { localizedField } from '@/shared/lib/i18n/localize';
-import type { CountryAdminOption } from '../types';
+import type { CountryAdminOption } from './types';
 
 export async function listActiveCountries(locale: string): Promise<CountryAdminOption[]> {
   const supabase = createClient();

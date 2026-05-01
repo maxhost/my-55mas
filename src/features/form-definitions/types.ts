@@ -13,7 +13,19 @@ export type FormDefinitionRow = Database['public']['Tables']['form_definitions']
 
 export type FormFieldDefinition = {
   key: string;
-  type: 'text' | 'email' | 'tel' | 'number' | 'date' | 'select' | 'multiselect' | 'textarea' | 'checkbox';
+  type:
+    | 'text'
+    | 'email'
+    | 'password'
+    | 'tel'
+    | 'number'
+    | 'date'
+    | 'select'
+    | 'multiselect'
+    | 'textarea'
+    | 'checkbox'
+    | 'address'
+    | 'display';
   required?: boolean;
   validations?: Record<string, unknown>;
   dataSource?: string;
@@ -24,16 +36,17 @@ export type FormSchema = {
 };
 
 export type FormI18nFieldEntry = {
-  label: string;
+  label?: string;
   placeholder?: string;
   help?: string;
+  errors?: Record<string, string>;
 };
 
 export type FormI18nLocaleEntry = {
   title?: string;
   description?: string;
   submitLabel?: string;
-  fields: Record<string, FormI18nFieldEntry>;
+  fields?: Record<string, FormI18nFieldEntry>;
 };
 
 export type FormI18n = Record<string, FormI18nLocaleEntry>;
@@ -46,4 +59,26 @@ export type FormDefinition = {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+};
+
+export type CountryActivation = {
+  country_id: string;
+  country_code: string;
+  country_name: string;
+  is_active: boolean;
+};
+
+export type FormDefinitionDetail = FormDefinition & {
+  activeCountryIds: string[];
+};
+
+export type SaveI18nInput = {
+  formId: string;
+  i18n: FormI18n;
+};
+
+export type SaveActivationInput = {
+  formId: string;
+  is_active: boolean;
+  countryIds: string[];
 };

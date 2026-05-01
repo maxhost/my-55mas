@@ -1,13 +1,7 @@
 export { listFormDefinitions } from './actions/list';
 export { getFormDefinitionByKey } from './actions/get-by-key';
-export type {
-  FormDefinition,
-  FormDefinitionRow,
-  FormI18n,
-  FormI18nFieldEntry,
-  FormI18nLocaleEntry,
-  FormKey,
-  FormSchema,
-  FormFieldDefinition,
-} from './types';
-export { FORM_KEYS } from './types';
+export { getFormDefinitionDetail } from './actions/get-detail';
+export { saveFormDefinitionI18n } from './actions/save-i18n';
+export { saveFormDefinitionActivation } from './actions/save-activation';
+export * from './types';
+export * from './schemas';
