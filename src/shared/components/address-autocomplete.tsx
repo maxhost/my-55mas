@@ -10,13 +10,17 @@ export type AddressValue = {
   lng: number | null;
   mapbox_id: string | null;
   raw_text: string;
+  /** lowercase ISO 3166-1 alpha-2 from Mapbox properties.country_code */
+  country_code: string;
+  /** city/locality name from Mapbox properties.place */
+  city_name: string;
 };
 
 export type AddressAutocompleteProps = {
   value: AddressValue;
   onChange: (value: AddressValue) => void;
-  /** ISO 3166-1 alpha-2 country code, e.g. "ES" — restricts suggestions */
-  countryCode: string;
+  /** ISO 3166-1 alpha-2 codes (uppercase) — restricts suggestions to these countries. Empty array = no restriction. */
+  countryCodes: string[];
   language?: string;
   placeholder?: string;
   disabled?: boolean;
@@ -28,7 +32,7 @@ const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '';
 
 type AutofillProps = {
   accessToken: string;
-  options: { country: string; language?: string };
+  options: { country?: string; language?: string };
   onRetrieve: (res: unknown) => void;
   children: React.ReactNode;
 };
@@ -36,7 +40,7 @@ type AutofillProps = {
 export function AddressAutocomplete({
   value,
   onChange,
-  countryCode,
+  countryCodes,
   language,
   placeholder,
   disabled,
@@ -50,7 +54,6 @@ export function AddressAutocomplete({
   useEffect(() => {
     if (!TOKEN) return;
     let cancelled = false;
-    // @mapbox/search-js-react accesses `document` at module load — defer to client.
     import('@mapbox/search-js-react').then((m) => {
       if (cancelled) return;
       setAutofill(() => m.AddressAutofill as unknown as React.ComponentType<AutofillProps>);
@@ -80,6 +83,8 @@ export function AddressAutocomplete({
       lng: typeof lng === 'number' ? lng : null,
       mapbox_id: feature.id ?? null,
       raw_text: props.full_address ?? text,
+      country_code: (props.country_code ?? '').toLowerCase(),
+      city_name: props.place ?? props.locality ?? '',
     };
     setText(next.raw_text);
     onChange(next);
@@ -101,12 +106,15 @@ export function AddressAutocomplete({
     />
   );
 
-  if (!TOKEN || !Autofill || !countryCode) return inputEl;
+  if (!TOKEN || !Autofill) return inputEl;
 
   return (
     <Autofill
       accessToken={TOKEN}
-      options={{ country: countryCode, language }}
+      options={{
+        country: countryCodes.length > 0 ? countryCodes.join(',') : undefined,
+        language,
+      }}
       onRetrieve={handleRetrieve}
     >
       {inputEl}
@@ -121,4 +129,6 @@ export const emptyAddress: AddressValue = {
   lng: null,
   mapbox_id: null,
   raw_text: '',
+  country_code: '',
+  city_name: '',
 };

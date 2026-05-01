@@ -381,6 +381,8 @@
     "heading": "Talent registration",
     "intro": "Complete your details to start offering services.",
     "onboardingPlaceholderHeading": "Onboarding under construction",
-    "onboardingPlaceholderBody": "Soon you will be able to complete the information for each service you offer."
+    "onboardingPlaceholderBody": "Soon you will be able to complete the information for each service you offer.",
+    "locationNotDetected": "Start by typing your address above to detect country and city automatically.",
+    "cityManualHint": "We could not auto-detect your city. Please select it from the list."
   }
 }

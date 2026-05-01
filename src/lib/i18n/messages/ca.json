@@ -381,6 +381,8 @@
     "heading": "Registre de talent",
     "intro": "Completa les teves dades per començar a oferir serveis.",
     "onboardingPlaceholderHeading": "Onboarding en construcció",
-    "onboardingPlaceholderBody": "Aviat podràs completar la informació de cada servei que ofereixes."
+    "onboardingPlaceholderBody": "Aviat podràs completar la informació de cada servei que ofereixes.",
+    "locationNotDetected": "Comença escrivint la teva adreça a dalt per detectar país i ciutat automàticament.",
+    "cityManualHint": "No hem reconegut la teva ciutat automàticament. Selecciona-la de la llista."
   }
 }

@@ -36,6 +36,8 @@ describe('addressSchema', () => {
         lng: -3.7038,
         mapbox_id: 'addr_xyz',
         raw_text: 'Calle Mayor 1, 28013 Madrid',
+        country_code: 'es',
+        city_name: 'Madrid',
       }).success,
     ).toBe(true);
   });
@@ -48,6 +50,8 @@ describe('addressSchema', () => {
         lng: null,
         mapbox_id: null,
         raw_text: 'Calle Mayor 1',
+        country_code: '',
+        city_name: '',
       }).success,
     ).toBe(true);
   });
@@ -60,6 +64,8 @@ describe('addressSchema', () => {
         lng: null,
         mapbox_id: null,
         raw_text: 'fallback',
+        country_code: '',
+        city_name: '',
       }).success,
     ).toBe(false);
   });
@@ -72,6 +78,8 @@ describe('addressSchema', () => {
         lng: null,
         mapbox_id: null,
         raw_text: '',
+        country_code: '',
+        city_name: '',
       }).success,
     ).toBe(false);
   });

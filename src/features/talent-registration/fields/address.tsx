@@ -16,12 +16,14 @@ export const addressSchema = z.object({
   lng: z.number().nullable(),
   mapbox_id: z.string().nullable(),
   raw_text: z.string().min(1),
+  country_code: z.string(),
+  city_name: z.string(),
 });
 
 export { emptyAddress };
 
 type Props = FieldProps<AddressValue> & {
-  countryCode: string;
+  countryCodes: string[];
   language?: string;
 };
 
@@ -35,7 +37,7 @@ export function AddressField({
   onChange,
   required,
   disabled,
-  countryCode,
+  countryCodes,
   language,
 }: Props) {
   return (
@@ -48,7 +50,7 @@ export function AddressField({
         id={id}
         value={value}
         onChange={onChange}
-        countryCode={countryCode}
+        countryCodes={countryCodes}
         language={language}
         placeholder={placeholder}
         disabled={disabled}

@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { CountryCode } from 'libphonenumber-js';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from 'next-intl';
 import { PhoneField } from '../fields/phone';
 import { CountryCityField } from '../fields/country-city';
 import { AddressField, emptyAddress } from '../fields/address';
@@ -39,11 +40,21 @@ const DEFAULT_VALUES: TalentRegistrationSchemaInput = {
   fiscal_id: '',
   services: [],
   additional_info: undefined,
-  terms_accepted: true as const, // satisfies the schema's literal(true)
+  terms_accepted: true as const,
   marketing_consent: false,
 };
 
+function normalize(s: string): string {
+  // Strip diacritics by decomposing to NFD and removing combining marks (U+0300-U+036F)
+  return s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .trim();
+}
+
 export function TalentRegistrationForm({ context, cities, loadServices, onSubmit }: Props) {
+  const t = useTranslations('TalentRegistration');
   const fieldsI18n = context.i18n.fields;
   const [services, setServices] = useState<ServiceOption[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -57,22 +68,56 @@ export function TalentRegistrationForm({ context, cities, loadServices, onSubmit
 
   const country = form.watch('country_id');
   const city = form.watch('city_id');
-  const countryCode = context.countries.find((c) => c.id === country)?.code ?? '';
-  const phoneCountryCodes = context.countries
-    .map((c) => c.code as CountryCode)
-    .filter(Boolean);
+  const address = form.watch('address');
 
-  const handleCountryCityChange = async (newCountryId: string, newCityId: string) => {
-    if (newCountryId && newCityId) {
-      const opts = await loadServices(newCountryId, newCityId);
-      setServices(opts);
-    } else if (newCountryId) {
-      const opts = await loadServices(newCountryId);
-      setServices(opts);
-    } else {
-      setServices([]);
+  const activeCountryCodes = useMemo(
+    () => context.countries.map((c) => c.code).filter(Boolean),
+    [context.countries],
+  );
+  const phoneCountryCodes = activeCountryCodes as CountryCode[];
+
+  const cityNeedsManual =
+    Boolean(country) && Boolean(address.city_name) && !city;
+
+  // Derive country_id and city_id whenever Mapbox returns new metadata.
+  useEffect(() => {
+    if (!address.country_code) return;
+
+    const matchedCountry = context.countries.find(
+      (c) => c.code.toLowerCase() === address.country_code,
+    );
+    if (!matchedCountry) return;
+
+    const nextCountryId = matchedCountry.id;
+    let nextCityId = '';
+    if (address.city_name) {
+      const target = normalize(address.city_name);
+      const matchedCity = cities.find(
+        (c) => c.country_id === nextCountryId && normalize(c.name) === target,
+      );
+      if (matchedCity) nextCityId = matchedCity.id;
     }
-  };
+
+    if (nextCountryId !== form.getValues('country_id')) {
+      form.setValue('country_id', nextCountryId, { shouldValidate: true });
+      form.setValue('fiscal_id_type_id', '');
+      form.setValue('services', []);
+    }
+    if (nextCityId !== form.getValues('city_id')) {
+      form.setValue('city_id', nextCityId, { shouldValidate: true });
+    }
+    void refreshServices(nextCountryId, nextCityId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address.country_code, address.city_name]);
+
+  async function refreshServices(countryId: string, cityId: string) {
+    if (!countryId) {
+      setServices([]);
+      return;
+    }
+    const opts = await loadServices(countryId, cityId || undefined);
+    setServices(opts);
+  }
 
   const submit = (data: TalentRegistrationSchemaInput) => {
     setSubmitError(null);
@@ -102,6 +147,44 @@ export function TalentRegistrationForm({ context, cities, loadServices, onSubmit
 
       <Controller
         control={form.control}
+        name="address"
+        render={({ field, fieldState }) => (
+          <AddressField
+            id="address"
+            label={fieldsI18n.address?.label ?? 'Dirección'}
+            placeholder={fieldsI18n.address?.placeholder}
+            help={fieldsI18n.address?.help}
+            error={fieldState.error?.message}
+            value={field.value}
+            onChange={field.onChange}
+            required
+            countryCodes={activeCountryCodes}
+          />
+        )}
+      />
+
+      <CountryCityField
+        countries={context.countries}
+        cities={cities}
+        countryValue={country}
+        cityValue={city}
+        onCityChange={(id) => {
+          form.setValue('city_id', id, { shouldValidate: true });
+          void refreshServices(country, id);
+        }}
+        countryLabel={fieldsI18n.country_id?.label ?? 'País'}
+        cityLabel={fieldsI18n.city_id?.label ?? 'Ciudad'}
+        cityPlaceholder={fieldsI18n.city_id?.placeholder}
+        cityError={form.formState.errors.city_id?.message}
+        notDetectedHint={t('locationNotDetected')}
+        manualCityHint={t('cityManualHint')}
+        cityNeedsManual={cityNeedsManual}
+        required
+        cityFieldId="city_id"
+      />
+
+      <Controller
+        control={form.control}
         name="phone"
         render={({ field, fieldState }) => (
           <PhoneField
@@ -114,53 +197,10 @@ export function TalentRegistrationForm({ context, cities, loadServices, onSubmit
             onChange={field.onChange}
             required
             countryCodes={phoneCountryCodes}
-            defaultCountry={(countryCode as CountryCode) || phoneCountryCodes[0]}
-          />
-        )}
-      />
-
-      <CountryCityField
-        countries={context.countries}
-        cities={cities}
-        countryValue={country}
-        cityValue={city}
-        onCountryChange={(id) => {
-          form.setValue('country_id', id);
-          form.setValue('city_id', '');
-          form.setValue('fiscal_id_type_id', '');
-          form.setValue('services', []);
-          handleCountryCityChange(id, '');
-        }}
-        onCityChange={(id) => {
-          form.setValue('city_id', id);
-          handleCountryCityChange(country, id);
-        }}
-        countryLabel={fieldsI18n.country_id?.label ?? 'País'}
-        cityLabel={fieldsI18n.city_id?.label ?? 'Ciudad'}
-        countryPlaceholder={fieldsI18n.country_id?.placeholder}
-        cityPlaceholder={fieldsI18n.city_id?.placeholder}
-        countryError={form.formState.errors.country_id?.message}
-        cityError={form.formState.errors.city_id?.message}
-        required
-        countryFieldId="country_id"
-        cityFieldId="city_id"
-      />
-
-      <Controller
-        control={form.control}
-        name="address"
-        render={({ field, fieldState }) => (
-          <AddressField
-            id="address"
-            label={fieldsI18n.address?.label ?? 'Dirección'}
-            placeholder={fieldsI18n.address?.placeholder}
-            help={fieldsI18n.address?.help}
-            error={fieldState.error?.message}
-            value={field.value}
-            onChange={field.onChange}
-            required
-            countryCode={countryCode}
-            disabled={!countryCode}
+            defaultCountry={
+              (context.countries.find((c) => c.id === country)?.code as CountryCode) ||
+              phoneCountryCodes[0]
+            }
           />
         )}
       />

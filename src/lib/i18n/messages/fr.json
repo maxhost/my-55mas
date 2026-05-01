@@ -381,6 +381,8 @@
     "heading": "Inscription de talent",
     "intro": "Complétez vos données pour commencer à offrir des services.",
     "onboardingPlaceholderHeading": "Onboarding en construction",
-    "onboardingPlaceholderBody": "Vous pourrez bientôt compléter les informations de chaque service que vous offrez."
+    "onboardingPlaceholderBody": "Vous pourrez bientôt compléter les informations de chaque service que vous offrez.",
+    "locationNotDetected": "Commence par écrire ton adresse ci-dessus pour détecter le pays et la ville automatiquement.",
+    "cityManualHint": "Nous n'avons pas pu détecter ta ville automatiquement. Sélectionne-la dans la liste."
   }
 }

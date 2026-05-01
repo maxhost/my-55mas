@@ -381,6 +381,8 @@
     "heading": "Registro de talento",
     "intro": "Completa tus datos para empezar a ofrecer servicios.",
     "onboardingPlaceholderHeading": "Onboarding en construcción",
-    "onboardingPlaceholderBody": "Pronto podrás completar la información de cada servicio que ofreces."
+    "onboardingPlaceholderBody": "Pronto podrás completar la información de cada servicio que ofreces.",
+    "locationNotDetected": "Empieza escribiendo tu dirección arriba para detectar país y ciudad automáticamente.",
+    "cityManualHint": "No reconocimos automáticamente tu ciudad. Selecciónala de la lista."
   }
 }
