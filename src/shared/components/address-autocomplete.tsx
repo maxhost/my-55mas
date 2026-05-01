@@ -1,7 +1,14 @@
 'use client';
 
 import { useEffect, useId, useState } from 'react';
-import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+
+// Same classes as shadcn Input — Mapbox AddressAutofill requires a native
+// <input> child (it cloneElement's the child to attach handlers; wrapping
+// component-libraries like @base-ui/react/input swallow those handlers),
+// so we render a raw <input> styled to match.
+const INPUT_CLASS =
+  'h-9 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80';
 
 export type AddressValue = {
   street: string;
@@ -107,7 +114,7 @@ export function AddressAutocomplete({
   };
 
   const inputEl = (
-    <Input
+    <input
       id={id ?? inputId}
       type="text"
       autoComplete="address-line1"
@@ -115,6 +122,7 @@ export function AddressAutocomplete({
       placeholder={placeholder}
       disabled={disabled}
       aria-invalid={hasError ? 'true' : undefined}
+      className={cn(INPUT_CLASS)}
       onChange={(e) => {
         setText(e.target.value);
         onChange({ ...value, raw_text: e.target.value, street: e.target.value });
