@@ -69,7 +69,11 @@ export function CountryCityField({
           disabled={disabled}
         >
           <SelectTrigger id={countryFieldId} aria-invalid={countryError ? 'true' : undefined}>
-            <SelectValue placeholder={countryPlaceholder} />
+            <SelectValue placeholder={countryPlaceholder}>
+              {(v: string) =>
+                countries.find((c) => c.id === v)?.name ?? countryPlaceholder ?? ''
+              }
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {countries.map((c) => (
@@ -92,7 +96,11 @@ export function CountryCityField({
           disabled={disabled || !countryValue}
         >
           <SelectTrigger id={cityFieldId} aria-invalid={cityError ? 'true' : undefined}>
-            <SelectValue placeholder={cityPlaceholder} />
+            <SelectValue placeholder={cityPlaceholder}>
+              {(v: string) =>
+                filteredCities.find((c) => c.id === v)?.name ?? cityPlaceholder ?? ''
+              }
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {filteredCities.map((c) => (

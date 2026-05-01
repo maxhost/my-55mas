@@ -71,7 +71,11 @@ export function FiscalIdField({
           disabled={disabled || !countryId || availableTypes.length === 0}
         >
           <SelectTrigger id={typeFieldId} aria-invalid={typeError ? 'true' : undefined}>
-            <SelectValue placeholder={typePlaceholder} />
+            <SelectValue placeholder={typePlaceholder}>
+              {(v: string) =>
+                availableTypes.find((t) => t.id === v)?.label ?? typePlaceholder ?? ''
+              }
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {availableTypes.map((t) => (

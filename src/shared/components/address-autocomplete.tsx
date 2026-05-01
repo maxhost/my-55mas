@@ -1,14 +1,7 @@
 'use client';
 
-import { useId, useState } from 'react';
-import dynamic from 'next/dynamic';
+import { useEffect, useId, useState } from 'react';
 import { Input } from '@/components/ui/input';
-
-// @mapbox/search-js-react accesses `document` at module load — defer to client only.
-const AddressAutofill = dynamic(
-  () => import('@mapbox/search-js-react').then((m) => m.AddressAutofill as unknown as React.ComponentType<unknown>),
-  { ssr: false }
-);
 
 export type AddressValue = {
   street: string;
@@ -33,6 +26,13 @@ export type AddressAutocompleteProps = {
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '';
 
+type AutofillProps = {
+  accessToken: string;
+  options: { country: string; language?: string };
+  onRetrieve: (res: unknown) => void;
+  children: React.ReactNode;
+};
+
 export function AddressAutocomplete({
   value,
   onChange,
@@ -45,9 +45,30 @@ export function AddressAutocomplete({
 }: AddressAutocompleteProps) {
   const inputId = useId();
   const [text, setText] = useState(value.raw_text || value.street || '');
+  const [Autofill, setAutofill] = useState<React.ComponentType<AutofillProps> | null>(null);
 
-  const handleRetrieve = (res: any) => {
-    const feature = res?.features?.[0];
+  useEffect(() => {
+    if (!TOKEN) return;
+    let cancelled = false;
+    // @mapbox/search-js-react accesses `document` at module load — defer to client.
+    import('@mapbox/search-js-react').then((m) => {
+      if (cancelled) return;
+      setAutofill(() => m.AddressAutofill as unknown as React.ComponentType<AutofillProps>);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleRetrieve = (res: unknown) => {
+    const r = res as {
+      features?: Array<{
+        id?: string;
+        properties?: Record<string, string>;
+        geometry?: { coordinates?: [number, number] };
+      }>;
+    };
+    const feature = r?.features?.[0];
     if (!feature) return;
     const props = feature.properties ?? {};
     const [lng, lat] = feature.geometry?.coordinates ?? [null, null];
@@ -64,49 +85,31 @@ export function AddressAutocomplete({
     onChange(next);
   };
 
-  // Graceful degradation when token missing: render a plain input that stores raw_text only.
-  if (!TOKEN) {
-    return (
-      <Input
-        id={id ?? inputId}
-        type="text"
-        value={text}
-        placeholder={placeholder}
-        disabled={disabled}
-        aria-invalid={hasError ? 'true' : undefined}
-        onChange={(e) => {
-          setText(e.target.value);
-          onChange({ ...value, raw_text: e.target.value, street: e.target.value });
-        }}
-      />
-    );
-  }
+  const inputEl = (
+    <Input
+      id={id ?? inputId}
+      type="text"
+      autoComplete="address-line1"
+      value={text}
+      placeholder={placeholder}
+      disabled={disabled}
+      aria-invalid={hasError ? 'true' : undefined}
+      onChange={(e) => {
+        setText(e.target.value);
+        onChange({ ...value, raw_text: e.target.value, street: e.target.value });
+      }}
+    />
+  );
 
-  const Autofill = AddressAutofill as unknown as React.ComponentType<{
-    accessToken: string;
-    options: { country: string; language?: string };
-    onRetrieve: (res: any) => void;
-    children: React.ReactNode;
-  }>;
+  if (!TOKEN || !Autofill || !countryCode) return inputEl;
+
   return (
     <Autofill
       accessToken={TOKEN}
       options={{ country: countryCode, language }}
-      onRetrieve={handleRetrieve as never}
+      onRetrieve={handleRetrieve}
     >
-      <Input
-        id={id ?? inputId}
-        type="text"
-        autoComplete="address-line1"
-        value={text}
-        placeholder={placeholder}
-        disabled={disabled}
-        aria-invalid={hasError ? 'true' : undefined}
-        onChange={(e) => {
-          setText(e.target.value);
-          onChange({ ...value, raw_text: e.target.value });
-        }}
-      />
+      {inputEl}
     </Autofill>
   );
 }
