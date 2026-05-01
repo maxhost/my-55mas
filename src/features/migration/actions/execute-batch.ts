@@ -74,7 +74,6 @@ async function insertClients(
       // Update profile (shared fields)
       await admin.from('profiles').update({
         phone: row.profile.phone,
-        nif: row.profile.nif,
         preferred_contact: row.profile.preferred_contact,
         gender: row.profile.gender,
         birth_date: row.profile.birth_date,
@@ -166,10 +165,9 @@ async function insertTalents(
         errors
       );
 
-      // Update profile (shared fields: phone, nif, gender, birth_date)
+      // Update profile (shared fields: phone, gender, birth_date)
       await admin.from('profiles').update({
         phone: row.profile.phone,
-        nif: row.profile.nif,
         preferred_contact: row.profile.preferred_contact,
         gender: row.profile.gender,
         birth_date: row.profile.birth_date,
@@ -185,11 +183,9 @@ async function insertTalents(
           legacy_id: row.talent_profile.legacy_id,
           terms_accepted: row.talent_profile.terms_accepted,
           has_car: row.talent_profile.has_car,
+          fiscal_id: row.talent_profile.fiscal_id,
           preferred_payment: row.talent_profile.preferred_payment,
           professional_status: row.talent_profile.professional_status,
-          address: row.talent_profile.address,
-          state: row.talent_profile.state,
-          postal_code: row.talent_profile.postal_code,
           internal_notes: row.internal_notes,
           city_id: cityId,
           country_id: countryId,

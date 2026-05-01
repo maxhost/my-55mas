@@ -6,7 +6,6 @@ export type TransformedTalent = {
     full_name: string;
     phone: string | null;
     preferred_contact: string | null;
-    nif: string | null;
     gender: string | null;
     birth_date: string | null;
     created_at: string | null;
@@ -17,6 +16,7 @@ export type TransformedTalent = {
     legacy_id: number | null;
     terms_accepted: boolean;
     has_car: boolean;
+    fiscal_id: string | null;
     preferred_payment: string | null;
     professional_status: string | null;
     address: string | null;
@@ -206,7 +206,6 @@ export function transformTalents(
         full_name: mapped.full_name,
         phone: mapped.phone || null,
         preferred_contact: contact,
-        nif: mapped.nif || null,
         gender,
         birth_date: parsedBirthDate,
         created_at: mapped.created_at || null,
@@ -217,6 +216,7 @@ export function transformTalents(
         legacy_id: Number.isNaN(legacyId) ? null : legacyId,
         terms_accepted: termsAccepted,
         has_car: hasCar,
+        fiscal_id: mapped.nif || null,
         preferred_payment: mapped.preferred_payment
           ? PAYMENT_MAP[mapped.preferred_payment.toLowerCase()] ?? null
           : null,

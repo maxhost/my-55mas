@@ -2,21 +2,26 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { getSpokenLanguageAliases } from '@/shared/lib/spoken-languages/actions';
-import type { ImportLookups, SurveyQuestionOption, ServiceOption, SubtypeGroupOption, TalentTagOption } from '../types';
+import { localizedField } from '@/shared/lib/i18n/localize';
+import type {
+  ImportLookups,
+  ServiceOption,
+  SubtypeGroupOption,
+  SurveyQuestionOption,
+  TalentTagOption,
+} from '../types';
 import { normalizeName } from '../lib/transformers/transform-orders';
 import type { OrderLookups } from '../lib/transformers/transform-orders';
 
-/**
- * Pre-load lookup maps for order imports.
- * Maps lowercase names → UUIDs for services, clients, talents, cities.
- */
-/**
- * Pre-load city/country name → UUID maps for client/talent imports.
- */
-// Map CSV locale → country code for default country assignment
 const LOCALE_TO_COUNTRY: Record<string, string> = {
   es: 'ES', en: 'ES', pt: 'PT', fr: 'FR', ca: 'ES',
 };
+
+type I18nRecord = Record<string, Record<string, unknown>> | null;
+
+function readName(i18n: I18nRecord, locale: string): string | null {
+  return localizedField(i18n, locale, 'name');
+}
 
 export async function getImportLookups(locale: string): Promise<ImportLookups> {
   const supabase = createClient();
@@ -25,38 +30,35 @@ export async function getImportLookups(locale: string): Promise<ImportLookups> {
 
   const [citiesRes, countriesRes, defaultCountryRes, tagsRes, spokenLanguageAliases] =
     await Promise.all([
-      supabase.from('city_translations').select('city_id, name').eq('locale', locale),
-      supabase.from('country_translations').select('country_id, name').eq('locale', locale),
+      supabase.from('cities').select('id, i18n'),
+      supabase.from('countries').select('id, i18n'),
       supabase.from('countries').select('id').eq('code', countryCode).single(),
-      supabase
-        .from('talent_tags')
-        .select('id, slug, talent_tag_translations(locale, name)')
-        .eq('is_active', true),
+      supabase.from('talent_tags').select('id, slug, i18n').eq('is_active', true),
       getSpokenLanguageAliases(),
     ]);
 
   const citiesByName = new Map<string, string>();
   for (const c of citiesRes.data ?? []) {
-    if (c.name) citiesByName.set(c.name.toLowerCase(), c.city_id);
+    const name = readName(c.i18n as I18nRecord, locale);
+    if (name) citiesByName.set(name.toLowerCase(), c.id);
   }
 
   const countriesByName = new Map<string, string>();
   for (const c of countriesRes.data ?? []) {
-    if (c.name) countriesByName.set(c.name.toLowerCase(), c.country_id);
+    const name = readName(c.i18n as I18nRecord, locale);
+    if (name) countriesByName.set(name.toLowerCase(), c.id);
   }
 
-  // Build tagIdsByName map with locale → 'es' → slug fallback chain.
-  // All translations for a tag are added (case-insensitive) so a CSV in any
-  // locale can match the same tag.
+  // Build tagIdsByName map. All translations are added (case-insensitive) so a
+  // CSV in any locale matches the same tag. Slug always added as fallback.
   const tagIdsByName = new Map<string, string>();
   for (const tag of tagsRes.data ?? []) {
-    const trans = tag.talent_tag_translations as unknown as
-      | { locale: string; name: string }[]
-      | null;
+    const i18n = (tag.i18n ?? {}) as Record<string, { name?: string } | null>;
     let matched = false;
-    for (const t of trans ?? []) {
-      if (t.name) {
-        tagIdsByName.set(t.name.toLowerCase(), tag.id);
+    for (const entry of Object.values(i18n)) {
+      const n = entry?.name;
+      if (typeof n === 'string' && n) {
+        tagIdsByName.set(n.toLowerCase(), tag.id);
         matched = true;
       }
     }
@@ -72,82 +74,56 @@ export async function getImportLookups(locale: string): Promise<ImportLookups> {
   };
 }
 
-/**
- * Load active talent tags for the column mapper UI (informational display only).
- * The import itself resolves names → ids via getImportLookups.tagIdsByName.
- */
 export async function getTalentTagOptions(locale: string): Promise<TalentTagOption[]> {
   const supabase = createClient();
 
   const { data, error } = await supabase
     .from('talent_tags')
-    .select('id, slug, talent_tag_translations(locale, name)')
+    .select('id, slug, i18n')
     .eq('is_active', true)
     .order('sort_order', { ascending: true });
 
   if (error) throw error;
 
   return (data ?? []).map((tag) => {
-    const trans = tag.talent_tag_translations as unknown as
-      | { locale: string; name: string }[]
-      | null;
-    const byLocale = new Map<string, string>();
-    for (const t of trans ?? []) byLocale.set(t.locale, t.name);
-    const name = byLocale.get(locale) ?? byLocale.get('es') ?? tag.slug;
+    const name = readName(tag.i18n as I18nRecord, locale) ?? tag.slug;
     return { id: tag.id, name };
   });
 }
 
-/**
- * Load active survey questions with localized labels.
- */
-export async function getSurveyQuestions(
-  locale: string
-): Promise<SurveyQuestionOption[]> {
+export async function getSurveyQuestions(locale: string): Promise<SurveyQuestionOption[]> {
   const supabase = createClient();
 
   const { data, error } = await supabase
     .from('survey_questions')
-    .select('id, key, survey_question_translations(locale, label)')
+    .select('id, key, i18n')
     .eq('is_active', true)
     .order('sort_order', { ascending: true });
 
   if (error) throw error;
 
   return (data ?? []).map((q) => {
-    const translations = q.survey_question_translations as unknown as
-      | { locale: string; label: string }[]
-      | null;
-    const byLocale = new Map<string, string>();
-    for (const t of translations ?? []) byLocale.set(t.locale, t.label);
-    const label = byLocale.get(locale) ?? byLocale.get('es') ?? q.key;
+    const label = localizedField(q.i18n as I18nRecord, locale, 'label') ?? q.key;
     return { id: q.id, key: q.key, label };
   });
 }
 
-/**
- * Load services for the talent import column mapper dropdown.
- */
 export async function getServiceOptions(locale: string): Promise<ServiceOption[]> {
   const supabase = createClient();
 
   const { data, error } = await supabase
-    .from('service_translations')
-    .select('service_id, name, services!inner(slug)')
-    .eq('locale', locale)
-    .order('name', { ascending: true });
+    .from('services')
+    .select('id, slug, i18n')
+    .order('slug', { ascending: true });
 
   if (error) throw error;
 
-  return (data ?? []).map((row) => {
-    const svc = row.services as unknown as { slug: string };
-    return { id: row.service_id, slug: svc.slug, name: row.name };
+  return (data ?? []).map((svc) => {
+    const name = readName(svc.i18n as I18nRecord, locale) ?? svc.slug;
+    return { id: svc.id, slug: svc.slug, name };
   });
 }
 
-/**
- * Load subtype groups with their items for the talent import column mapper.
- */
 export async function getSubtypeGroupOptions(locale: string): Promise<SubtypeGroupOption[]> {
   const supabase = createClient();
 
@@ -155,29 +131,33 @@ export async function getSubtypeGroupOptions(locale: string): Promise<SubtypeGro
     .from('service_subtype_groups')
     .select(`
       id,
-      service_subtype_group_translations!inner(name),
-      service_subtypes(id, service_subtype_translations!inner(name)),
+      i18n,
+      service_subtypes(id, i18n),
       service_subtype_group_assignments(services(slug))
     `)
-    .eq('service_subtype_group_translations.locale', locale)
-    .eq('service_subtypes.service_subtype_translations.locale', locale)
     .order('sort_order', { ascending: true });
 
   if (error) throw error;
 
   return (data ?? []).map((g) => {
-    const trans = g.service_subtype_group_translations as unknown as { name: string }[];
-    const subtypes = g.service_subtypes as unknown as { id: string; service_subtype_translations: { name: string }[] }[];
-    const assignments = g.service_subtype_group_assignments as unknown as { services: { slug: string } }[];
-    const serviceSlugs = assignments.map((a) => a.services.slug);
+    const subtypes = (g.service_subtypes ?? []) as unknown as {
+      id: string;
+      i18n: I18nRecord;
+    }[];
+    const assignments = (g.service_subtype_group_assignments ?? []) as unknown as {
+      services: { slug: string } | null;
+    }[];
+    const serviceSlugs = assignments
+      .map((a) => a.services?.slug)
+      .filter((s): s is string => typeof s === 'string');
 
     return {
       id: g.id,
       serviceSlugs,
-      groupName: trans[0]?.name ?? g.id,
+      groupName: readName(g.i18n as I18nRecord, locale) ?? g.id,
       items: subtypes.map((st) => ({
         id: st.id,
-        name: st.service_subtype_translations[0]?.name ?? st.id,
+        name: readName(st.i18n, locale) ?? st.id,
       })),
     };
   });
@@ -189,35 +169,18 @@ export async function getOrderLookups(locale: string): Promise<OrderLookups> {
 
   const [servicesRes, clientsRes, talentsRes, citiesRes, countriesRes, staffRes] =
     await Promise.all([
-      supabase
-        .from('service_translations')
-        .select('service_id, name')
-        .eq('locale', locale),
-      supabase
-        .from('profiles')
-        .select('id, full_name')
-        .eq('active_role', 'client'),
-      supabase
-        .from('profiles')
-        .select('id, full_name')
-        .eq('active_role', 'talent'),
-      supabase
-        .from('city_translations')
-        .select('city_id, name')
-        .eq('locale', locale),
-      supabase
-        .from('countries')
-        .select('id, code')
-        .eq('code', countryCode)
-        .single(),
-      supabase
-        .from('staff_profiles')
-        .select('id, first_name, last_name'),
+      supabase.from('services').select('id, i18n'),
+      supabase.from('profiles').select('id, full_name').eq('active_role', 'client'),
+      supabase.from('profiles').select('id, full_name').eq('active_role', 'talent'),
+      supabase.from('cities').select('id, i18n'),
+      supabase.from('countries').select('id, code').eq('code', countryCode).single(),
+      supabase.from('staff_profiles').select('id, first_name, last_name'),
     ]);
 
   const servicesByName = new Map<string, string>();
   for (const s of servicesRes.data ?? []) {
-    if (s.name) servicesByName.set(normalizeName(s.name), s.service_id);
+    const name = readName(s.i18n as I18nRecord, locale);
+    if (name) servicesByName.set(normalizeName(name), s.id);
   }
 
   const clientsByName = new Map<string, string>();
@@ -232,7 +195,8 @@ export async function getOrderLookups(locale: string): Promise<OrderLookups> {
 
   const citiesByName = new Map<string, string>();
   for (const c of citiesRes.data ?? []) {
-    if (c.name) citiesByName.set(normalizeName(c.name), c.city_id);
+    const name = readName(c.i18n as I18nRecord, locale);
+    if (name) citiesByName.set(normalizeName(name), c.id);
   }
 
   const staffByName = new Map<string, string>();

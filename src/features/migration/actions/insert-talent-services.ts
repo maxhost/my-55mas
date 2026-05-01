@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/lib/supabase/database.types';
+import { normalizeForMatch } from '@/shared/lib/i18n/localize';
 
 type ServiceEntry = { serviceId: string; tier: string };
 type SubtypeEntry = { groupId: string; names: string[] };
@@ -52,21 +53,30 @@ export async function insertTalentServices(
     }
   }
 
-  // Insert talent_service_subtypes
+  // Insert talent_service_subtypes. Match name accent-insensitive against
+  // i18n[csvLocale].name, fallback to i18n.es.name. Pulls all subtypes in the
+  // group once and matches in JS (no SQL ilike now that translations live in jsonb).
   for (const entry of subtypeEntries) {
-    for (const name of entry.names) {
-      // Lookup subtype by name (case-insensitive) within the group
-      const { data: subtypes } = await admin
-        .from('service_subtypes')
-        .select('id, service_subtype_translations!inner(name)')
-        .eq('group_id', entry.groupId)
-        .eq('service_subtype_translations.locale', csvLocale)
-        .ilike('service_subtype_translations.name', name);
+    const { data: subtypes } = await admin
+      .from('service_subtypes')
+      .select('id, i18n')
+      .eq('group_id', entry.groupId);
 
-      if (subtypes && subtypes.length > 0) {
+    const target = (name: string) => {
+      const normalized = normalizeForMatch(name);
+      return (subtypes ?? []).find((st) => {
+        const i18n = (st.i18n ?? {}) as Record<string, { name?: string } | null>;
+        const localized = i18n[csvLocale]?.name ?? i18n.es?.name;
+        return typeof localized === 'string' && normalizeForMatch(localized) === normalized;
+      });
+    };
+
+    for (const name of entry.names) {
+      const matched = target(name);
+      if (matched) {
         const { error } = await admin.from('talent_service_subtypes').insert({
           talent_id: talentProfileId,
-          subtype_id: subtypes[0].id,
+          subtype_id: matched.id,
         });
 
         if (error) {
