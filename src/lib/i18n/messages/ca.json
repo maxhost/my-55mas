@@ -37,6 +37,7 @@
     "dashboard": "Tauler",
     "subtypes": "Subtipus",
     "talentTags": "Etiquetes de talent",
+    "fiscalIdTypes": "IDs fiscals",
     "surveyQuestions": "Preguntes Estadístiques",
     "payments": "Pagaments",
     "notifications": "Notificacions",
@@ -138,6 +139,17 @@
     "assignDescription": "Seleccioneu quins grups de subtipus s'apliquen a aquest servei.",
     "saveAssignments": "Desar assignacions",
     "noGroupsAvailable": "No hi ha grups creats. Creeu grups a la secció Subtipus."
+  },
+  "AdminFiscalIdTypes": {
+    "title": "Tipus d'identificació fiscal",
+    "description": "Gestiona els tipus d'ID fiscal disponibles per país (NIF, NIE, CUIT, etc.). Al desactivar es conserven els registres històrics.",
+    "addType": "Afegir tipus",
+    "noTypes": "No hi ha tipus definits.",
+    "codePlaceholder": "NIF",
+    "labelPlaceholder": "Etiqueta visible",
+    "active": "Actiu",
+    "countries": "Països",
+    "noCountries": "Sense països actius"
   },
   "AdminTalentTags": {
     "title": "Etiquetes de talent",

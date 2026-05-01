@@ -37,6 +37,7 @@
     "dashboard": "Dashboard",
     "subtypes": "Sub-tipos",
     "talentTags": "Etiquetas de talento",
+    "fiscalIdTypes": "IDs fiscales",
     "surveyQuestions": "Preguntas Estadísticas",
     "payments": "Pagos",
     "notifications": "Notificaciones",
@@ -138,6 +139,17 @@
     "assignDescription": "Selecciona qué grupos de sub-tipos aplican a este servicio.",
     "saveAssignments": "Guardar asignaciones",
     "noGroupsAvailable": "No hay grupos creados. Crea grupos en la sección Sub-tipos."
+  },
+  "AdminFiscalIdTypes": {
+    "title": "Tipos de identificación fiscal",
+    "description": "Gestiona los tipos de ID fiscal disponibles por país (NIF, NIE, CUIT, etc.). Al desactivar se conservan los registros históricos.",
+    "addType": "Añadir tipo",
+    "noTypes": "No hay tipos definidos.",
+    "codePlaceholder": "NIF",
+    "labelPlaceholder": "Etiqueta visible",
+    "active": "Activo",
+    "countries": "Países",
+    "noCountries": "Sin países activos"
   },
   "AdminTalentTags": {
     "title": "Etiquetas de talento",

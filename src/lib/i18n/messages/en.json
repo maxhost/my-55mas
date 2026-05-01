@@ -37,6 +37,7 @@
     "dashboard": "Dashboard",
     "subtypes": "Subtypes",
     "talentTags": "Talent tags",
+    "fiscalIdTypes": "Fiscal IDs",
     "surveyQuestions": "Survey Questions",
     "payments": "Payments",
     "notifications": "Notifications",
@@ -138,6 +139,17 @@
     "assignDescription": "Select which subtype groups apply to this service.",
     "saveAssignments": "Save assignments",
     "noGroupsAvailable": "No groups created. Create groups in the Subtypes section."
+  },
+  "AdminFiscalIdTypes": {
+    "title": "Fiscal ID types",
+    "description": "Manage fiscal ID types available per country (NIF, NIE, CUIT, etc.). Deactivating preserves historical records.",
+    "addType": "Add type",
+    "noTypes": "No types defined.",
+    "codePlaceholder": "NIF",
+    "labelPlaceholder": "Visible label",
+    "active": "Active",
+    "countries": "Countries",
+    "noCountries": "No active countries"
   },
   "AdminTalentTags": {
     "title": "Talent tags",

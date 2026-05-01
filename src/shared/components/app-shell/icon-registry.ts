@@ -19,6 +19,7 @@ import {
   Circle,
   Globe,
   Database,
+  IdCard,
 } from 'lucide-react';
 
 const icons: Record<string, LucideIcon> = {
@@ -38,6 +39,7 @@ const icons: Record<string, LucideIcon> = {
   'chevron-down': ChevronDown,
   globe: Globe,
   database: Database,
+  'id-card': IdCard,
 };
 
 export function getNavIcon(name: string): LucideIcon {
