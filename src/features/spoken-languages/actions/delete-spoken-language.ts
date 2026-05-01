@@ -21,7 +21,6 @@ export async function deleteSpokenLanguage(
   if (error) return { error: { _db: [error.message] } };
 
   revalidatePath('/[locale]/(admin)/admin/spoken-languages', 'layout');
-  revalidatePath('/[locale]/(admin)/admin/form-builder', 'layout');
 
   return { data: { code: parsed.data } };
 }

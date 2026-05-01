@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import type { Json } from '@/lib/supabase/database.types';
 import { createServiceSchema, type CreateServiceInput } from '../schemas';
 
 export async function createService(input: CreateServiceInput) {
@@ -13,10 +14,23 @@ export async function createService(input: CreateServiceInput) {
   const { slug, translation } = parsed.data;
   const supabase = createClient();
 
-  // Create service
+  const initialEntry: Record<string, unknown> = {
+    name: translation.name,
+  };
+  if (translation.description) initialEntry.description = translation.description;
+  if (translation.includes) initialEntry.includes = translation.includes;
+  if (translation.hero_title) initialEntry.hero_title = translation.hero_title;
+  if (translation.hero_subtitle) initialEntry.hero_subtitle = translation.hero_subtitle;
+  if (translation.benefits.length) initialEntry.benefits = translation.benefits;
+  if (translation.guarantees.length) initialEntry.guarantees = translation.guarantees;
+  if (translation.faqs.length) initialEntry.faqs = translation.faqs;
+
   const { data: service, error: serviceError } = await supabase
     .from('services')
-    .insert({ slug })
+    .insert({
+      slug,
+      i18n: { [translation.locale]: initialEntry } as unknown as Json,
+    })
     .select('id')
     .single();
 
@@ -26,24 +40,6 @@ export async function createService(input: CreateServiceInput) {
     }
     throw serviceError;
   }
-
-  // Create initial translation
-  const { error: translationError } = await supabase
-    .from('service_translations')
-    .insert({
-      service_id: service.id,
-      locale: translation.locale,
-      name: translation.name,
-      description: translation.description || null,
-      includes: translation.includes || null,
-      hero_title: translation.hero_title || null,
-      hero_subtitle: translation.hero_subtitle || null,
-      benefits: translation.benefits,
-      guarantees: translation.guarantees,
-      faqs: translation.faqs,
-    });
-
-  if (translationError) throw translationError;
 
   revalidatePath('/[locale]/(admin)/admin/services', 'layout');
   return { data: { id: service.id } };

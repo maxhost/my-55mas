@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import type { Json } from '@/lib/supabase/database.types';
 import { saveSubtypeGroupsSchema } from '../schemas';
 import type { SaveSubtypeGroupsInput, SubtypeGroupInput } from '../types';
 
@@ -56,34 +57,38 @@ async function upsertGroup(
 ) {
   let groupId: string;
 
+  // Build i18n jsonb from translations record { locale: name }
+  const groupI18n = Object.fromEntries(
+    Object.entries(group.translations).map(([locale, name]) => [locale, { name }])
+  ) as unknown as Json;
+
   if (group.id) {
-    // Update existing group
     const { error } = await supabase
       .from('service_subtype_groups')
-      .update({ slug: group.slug, sort_order: group.sort_order, is_active: group.is_active })
+      .update({
+        slug: group.slug,
+        sort_order: group.sort_order,
+        is_active: group.is_active,
+        i18n: groupI18n,
+      })
       .eq('id', group.id);
     if (error) return { error: { _db: [error.message] } };
     groupId = group.id;
   } else {
-    // Insert new group
     const { data, error } = await supabase
       .from('service_subtype_groups')
-      .insert({ slug: group.slug, sort_order: group.sort_order, is_active: group.is_active })
+      .insert({
+        slug: group.slug,
+        sort_order: group.sort_order,
+        is_active: group.is_active,
+        i18n: groupI18n,
+      })
       .select('id')
       .single();
     if (error) return { error: { _db: [error.message] } };
     groupId = data.id;
   }
 
-  // Upsert group translations
-  for (const [locale, name] of Object.entries(group.translations)) {
-    const { error } = await supabase
-      .from('service_subtype_group_translations')
-      .upsert({ group_id: groupId, locale, name }, { onConflict: 'group_id,locale' });
-    if (error) return { error: { _db: [error.message] } };
-  }
-
-  // Upsert items within this group
   return upsertItems(supabase, groupId, group.items);
 }
 
@@ -112,37 +117,34 @@ async function upsertItems(
     if (error) return { error: { _db: [error.message] } };
   }
 
-  // Upsert each item + translations
   for (const item of items) {
-    let itemId: string;
+    const itemI18n = Object.fromEntries(
+      Object.entries(item.translations).map(([locale, name]) => [locale, { name }])
+    ) as unknown as Json;
 
     if (item.id && existingIds.includes(item.id)) {
       const { error } = await supabase
         .from('service_subtypes')
-        .update({ slug: item.slug, sort_order: item.sort_order, is_active: item.is_active })
+        .update({
+          slug: item.slug,
+          sort_order: item.sort_order,
+          is_active: item.is_active,
+          i18n: itemI18n,
+        })
         .eq('id', item.id);
       if (error) return { error: { _db: [error.message] } };
-      itemId = item.id;
     } else {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('service_subtypes')
         .insert({
           group_id: groupId,
           slug: item.slug,
           sort_order: item.sort_order,
           is_active: item.is_active,
+          i18n: itemI18n,
         })
         .select('id')
         .single();
-      if (error) return { error: { _db: [error.message] } };
-      itemId = data.id;
-    }
-
-    // Upsert item translations
-    for (const [locale, name] of Object.entries(item.translations)) {
-      const { error } = await supabase
-        .from('service_subtype_translations')
-        .upsert({ subtype_id: itemId, locale, name }, { onConflict: 'subtype_id,locale' });
       if (error) return { error: { _db: [error.message] } };
     }
   }

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import type { Json } from '@/lib/supabase/database.types';
 import { saveSurveyQuestionsSchema } from '../schemas';
 import type { SaveSurveyQuestionsInput, SurveyQuestionInput } from '../types';
 
@@ -50,10 +51,20 @@ async function upsertQuestion(
   supabase: ReturnType<typeof createClient>,
   question: SurveyQuestionInput
 ) {
-  let questionId: string;
+  // Build i18n jsonb. Each locale entry has label + optional description +
+  // optional option_labels (nested record).
+  const i18n: Record<string, Record<string, unknown>> = {};
+  for (const [locale, trans] of Object.entries(question.translations)) {
+    const entry: Record<string, unknown> = { label: trans.label };
+    if (trans.description) entry.description = trans.description;
+    if (trans.option_labels) entry.option_labels = trans.option_labels;
+    i18n[locale] = entry;
+  }
+
+  const i18nJson = i18n as unknown as Json;
 
   if (question.id) {
-    // Update existing (key is read-only after creation — don't update it)
+    // Update existing (key is read-only after creation)
     const { error } = await supabase
       .from('survey_questions')
       .update({
@@ -61,13 +72,12 @@ async function upsertQuestion(
         options: question.options,
         sort_order: question.sort_order,
         is_active: question.is_active,
+        i18n: i18nJson,
       })
       .eq('id', question.id);
     if (error) return { error: { _db: [error.message] } };
-    questionId = question.id;
   } else {
-    // Insert new
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('survey_questions')
       .insert({
         key: question.key,
@@ -75,27 +85,10 @@ async function upsertQuestion(
         options: question.options,
         sort_order: question.sort_order,
         is_active: question.is_active,
+        i18n: i18nJson,
       })
       .select('id')
       .single();
-    if (error) return { error: { _db: [error.message] } };
-    questionId = data.id;
-  }
-
-  // Upsert translations
-  for (const [locale, trans] of Object.entries(question.translations)) {
-    const { error } = await supabase
-      .from('survey_question_translations')
-      .upsert(
-        {
-          question_id: questionId,
-          locale,
-          label: trans.label,
-          description: trans.description ?? null,
-          option_labels: trans.option_labels ?? null,
-        },
-        { onConflict: 'question_id,locale' }
-      );
     if (error) return { error: { _db: [error.message] } };
   }
 }

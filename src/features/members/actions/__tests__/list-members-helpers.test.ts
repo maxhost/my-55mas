@@ -1,28 +1,28 @@
 import { describe, it, expect } from 'vitest';
 import { buildNameMap, buildTeamsMap } from '../list-members-helpers';
-import type { LocalizedRow, TeamMemberRow } from '../list-members-helpers';
+import type { I18nRow, TeamMemberRow } from '../list-members-helpers';
 
 describe('buildNameMap', () => {
   it('returns empty map for empty input', () => {
-    expect(buildNameMap([])).toEqual(new Map());
+    expect(buildNameMap([], 'es')).toEqual(new Map());
   });
 
-  it('maps id to name', () => {
-    const rows: LocalizedRow[] = [
-      { id: 'c1', name: 'España' },
-      { id: 'c2', name: 'Portugal' },
+  it('maps id to localized name in the requested locale', () => {
+    const rows: I18nRow[] = [
+      { id: 'c1', i18n: { es: { name: 'España' }, en: { name: 'Spain' } } },
+      { id: 'c2', i18n: { es: { name: 'Portugal' } } },
     ];
-    const map = buildNameMap(rows);
-    expect(map.get('c1')).toBe('España');
-    expect(map.get('c2')).toBe('Portugal');
+    expect(buildNameMap(rows, 'es').get('c1')).toBe('España');
+    expect(buildNameMap(rows, 'en').get('c1')).toBe('Spain');
+    expect(buildNameMap(rows, 'es').get('c2')).toBe('Portugal');
   });
 
-  it('skips rows with null id or name', () => {
-    const rows: LocalizedRow[] = [
-      { id: null, name: 'Unknown' },
-      { id: 'c1', name: null },
+  it('skips rows with null id or empty i18n', () => {
+    const rows: I18nRow[] = [
+      { id: null, i18n: { es: { name: 'Unknown' } } },
+      { id: 'c1', i18n: null },
     ];
-    expect(buildNameMap(rows).size).toBe(0);
+    expect(buildNameMap(rows, 'es').size).toBe(0);
   });
 });
 

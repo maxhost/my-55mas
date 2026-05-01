@@ -15,8 +15,6 @@ const LOCALES: Record<string, LocaleMessages> = {
   ca: caJson as LocaleMessages,
 };
 
-// Aplana un objeto JSON a paths con dot-notation. Ej:
-// { a: { b: 'x' }, c: 'y' } → ['a.b', 'c']
 function flattenKeys(obj: unknown, prefix = ''): string[] {
   if (obj === null || obj === undefined) return [];
   if (typeof obj !== 'object' || Array.isArray(obj)) return [prefix];
@@ -29,7 +27,7 @@ function flattenKeys(obj: unknown, prefix = ''): string[] {
 }
 
 function diff(a: Set<string>, b: Set<string>): string[] {
-  return [...a].filter((k) => !b.has(k));
+  return Array.from(a).filter((k) => !b.has(k));
 }
 
 describe('locale parity — todas las claves deben existir en los 5 locales', () => {
@@ -47,7 +45,6 @@ describe('locale parity — todas las claves deben existir en los 5 locales', ()
       const otherKeys = localeKeys[locale];
       const missing = diff(referenceKeys, otherKeys);
       const extra = diff(otherKeys, referenceKeys);
-      // Reporta de forma legible: lista de keys faltantes/extra.
       if (missing.length > 0 || extra.length > 0) {
         const lines: string[] = [];
         if (missing.length > 0) {
@@ -66,56 +63,4 @@ describe('locale parity — todas las claves deben existir en los 5 locales', ()
       expect(extra).toEqual([]);
     }
   );
-
-  it('cubre los namespaces críticos del embed', () => {
-    const requiredKeys = [
-      'TalentServiceEmbed.unavailable.unknownSlug',
-      'TalentServiceEmbed.unavailable.serviceNotActive',
-      'TalentServiceEmbed.unavailable.countryMismatch',
-      'TalentServiceEmbed.unavailable.talentCountryNotSet',
-      'TalentServiceEmbed.unavailable.cityNotConfigured',
-      'TalentServiceEmbed.unavailable.noActiveForm',
-      'TalentServiceEmbed.unavailable.emptySchema',
-      'TalentServiceEmbed.unavailable.legacySchema',
-      'TalentServiceEmbed.unavailable.notAuthenticated',
-      'TalentServiceEmbed.unavailable.noTalentProfile',
-      'TalentServiceEmbed.error.auth',
-      'TalentServiceEmbed.error.config',
-      'TalentServiceEmbed.error.db',
-      'AdminTalentServices.tabEmbed',
-      'AdminTalentServices.embedCode',
-      'AdminTalentServices.embedHint',
-      'Embed.unavailable.unknownSlug',
-      'Embed.unavailable.cityNotConfigured',
-      'Embed.unavailable.noActiveForm',
-      'Embed.unavailable.emptySchema',
-      'Embed.unavailable.legacySchema',
-      // Onboarding services step 3 (S5+S8 del feature onboarding-services).
-      'OnboardingServices.commitSelection',
-      'OnboardingServices.commitPending',
-      'OnboardingServices.commitInFlight',
-      'OnboardingServices.commitSuccess',
-      'OnboardingServices.commitError',
-      'OnboardingServices.statusPending',
-      'OnboardingServices.statusSaved',
-      'OnboardingServices.emptyState',
-      'OnboardingServices.atLeastOneService',
-      'OnboardingServices.saveAllServicesFirst',
-      'OnboardingServices.savedCount',
-      'OnboardingServices.accordionTitle',
-      // talent_services_panel renderer (S5b del feature talent-services-panel).
-      'OnboardingServices.loadingService',
-      'OnboardingServices.expandError',
-      'OnboardingServices.retry',
-    ];
-    for (const locale of Object.keys(LOCALES)) {
-      const keys = localeKeys[locale];
-      for (const required of requiredKeys) {
-        expect(
-          keys.has(required),
-          `${locale}.json is missing required key: ${required}`
-        ).toBe(true);
-      }
-    }
-  });
 });

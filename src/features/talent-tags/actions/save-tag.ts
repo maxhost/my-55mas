@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import type { Json } from '@/lib/supabase/database.types';
 import { saveTalentTagSchema } from '../schemas';
 import type { SaveTalentTagInput } from '../types';
 
@@ -18,6 +19,10 @@ export async function saveTag(input: SaveTalentTagInput): Promise<SaveTagResult>
   const { tag } = parsed.data;
   const supabase = createClient();
 
+  const i18n = Object.fromEntries(
+    Object.entries(tag.translations).map(([locale, name]) => [locale, { name }])
+  ) as unknown as Json;
+
   let tagId: string;
 
   if (tag.id) {
@@ -27,6 +32,7 @@ export async function saveTag(input: SaveTalentTagInput): Promise<SaveTagResult>
         slug: tag.slug,
         sort_order: tag.sort_order,
         is_active: tag.is_active,
+        i18n,
       })
       .eq('id', tag.id);
     if (error) return { error: { _db: [error.message] } };
@@ -38,18 +44,12 @@ export async function saveTag(input: SaveTalentTagInput): Promise<SaveTagResult>
         slug: tag.slug,
         sort_order: tag.sort_order,
         is_active: tag.is_active,
+        i18n,
       })
       .select('id')
       .single();
     if (error) return { error: { _db: [error.message] } };
     tagId = data.id;
-  }
-
-  for (const [locale, name] of Object.entries(tag.translations)) {
-    const { error } = await supabase
-      .from('talent_tag_translations')
-      .upsert({ tag_id: tagId, locale, name }, { onConflict: 'tag_id,locale' });
-    if (error) return { error: { _db: [error.message] } };
   }
 
   revalidatePath('/[locale]/(admin)/admin/talent-tags', 'layout');

@@ -23,7 +23,6 @@ src/
 │   ├── orders/          #   Contratación, estados, seguimiento
 │   ├── talents/         #   Perfiles, documentación, disponibilidad
 │   ├── clients/         #   Datos y gestión de clientes
-│   ├── forms/           #   Formularios dinámicos de contratación
 │   ├── members/         #   Gestión de miembros staff (admin/manager/viewer)
 │   └── notifications/   #   Emails y alertas
 ├── shared/              # UI compartida, hooks, utils, tipos globales

@@ -40,16 +40,22 @@ export async function listTalents({
 
   let serviceNamesMap = new Map<string, string>();
   if (serviceIds.length > 0) {
-    const { data: translations, error: transError } = await supabase
-      .from('service_translations')
-      .select('service_id, name')
-      .in('service_id', serviceIds)
-      .eq('locale', locale);
+    const { data: services, error: svcError } = await supabase
+      .from('services')
+      .select('id, slug, i18n')
+      .in('id', serviceIds);
 
-    if (transError) throw transError;
+    if (svcError) throw svcError;
 
     serviceNamesMap = new Map(
-      (translations ?? []).map((t) => [t.service_id, t.name])
+      (services ?? []).map((s) => {
+        const i18n = (s.i18n ?? {}) as Record<string, Record<string, unknown>>;
+        const name =
+          (i18n[locale]?.name as string | undefined) ??
+          (i18n.es?.name as string | undefined) ??
+          s.slug;
+        return [s.id, name];
+      })
     );
   }
 
@@ -70,24 +76,22 @@ export async function listTalents({
 
   if (ordersError) throw ordersError;
 
-  // Query 4: localized country/city names
+  // Query 4: countries/cities with i18n jsonb
   const { data: countries, error: countriesErr } = await supabase
-    .from('countries_localized')
-    .select('id, name')
-    .eq('locale', locale);
+    .from('countries')
+    .select('id, i18n');
 
   if (countriesErr) throw countriesErr;
 
   const { data: cities, error: citiesErr } = await supabase
-    .from('cities_localized')
-    .select('id, name')
-    .eq('locale', locale);
+    .from('cities')
+    .select('id, i18n');
 
   if (citiesErr) throw citiesErr;
 
   const earningsMap = buildEarningsMap(orders ?? []);
-  const countryMap = buildNameMap(countries ?? []);
-  const cityMap = buildNameMap(cities ?? []);
+  const countryMap = buildNameMap(countries ?? [], locale);
+  const cityMap = buildNameMap(cities ?? [], locale);
 
   return talents.map((t) => {
     const profile = t.profiles as unknown as { full_name: string | null };

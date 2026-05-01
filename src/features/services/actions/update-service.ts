@@ -47,22 +47,32 @@ export async function saveTranslation(input: SaveTranslationInput) {
   const { service_id, translation } = parsed.data;
   const supabase = createClient();
 
-  const { error } = await supabase.from('service_translations').upsert(
-    {
-      service_id,
-      locale: translation.locale,
-      name: translation.name,
-      description: translation.description || null,
-      includes: translation.includes || null,
-      hero_title: translation.hero_title || null,
-      hero_subtitle: translation.hero_subtitle || null,
-      benefits: translation.benefits,
-      guarantees: translation.guarantees,
-      faqs: translation.faqs,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'service_id,locale' }
-  );
+  // Read current i18n, merge in the new locale entry, write back. Preserves
+  // other locales atomically (single UPDATE).
+  const { data: row, error: readError } = await supabase
+    .from('services')
+    .select('i18n')
+    .eq('id', service_id)
+    .single();
+
+  if (readError) throw readError;
+
+  const entry: Record<string, unknown> = { name: translation.name };
+  if (translation.description) entry.description = translation.description;
+  if (translation.includes) entry.includes = translation.includes;
+  if (translation.hero_title) entry.hero_title = translation.hero_title;
+  if (translation.hero_subtitle) entry.hero_subtitle = translation.hero_subtitle;
+  if (translation.benefits.length) entry.benefits = translation.benefits;
+  if (translation.guarantees.length) entry.guarantees = translation.guarantees;
+  if (translation.faqs.length) entry.faqs = translation.faqs;
+
+  const currentI18n = (row?.i18n ?? {}) as Record<string, unknown>;
+  const nextI18n = { ...currentI18n, [translation.locale]: entry };
+
+  const { error } = await supabase
+    .from('services')
+    .update({ i18n: nextI18n as unknown as Json, updated_at: new Date().toISOString() })
+    .eq('id', service_id);
 
   if (error) throw error;
 

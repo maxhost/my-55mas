@@ -1,7 +1,10 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { localizedField } from '@/shared/lib/i18n/localize';
 import type { SpokenLanguageAliasMap, SpokenLanguageOption } from './types';
+
+type I18nRecord = Record<string, Record<string, unknown>> | null;
 
 export async function getSpokenLanguageOptions(
   locale: string
@@ -10,19 +13,14 @@ export async function getSpokenLanguageOptions(
 
   const { data, error } = await supabase
     .from('spoken_languages')
-    .select('code, sort_order, spoken_language_translations(locale, name)')
+    .select('code, sort_order, i18n')
     .eq('is_active', true)
     .order('sort_order', { ascending: true });
 
   if (error) throw error;
 
   return (data ?? []).map((row) => {
-    const trans = row.spoken_language_translations as unknown as
-      | { locale: string; name: string }[]
-      | null;
-    const byLocale = new Map<string, string>();
-    for (const t of trans ?? []) byLocale.set(t.locale, t.name);
-    const label = byLocale.get(locale) ?? byLocale.get('es') ?? row.code;
+    const label = localizedField(row.i18n as I18nRecord, locale, 'name') ?? row.code;
     return { code: row.code, label, sortOrder: row.sort_order };
   });
 }

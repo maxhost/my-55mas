@@ -43,24 +43,22 @@ export async function listClients({
 
   if (clients.length === 0) return [];
 
-  // Query 2: localized country names
+  // Query 2: countries with i18n jsonb
   const { data: countries, error: countriesError } = await supabase
-    .from('countries_localized')
-    .select('id, name')
-    .eq('locale', locale);
+    .from('countries')
+    .select('id, i18n');
 
   if (countriesError) throw countriesError;
 
-  // Query 3: localized city names
+  // Query 3: cities with i18n jsonb
   const { data: cities, error: citiesError } = await supabase
-    .from('cities_localized')
-    .select('id, name')
-    .eq('locale', locale);
+    .from('cities')
+    .select('id, i18n');
 
   if (citiesError) throw citiesError;
 
-  const countryMap = buildNameMap(countries ?? []);
-  const cityMap = buildNameMap(cities ?? []);
+  const countryMap = buildNameMap(countries ?? [], locale);
+  const cityMap = buildNameMap(cities ?? [], locale);
 
   return clients.map((c) => ({
     id: c.id,

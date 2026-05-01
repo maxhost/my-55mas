@@ -12,30 +12,32 @@ import type {
 } from '../types';
 import { SPOKEN_LANGUAGE_LOCALES } from '../types';
 
+type I18nEntry = { name?: string } | null;
+type I18nRecord = Record<string, I18nEntry> | null;
+
 export async function listSpokenLanguages(): Promise<ListSpokenLanguagesResult> {
   const supabase = createAdminClient();
 
   const { data, error } = await supabase
     .from('spoken_languages')
-    .select(
-      'code, sort_order, is_active, spoken_language_translations(locale, name)'
-    )
+    .select('code, sort_order, is_active, i18n')
     .order('sort_order', { ascending: true });
 
   if (error) return { ok: false, error: error.message };
 
   const mapped: SpokenLanguageWithTranslations[] = (data ?? []).map((row) => {
-    const rawTrans = row.spoken_language_translations as unknown as
-      | { locale: string; name: string }[]
-      | null;
+    const i18n = (row.i18n ?? {}) as I18nRecord;
     const translations = SPOKEN_LANGUAGE_LOCALES.reduce((acc, locale) => {
       acc[locale] = '';
       return acc;
     }, {} as SpokenLanguageTranslations);
 
-    for (const t of rawTrans ?? []) {
-      if ((SPOKEN_LANGUAGE_LOCALES as readonly string[]).includes(t.locale)) {
-        translations[t.locale as SpokenLanguageLocale] = t.name;
+    if (i18n) {
+      for (const locale of SPOKEN_LANGUAGE_LOCALES) {
+        const name = i18n[locale]?.name;
+        if (typeof name === 'string') {
+          translations[locale as SpokenLanguageLocale] = name;
+        }
       }
     }
 

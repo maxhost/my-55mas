@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { localize, localizedField } from '@/shared/lib/i18n/localize';
 import type {
   ServiceDetail,
   ServiceTranslationDetail,
@@ -9,10 +10,34 @@ import type {
   FaqItem,
 } from '../types';
 
+type ServiceI18nEntry = {
+  name?: string;
+  description?: string | null;
+  includes?: string | null;
+  hero_title?: string | null;
+  hero_subtitle?: string | null;
+  benefits?: unknown;
+  guarantees?: unknown;
+  faqs?: unknown;
+};
+
+function toTranslationDetail(locale: string, entry: ServiceI18nEntry): ServiceTranslationDetail {
+  return {
+    locale,
+    name: entry.name ?? '',
+    description: entry.description ?? '',
+    includes: entry.includes ?? '',
+    hero_title: entry.hero_title ?? '',
+    hero_subtitle: entry.hero_subtitle ?? '',
+    benefits: Array.isArray(entry.benefits) ? (entry.benefits as string[]) : [],
+    guarantees: Array.isArray(entry.guarantees) ? (entry.guarantees as string[]) : [],
+    faqs: Array.isArray(entry.faqs) ? (entry.faqs as FaqItem[]) : [],
+  };
+}
+
 export async function getService(id: string): Promise<ServiceDetail | null> {
   const supabase = createClient();
 
-  // Fetch service base data
   const { data: service, error } = await supabase
     .from('services')
     .select('*')
@@ -21,27 +46,11 @@ export async function getService(id: string): Promise<ServiceDetail | null> {
 
   if (error || !service) return null;
 
-  // Fetch all translations
-  const { data: rawTranslations } = await supabase
-    .from('service_translations')
-    .select('*')
-    .eq('service_id', id);
+  const i18n = (service.i18n ?? {}) as Record<string, ServiceI18nEntry>;
+  const translations: ServiceTranslationDetail[] = Object.entries(i18n).map(
+    ([locale, entry]) => toTranslationDetail(locale, entry)
+  );
 
-  const translations: ServiceTranslationDetail[] = (
-    rawTranslations ?? []
-  ).map((t) => ({
-    locale: t.locale,
-    name: t.name,
-    description: t.description ?? '',
-    includes: t.includes ?? '',
-    hero_title: t.hero_title ?? '',
-    hero_subtitle: t.hero_subtitle ?? '',
-    benefits: Array.isArray(t.benefits) ? (t.benefits as string[]) : [],
-    guarantees: Array.isArray(t.guarantees) ? (t.guarantees as string[]) : [],
-    faqs: Array.isArray(t.faqs) ? (t.faqs as FaqItem[]) : [],
-  }));
-
-  // Fetch country pricing with country details
   const { data: rawCountries } = await supabase
     .from('service_countries')
     .select(
@@ -52,73 +61,48 @@ export async function getService(id: string): Promise<ServiceDetail | null> {
       is_active,
       countries (
         code,
-        currency
+        currency,
+        i18n
       )
     `
     )
     .eq('service_id', id);
 
-  // Fetch country names (in 'es' as admin default)
-  const countryIds = (rawCountries ?? []).map((c) => c.country_id);
-  let countryNameMap: Record<string, string> = {};
-
-  if (countryIds.length > 0) {
-    const { data: countryNames } = await supabase
-      .from('country_translations')
-      .select('country_id, name')
-      .eq('locale', 'es')
-      .in('country_id', countryIds);
-
-    countryNameMap = Object.fromEntries(
-      (countryNames ?? []).map((c) => [c.country_id, c.name])
-    );
-  }
-
   const countries: ServiceCountryDetail[] = (rawCountries ?? []).map((c) => {
     const country = c.countries as unknown as {
       code: string;
       currency: string;
+      i18n: Record<string, Record<string, unknown>> | null;
     };
+    const countryName = localizedField(country.i18n, 'es', 'name') ?? country.code;
     return {
       service_id: c.service_id,
       country_id: c.country_id,
       base_price: c.base_price,
       is_active: c.is_active,
-      country_name: countryNameMap[c.country_id] ?? country.code,
+      country_name: countryName,
       currency: country.currency,
       country_code: country.code,
     };
   });
 
-  // Fetch city pricing with city details
   const { data: rawCities } = await supabase
     .from('service_cities')
-    .select('service_id, city_id, base_price, is_active, cities (country_id)')
+    .select('service_id, city_id, base_price, is_active, cities (country_id, i18n)')
     .eq('service_id', id);
 
-  const cityIds = (rawCities ?? []).map((c) => c.city_id);
-  let cityNameMap: Record<string, string> = {};
-
-  if (cityIds.length > 0) {
-    const { data: cityNames } = await supabase
-      .from('city_translations')
-      .select('city_id, name')
-      .eq('locale', 'es')
-      .in('city_id', cityIds);
-
-    cityNameMap = Object.fromEntries(
-      (cityNames ?? []).map((c) => [c.city_id, c.name])
-    );
-  }
-
   const cities: ServiceCityDetail[] = (rawCities ?? []).map((c) => {
-    const city = c.cities as unknown as { country_id: string };
+    const city = c.cities as unknown as {
+      country_id: string;
+      i18n: Record<string, Record<string, unknown>> | null;
+    };
+    const cityName = localizedField(city.i18n, 'es', 'name') ?? c.city_id;
     return {
       service_id: c.service_id,
       city_id: c.city_id,
       base_price: c.base_price,
       is_active: c.is_active,
-      city_name: cityNameMap[c.city_id] ?? c.city_id,
+      city_name: cityName,
       country_id: city.country_id,
     };
   });

@@ -3,8 +3,6 @@ import type { Database } from '@/lib/supabase/database.types';
 // ── DB Row Types ──────────────────────────────────────
 
 type ServiceRow = Database['public']['Tables']['services']['Row'];
-type ServiceTranslationRow =
-  Database['public']['Tables']['service_translations']['Row'];
 type ServiceCountryRow =
   Database['public']['Tables']['service_countries']['Row'];
 // ── Service Status ────────────────────────────────────
@@ -36,15 +34,14 @@ export type ServiceDetail = ServiceRow & {
   cities: ServiceCityDetail[];
 };
 
-export type ServiceTranslationDetail = Pick<
-  ServiceTranslationRow,
-  | 'locale'
-  | 'name'
-  | 'description'
-  | 'includes'
-  | 'hero_title'
-  | 'hero_subtitle'
-> & {
+// Logical shape per locale (lives in services.i18n[locale]).
+export type ServiceTranslationDetail = {
+  locale: string;
+  name: string;
+  description: string | null;
+  includes: string | null;
+  hero_title: string | null;
+  hero_subtitle: string | null;
   benefits: string[];
   guarantees: string[];
   faqs: FaqItem[];

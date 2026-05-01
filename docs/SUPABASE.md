@@ -67,9 +67,9 @@ Todas las tablas tienen RLS habilitado. Las políticas (por definir feature a fe
 
 8 migraciones aplicadas con 27+ tablas:
 
-1. `languages`, `countries`, `country_translations`, `cities`, `city_translations`
+1. `languages`, `countries`, `cities` (i18n jsonb en cada entidad)
 2. `profiles`, `user_roles`, `staff_roles`, `staff_role_scopes`
-3. `categories`, `category_translations`, `services`, `service_translations`, `service_countries`, `service_forms`, `service_form_translations`, `service_required_documents`
+3. `services` (i18n jsonb), `service_countries`
 4. `talent_profiles`, `talent_services`, `talent_documents`
 5. `orders`, `order_status_history`, `order_schedules`, `order_sessions`
 6. Triggers: `handle_new_user`, `handle_updated_at`, `validate_active_role`, etc.

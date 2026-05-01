@@ -8,7 +8,7 @@
 | **Invitado** | Contrata servicios sin registrarse; proporciona email, nombre, teléfono y dirección; recibe updates por email; puede registrarse después para reclamar sus pedidos |
 | **Cliente** | Se registra, contrata servicios, sigue sus pedidos |
 | **Talento** | Persona 55+, completa perfil, sube documentación, recibe notificaciones de trabajos compatibles, acepta o rechaza |
-| **Admin** | Acceso global; gestiona servicios, talentos, pedidos y formularios; puede intervenir, reasignar y gestionar miembros del equipo |
+| **Admin** | Acceso global; gestiona servicios, talentos, pedidos; puede intervenir, reasignar y gestionar miembros del equipo |
 | **Manager** | Miembro del equipo interno con acceso restringido por país y ciudad; permisos granulares por recurso (lectura/escritura configurable) |
 | **Viewer** | Miembro del equipo interno con acceso de solo lectura y exportación; restringido a un país/ciudad concretos |
 
@@ -48,7 +48,7 @@ Los nombres de los roles de staff (admin, manager, viewer) son editables desde e
 
 - El catálogo de servicios pertenece a 55mas, no a los talentos
 - 55mas factura al cliente (B2C); el talento factura a 55mas para cobrar
-- Los formularios dinámicos de contratación los diseña el Admin
+- Los formularios de registro y contratación son estáticos (uno por flujo: registro talento, registro cliente, servicio contratado por cliente, servicio ofrecido por talento)
 - Tras cada servicio completado, el cliente valora al talento; las valoraciones se acumulan en su perfil
 
 ## Orden de implementación v1
@@ -62,11 +62,10 @@ Los nombres de los roles de staff (admin, manager, viewer) son editables desde e
 | 5 | Acceso del equipo interno | #1 | Login admin; middleware protege rutas `(admin)`; rol `admin` en DB |
 | 5.5 | Gestión de miembros | #5 | CRUD de miembros staff desde admin: invitar por email, asignar rol (`manager`/`viewer`), configurar país/ciudad; renombrar roles; trigger DB bloquea auto-asignación de roles staff |
 | 6 | Administración de servicios | #2, #5 | CRUD de servicios con país, precio orientativo, estado draft/publicado |
-| 7 | Constructor de formularios | #6 | Editor de pasos y campos con flechas ↑↓ para reordenar (text, number, select, file); schema JSON guardado por servicio; variantes por ciudad con cascade |
 | 8 | Catálogo de servicios | #2, #6 | Lista pública filtrable por país; paginación; SSR |
 | 9 | Página de cada servicio | #8 | Detalle con descripción, precio, incluye, botón "Contratar"; SEO meta tags |
-| 10 | Formulario de contratación | #7, #9 | Renderiza formulario dinámico del servicio; captura contacto (email, nombre, teléfono, dirección); soporta guest (anon auth) y cliente registrado; fecha, horario, frecuencia; crea pedido en DB |
-| 11 | Perfil del talento | #4 | Formulario de datos personales, experiencia, foto, selección de servicios |
+| 10 | Formulario estático de contratación | #9 | Form hardcodeado por servicio: contacto (email, nombre, teléfono, dirección), fecha, horario, frecuencia; soporta guest (anon auth) y cliente registrado; crea pedido en DB |
+| 11 | Perfil del talento | #4 | Form estático de datos personales, experiencia, foto, selección de servicios |
 | 12 | Documentación del talento | #6, #11 | Subida de archivos a Supabase Storage; lista de docs requeridos por servicio |
 | 13 | Administración de talentos | #5, #11, #12 | Lista de talentos; aprobar/rechazar registro; revisar docs; pedir info adicional |
 | 14 | Zona personal del cliente | #3, #10 | Dashboard con lista de pedidos, estado actual, datos del talento asignado |

@@ -1,23 +1,22 @@
 # Esquema de Base de Datos — 55mas v1
 
+> **Nota (2026-05-02):** este doc todavía describe el modelo viejo de traducciones con tablas `*_translations` separadas. El modelo actual es **`i18n jsonb` consolidado en cada entidad madre** + nueva tabla `form_definitions`. Las tablas `categories`, `category_translations`, `service_required_documents`, `service_required_document_translations`, `talent_profile_translations`, `country_translations`, `city_translations`, `service_translations`, `service_subtype_translations`, `service_subtype_group_translations`, `talent_tag_translations`, `spoken_language_translations`, `survey_question_translations` y las views `*_localized` ya **NO existen**. Ver `docs/I18N.md` para el patrón vigente. Las secciones "Estrategia de traducciones" y "Orden de creación de tablas" se actualizaron arriba; los CREATE TABLE detallados más abajo siguen reflejando el modelo histórico y se reescribirán en un plan de doc refresh dedicado.
+
 ## Estrategia de traducciones
 
 ### Contenido estático (UI, labels, landing pages)
 - **next-intl** con archivos JSON en `src/lib/i18n/messages/{locale}.json`
 - Versionado en git, type-safe, no depende de DB
 
-### Contenido dinámico (servicios, formularios)
-- **Tablas `_translations` dedicadas por entidad** con columnas tipadas
-- Cada fila = un idioma. Agregar idioma = agregar filas, sin tocar datos existentes
-- FK real sobre `languages(code)`, NOT NULL en campos obligatorios
+### Contenido dinámico
+- **Columna `i18n jsonb`** en cada entidad madre. Shape: `{ "es": {...}, "en": {...}, ... }`.
+- Validación a nivel app via Zod (no FK a `languages` desde JSONB; el catálogo de locales válidos vive en `src/lib/i18n/messages/`).
+- Lectura via helper `localize()` en `src/shared/lib/i18n/localize.ts`.
 
-### Formularios dinámicos
-- Schema JSONB almacena **solo estructura** (tipos de campo, keys, validaciones)
-- Traducciones de labels/placeholders/opciones en tabla `service_form_translations`, una fila por idioma
-- Separación total entre estructura y texto visible
+Detalle completo en `docs/I18N.md`.
 
 ### Fallback chain al leer
-locale solicitado → locale default del país → 'es'
+locale solicitado → 'es' → null (helper devuelve null o slug como fallback de UI)
 
 ---
 
@@ -26,17 +25,17 @@ locale solicitado → locale default del país → 'es'
 Las tablas deben crearse en este orden para respetar dependencias de FK:
 
 1. `languages` — sin dependencias
-2. `countries` + `country_translations` — depende de `languages`
-3. `cities` + `city_translations` — depende de `countries`, `languages`
+2. `countries` (con `i18n jsonb`) — depende de `languages`
+3. `cities` (con `i18n jsonb`) — depende de `countries`
 4. `staff_roles` — sin dependencias (seed obligatorio antes del primer miembro)
 5. `profiles` + `user_roles` + `staff_role_scopes` — depende de `countries`, `staff_roles`, `cities`
-6. `categories` + `category_translations` — depende de `languages`
-7. `services` + `service_translations` + `service_countries` — depende de `countries`, `languages`
-8. `service_forms` + `service_form_translations` — depende de `services`, `countries`, `languages`
-9. `talent_profiles` + `client_profiles` + `talent_services` + `talent_analytics` + `service_subtype_groups` + `service_subtype_group_translations` + `service_subtypes` + `talent_service_subtypes` — depende de `profiles`, `countries`, `cities`, `services`, `languages`
-9.5. `talent_forms` + `talent_form_translations` — depende de `services`, `cities`, `languages`
-9.6. `registration_forms` + `registration_form_translations` + `registration_form_countries` + `registration_form_cities` — depende de `cities`, `countries`, `languages`
-10. `orders` + tablas relacionadas — depende de `profiles`, `services`, `countries`, `cities`, `service_forms`
+6. `services` (con `i18n jsonb`) + `service_countries` — depende de `countries`
+7. `talent_profiles` + `client_profiles` + `talent_services` + `talent_analytics` + `service_subtype_groups` + `service_subtypes` + `talent_service_subtypes` — depende de `profiles`, `countries`, `cities`, `services`. Todas las tablas con catalog (`*_groups`, `*_subtypes`) usan `i18n jsonb`.
+8. `survey_questions` (con `i18n jsonb`) + `survey_responses` — depende de `profiles`
+9. `orders` + tablas relacionadas — depende de `profiles`, `services`, `countries`, `cities`
+10. `talent_tags` + `talent_tag_assignments` (con `i18n jsonb` en `talent_tags`)
+11. `spoken_languages` + `spoken_language_aliases` (con `i18n jsonb` en `spoken_languages`)
+12. `form_definitions` (con `schema jsonb` y `i18n jsonb`) — para los 4 forms estáticos
 11. Triggers
 12. `ENABLE ROW LEVEL SECURITY`
 13. Índices
@@ -410,83 +409,6 @@ CREATE TABLE service_cities (
 
 ---
 
-## Capa 5 — Formularios dinámicos
-
-El formulario puede variar por ciudad (regulaciones locales, requisitos municipales). Schema almacena solo estructura.
-
-```sql
-CREATE TABLE service_forms (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  service_id  uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
-  city_id     uuid REFERENCES cities(id),     -- NULL = default para todas las ciudades
-  schema      jsonb NOT NULL,                 -- solo estructura, sin texto
-  version     int NOT NULL DEFAULT 1,
-  is_active   boolean NOT NULL DEFAULT true,
-  created_at  timestamptz DEFAULT now(),
-  updated_at  timestamptz DEFAULT now(),
-  -- NULLS NOT DISTINCT: PG15+ (Supabase). NULL == NULL en UNIQUE; evita múltiples defaults.
-  UNIQUE NULLS NOT DISTINCT (service_id, city_id, version)
-);
-
--- Traducciones de labels, placeholders y opciones del formulario
-CREATE TABLE service_form_translations (
-  form_id       uuid NOT NULL REFERENCES service_forms(id) ON DELETE CASCADE,
-  locale        text NOT NULL REFERENCES languages(code),
-  labels        jsonb NOT NULL,  -- {"field_key": "Label traducido"}
-  placeholders  jsonb,           -- {"field_key": "Placeholder traducido"}
-  option_labels jsonb,           -- {"field_key.option_value": "Opción traducida"}
-  created_at    timestamptz DEFAULT now(),
-  updated_at    timestamptz DEFAULT now(),
-  PRIMARY KEY (form_id, locale)
-);
-```
-
-### Ejemplo de schema (solo estructura)
-
-```json
-{
-  "fields": [
-    {"key": "address", "type": "text", "required": true},
-    {"key": "city", "type": "text", "required": true},
-    {"key": "postal_code", "type": "text", "required": true},
-    {"key": "frequency", "type": "select", "options": ["once", "weekly", "monthly"]},
-    {"key": "start_date", "type": "date", "required": true},
-    {"key": "notes", "type": "textarea", "required": false}
-  ]
-}
-```
-
-### Ejemplo de service_form_translations (locale = 'es')
-
-```json
-{
-  "labels": {
-    "address": "Dirección",
-    "city": "Ciudad",
-    "postal_code": "Código postal",
-    "frequency": "Frecuencia",
-    "start_date": "Fecha de inicio",
-    "notes": "Notas"
-  },
-  "placeholders": {
-    "address": "Calle, número, piso",
-    "notes": "Información adicional"
-  },
-  "option_labels": {
-    "frequency.once": "Una vez",
-    "frequency.weekly": "Semanal",
-    "frequency.monthly": "Mensual"
-  }
-}
-```
-
-### Resolución del formulario para servicio X en ciudad Y
-
-1. `WHERE service_id = X AND city_id = Y AND is_active = true`
-2. Si no existe → `WHERE service_id = X AND city_id IS NULL AND is_active = true`
-
----
-
 ## Capa 6 — Talento
 
 ```sql
@@ -568,8 +490,7 @@ CREATE TABLE talent_services (
   country_id  uuid NOT NULL REFERENCES countries(id),
   unit_price  numeric(10,2) CHECK (unit_price >= 0),  -- precio que cobra el talento por este servicio
   specializations jsonb DEFAULT NULL,     -- DEPRECATED: usar talent_service_subtypes. Temporal para CSV import.
-  form_data   jsonb,                      -- respuestas del talento al formulario de talento
-  form_id     uuid REFERENCES talent_forms(id) ON DELETE SET NULL,  -- snapshot del formulario usado
+  form_data   jsonb,                      -- respuestas del talento al formulario estático
   is_verified boolean NOT NULL DEFAULT false,  -- admin verificó docs
   created_at  timestamptz DEFAULT now(),
   updated_at  timestamptz DEFAULT now(),
@@ -756,88 +677,6 @@ Borrado: soft delete (`is_active = false`) para preservar asignaciones históric
 
 ---
 
-## Capa 6.5 — Formularios de talento
-
-Formularios dinámicos que el talento completa al registrarse para ofrecer un servicio.
-Estructura idéntica a `service_forms` pero con FK a `talent_forms`.
-
-```sql
-CREATE TABLE talent_forms (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  service_id  uuid NOT NULL REFERENCES services(id) ON DELETE CASCADE,
-  city_id     uuid REFERENCES cities(id),
-  schema      jsonb NOT NULL DEFAULT '{"steps": []}',
-  version     int NOT NULL DEFAULT 1,
-  is_active   boolean NOT NULL DEFAULT true,
-  created_at  timestamptz DEFAULT now(),
-  updated_at  timestamptz DEFAULT now(),
-  UNIQUE NULLS NOT DISTINCT (service_id, city_id, version)
-);
-
-CREATE TABLE talent_form_translations (
-  form_id       uuid NOT NULL REFERENCES talent_forms(id) ON DELETE CASCADE,
-  locale        text NOT NULL REFERENCES languages(code),
-  labels        jsonb NOT NULL,
-  placeholders  jsonb,
-  option_labels jsonb,
-  created_at    timestamptz DEFAULT now(),
-  updated_at    timestamptz DEFAULT now(),
-  PRIMARY KEY (form_id, locale)
-);
-```
-
-Resolución del formulario: misma lógica que service_forms (city_id específico → fallback a NULL).
-
----
-
-## Capa 6.7 — Formularios de registro de talentos
-
-Formularios dinámicos para el registro/onboarding de talentos. No atados a un servicio.
-Agrupados por slug, con variantes por ciudad (parent_id → General).
-
-```sql
-CREATE TABLE registration_forms (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  slug        text NOT NULL,
-  name        text NOT NULL,
-  city_id     uuid REFERENCES cities(id),
-  parent_id   uuid REFERENCES registration_forms(id) ON DELETE CASCADE,
-  schema      jsonb NOT NULL DEFAULT '{"steps": []}',
-  version     int NOT NULL DEFAULT 1,
-  is_active   boolean NOT NULL DEFAULT true,
-  created_at  timestamptz DEFAULT now(),
-  updated_at  timestamptz DEFAULT now(),
-  UNIQUE NULLS NOT DISTINCT (slug, city_id, version)
-);
-
-CREATE TABLE registration_form_translations (
-  form_id      uuid NOT NULL REFERENCES registration_forms(id) ON DELETE CASCADE,
-  locale       text NOT NULL REFERENCES languages(code),
-  labels       jsonb NOT NULL DEFAULT '{}',
-  placeholders jsonb NOT NULL DEFAULT '{}',
-  option_labels jsonb,
-  created_at   timestamptz DEFAULT now(),
-  updated_at   timestamptz DEFAULT now(),
-  PRIMARY KEY (form_id, locale)
-);
-
-CREATE TABLE registration_form_countries (
-  form_id     uuid NOT NULL REFERENCES registration_forms(id) ON DELETE CASCADE,
-  country_id  uuid NOT NULL REFERENCES countries(id) ON DELETE CASCADE,
-  created_at  timestamptz DEFAULT now(),
-  PRIMARY KEY (form_id, country_id)
-);
-
-CREATE TABLE registration_form_cities (
-  form_id     uuid NOT NULL REFERENCES registration_forms(id) ON DELETE CASCADE,
-  city_id     uuid NOT NULL REFERENCES cities(id) ON DELETE CASCADE,
-  created_at  timestamptz DEFAULT now(),
-  PRIMARY KEY (form_id, city_id)
-);
-```
-
----
-
 ## Capa 7 — Pedidos y programación
 
 ### Generación lazy de sesiones (pull-based)
@@ -861,12 +700,10 @@ Las sesiones se generan bajo demanda via cron, no en cadena (push).
 
 ### Validación de form_data
 
-`form_data` es NOT NULL — toda orden debe incluir los datos del formulario. `form_id` es nullable (se pone a NULL si el formulario fue eliminado, preservando `form_data` como registro histórico).
+`form_data` es NOT NULL — toda orden debe incluir los datos del formulario estático de contratación.
 
-- **`form_id`** referencia la versión exacta del formulario usado al crear el pedido (snapshot). Nullable con `ON DELETE SET NULL`.
-- **`form_data`** contiene las respuestas del cliente, validadas por la aplicación (Zod) contra `service_forms.schema` al momento del submit.
-- **No hay validación de form_data a nivel DB** — la validación estructural de JSONB contra un schema dinámico sería frágil y duplicaría lógica. La capa de aplicación es la fuente de verdad para la validación.
-- **Datos históricos:** si el formulario evoluciona (nueva versión), los datos de pedidos anteriores se mantienen intactos. El `form_id` (cuando no es NULL) permite reconstruir qué schema se usó para ese pedido.
+- **`form_data`** contiene las respuestas del cliente, validadas por la aplicación (Zod) al momento del submit.
+- **No hay validación de form_data a nivel DB** — la validación se hace en la capa de aplicación.
 
 ```sql
 CREATE TABLE orders (
@@ -875,7 +712,6 @@ CREATE TABLE orders (
   service_id          uuid REFERENCES services(id) ON DELETE SET NULL,  -- nullable: servicio puede archivarse tras crear el pedido
   country_id          uuid NOT NULL REFERENCES countries(id),
   talent_id           uuid REFERENCES profiles(id) ON DELETE SET NULL,  -- NULL hasta asignación
-  form_id             uuid REFERENCES service_forms(id) ON DELETE SET NULL,  -- versión del formulario usado (snapshot); NULL si el form fue eliminado
   form_data           jsonb NOT NULL,                                   -- respuestas del cliente (validadas por app via Zod)
   -- Contacto del pedido (siempre explícito; para guests es la ÚNICA vía de comunicación)
   contact_email       text NOT NULL,                                    -- email de contacto para ESTE pedido
@@ -975,8 +811,6 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON categories
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON services
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_forms
-  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_required_documents
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON talent_profiles
@@ -1001,8 +835,6 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON category_translations
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_translations
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_form_translations
-  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON talent_profile_translations
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_required_document_translations
@@ -1018,10 +850,6 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_subtype_group_translation
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_subtypes
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON service_subtype_translations
-  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON talent_forms
-  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON talent_form_translations
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 ```
 
@@ -1223,8 +1051,6 @@ ALTER TABLE category_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE services ENABLE ROW LEVEL SECURITY;
 ALTER TABLE service_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE service_countries ENABLE ROW LEVEL SECURITY;
-ALTER TABLE service_forms ENABLE ROW LEVEL SECURITY;
-ALTER TABLE service_form_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE talent_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE talent_profile_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE talent_services ENABLE ROW LEVEL SECURITY;
@@ -1237,8 +1063,6 @@ ALTER TABLE service_subtype_group_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE service_subtypes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE service_subtype_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE talent_service_subtypes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE talent_forms ENABLE ROW LEVEL SECURITY;
-ALTER TABLE talent_form_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE service_required_documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE service_required_document_translations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
@@ -1385,10 +1209,6 @@ Funciones almacenadas en `public` que encapsulan operaciones de negocio compleja
 │ order_sessions.talent_id        │ Permite sustitución de talento por sesión sin      │
 │ independiente                   │ cambiar el pedido                                  │
 ├─────────────────────────────────┼────────────────────────────────────────────────────┤
-│ UNIQUE NULLS NOT DISTINCT en    │ PG15+ (Supabase). Sin esto, NULL != NULL en        │
-│ service_forms                   │ UNIQUE: múltiples formularios default con mismo    │
-│                                 │ service+version                                    │
-├─────────────────────────────────┼────────────────────────────────────────────────────┤
 │ timestamptz en order_sessions,  │ Multi-país: schedule = hora local + IANA tz        │
 │ timezone text en                │ (template). Sesiones = momento absoluto. Evita     │
 │ order_schedules                 │ bugs de DST                                        │
@@ -1499,8 +1319,7 @@ Funciones almacenadas en `public` que encapsulan operaciones de negocio compleja
 │                                 │ direcciones en INSERT                              │
 ├─────────────────────────────────┼────────────────────────────────────────────────────┤
 │ Scope country_id NULL + city    │ NULL = sin restricción (accede a todos los         │
-│ NULL en staff_role_scopes       │ países/ciudades). Consistente con el patrón NULL=  │
-│                                 │ default de service_forms                           │
+│ NULL en staff_role_scopes       │ países/ciudades).                                  │
 ├─────────────────────────────────┼────────────────────────────────────────────────────┤
 │ admin sin fila en               │ Admin tiene acceso global; forzarle a tener un     │
 │ staff_role_scopes               │ scope sería un workaround innecesario. CHECK en    │
@@ -1546,10 +1365,9 @@ Funciones almacenadas en `public` que encapsulan operaciones de negocio compleja
 │ tax_rate, tax, total, currency) │ capturar precio al crearse. currency es snapshot   │
 │                                 │ de countries.currency (inmutable post-creación)     │
 ├─────────────────────────────────┼────────────────────────────────────────────────────┤
-│ form_id y form_data NOT NULL    │ Toda orden proviene de un formulario. form_id =    │
-│ en orders                       │ snapshot de la versión usada. Validación de         │
-│                                 │ form_data en app (Zod), no en DB (demasiado frágil │
-│                                 │ para JSONB dinámico)                                │
+│ form_data NOT NULL en orders    │ Toda orden proviene de un formulario estático.     │
+│                                 │ Validación de form_data en app (Zod), no en DB     │
+│                                 │ (demasiado frágil para JSONB).                     │
 ├─────────────────────────────────┼────────────────────────────────────────────────────┤
 │ CHECK status-based en           │ Onboarding multi-step: pending/rejected permiten   │
 │ talent_profiles para            │ NULL (perfil incompleto). approved/suspended        │
@@ -1621,9 +1439,8 @@ Funciones almacenadas en `public` que encapsulan operaciones de negocio compleja
 35. **Numeración corregida en "Orden de creación"** — eliminados duplicados, añadidas tablas `cities`
 36. **Trigger `validate_city_country_match`** — impide que `city_id`/`service_city_id` apunte a una ciudad de otro país en `talent_profiles`, `orders` y `staff_role_scopes`
 37. **Pricing en `orders`** — `price_subtotal`, `price_tax_rate`, `price_tax`, `price_total`, `currency` (snapshot de `countries.currency` al crear el pedido)
-38. **`form_id` y `form_data` NOT NULL en `orders`** — toda orden proviene de un formulario; `form_id` = snapshot de versión; validación en app (Zod)
+38. **`form_data` NOT NULL en `orders`** — toda orden proviene de un formulario estático; validación en app (Zod), no en DB
 39. **CHECK status-based en `talent_profiles`** — `country_id` y `city_id` pueden ser NULL solo en `pending`/`rejected` (onboarding multi-step); `approved`/`suspended` los requieren
 40. **Timestamps en todas las tablas `_translations`** — `created_at` + `updated_at` con triggers para las 7 tablas de traducciones
 41. **Views `_localized` con INNER JOIN intencional** — traducción ausente = entidad no visible para ese locale (por diseño)
 42. **Índice `idx_orders_country`** — faltaba; necesario para RLS de manager/viewer y filtros de admin por país
-43. **Documentación de estrategia `form_data`** — validación en app, no en DB; `form_id` como audit trail de versión

@@ -46,18 +46,16 @@ export async function listMembers({
 
   if (roleNamesError) throw roleNamesError;
 
-  // Query 5: localized country/city names
+  // Query 5: countries/cities with i18n jsonb
   const { data: countries, error: countriesErr } = await supabase
-    .from('countries_localized')
-    .select('id, name')
-    .eq('locale', locale);
+    .from('countries')
+    .select('id, i18n');
 
   if (countriesErr) throw countriesErr;
 
   const { data: cities, error: citiesErr } = await supabase
-    .from('cities_localized')
-    .select('id, name')
-    .eq('locale', locale);
+    .from('cities')
+    .select('id, i18n');
 
   if (citiesErr) throw citiesErr;
 
@@ -71,8 +69,8 @@ export async function listMembers({
   const roleNameMap = new Map(
     (roleNames ?? []).map((r) => [r.key, r.display_name])
   );
-  const countryMap = buildNameMap(countries ?? []);
-  const cityMap = buildNameMap(cities ?? []);
+  const countryMap = buildNameMap(countries ?? [], locale);
+  const cityMap = buildNameMap(cities ?? [], locale);
 
   return staffRoles.map((r) => {
     const profile = r.profiles as unknown as { full_name: string | null; email: string | null };

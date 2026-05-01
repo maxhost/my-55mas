@@ -11,15 +11,20 @@ export function buildNameMap(
   return map;
 }
 
+import { localizedField } from '@/shared/lib/i18n/localize';
+
 /**
- * Build a Map<id, name> from service translation rows (service_id field).
+ * Build a Map<service_id, localized name> from services rows with i18n jsonb.
  */
 export function buildServiceNameMap(
-  rows: { service_id: string; name: string }[]
+  rows: { id: string; slug: string; i18n: unknown }[],
+  locale: string
 ): Map<string, string> {
   const map = new Map<string, string>();
   for (const row of rows) {
-    map.set(row.service_id, row.name);
+    const i18n = (row.i18n ?? {}) as Record<string, Record<string, unknown>>;
+    const name = localizedField(i18n, locale, 'name') ?? row.slug;
+    map.set(row.id, name);
   }
   return map;
 }

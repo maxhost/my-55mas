@@ -13,7 +13,7 @@ Sistema para definir sub-tipos usando una jerarquía de dos niveles: **grupos** 
 3. **Traducciones**: Cada grupo e ítem tiene nombre traducido por locale
 4. **Ordenamiento**: Grupos e ítems tienen sort_order para controlar el orden de display
 5. **Activar/desactivar**: Grupos e ítems individuales pueden desactivarse sin eliminarlos
-6. **Field type "subtype"**: Tipo de campo en el form builder — referencia grupos por slug
+6. **Referencia por slug del grupo**: los forms estáticos referencian un grupo por su slug y muestran sus ítems activos como opciones
 7. **Relación talento↔subtipo**: Tabla normalizada `talent_service_subtypes` para queries eficientes
 
 ### No funcionales

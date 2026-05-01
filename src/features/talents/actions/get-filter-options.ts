@@ -1,48 +1,44 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { localizedField } from '@/shared/lib/i18n/localize';
 import type { CountryOption, CityOption } from '../types';
 
-export async function getCountryOptions(
-  locale: string
-): Promise<CountryOption[]> {
+type I18nRecord = Record<string, Record<string, unknown>> | null;
+
+export async function getCountryOptions(locale: string): Promise<CountryOption[]> {
   const supabase = createClient();
 
   const { data, error } = await supabase
-    .from('country_translations')
-    .select('country_id, name, countries!inner(is_active)')
-    .eq('locale', locale)
-    .eq('countries.is_active', true)
-    .order('name', { ascending: true });
+    .from('countries')
+    .select('id, i18n')
+    .eq('is_active', true);
 
   if (error) throw error;
 
-  return (data ?? []).map((row) => ({
-    id: row.country_id,
-    name: row.name,
-  }));
+  return (data ?? [])
+    .map((row) => ({
+      id: row.id,
+      name: localizedField(row.i18n as I18nRecord, locale, 'name') ?? row.id,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export async function getCityOptions(
-  locale: string
-): Promise<CityOption[]> {
+export async function getCityOptions(locale: string): Promise<CityOption[]> {
   const supabase = createClient();
 
   const { data, error } = await supabase
-    .from('city_translations')
-    .select('city_id, name, cities!inner(country_id, is_active)')
-    .eq('locale', locale)
-    .eq('cities.is_active', true)
-    .order('name', { ascending: true });
+    .from('cities')
+    .select('id, country_id, i18n')
+    .eq('is_active', true);
 
   if (error) throw error;
 
-  return (data ?? []).map((row) => {
-    const city = row.cities as unknown as { country_id: string };
-    return {
-      id: row.city_id,
-      name: row.name,
-      country_id: city.country_id,
-    };
-  });
+  return (data ?? [])
+    .map((row) => ({
+      id: row.id,
+      name: localizedField(row.i18n as I18nRecord, locale, 'name') ?? row.id,
+      country_id: row.country_id,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }

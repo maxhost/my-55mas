@@ -14,89 +14,13 @@ export type Database = {
   }
   public: {
     Tables: {
-      categories: {
-        Row: {
-          created_at: string | null
-          icon: string | null
-          id: string
-          is_active: boolean
-          slug: string
-          sort_order: number | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          icon?: string | null
-          id?: string
-          is_active?: boolean
-          slug: string
-          sort_order?: number | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          icon?: string | null
-          id?: string
-          is_active?: boolean
-          slug?: string
-          sort_order?: number | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      category_translations: {
-        Row: {
-          category_id: string
-          created_at: string | null
-          locale: string
-          name: string
-          updated_at: string | null
-        }
-        Insert: {
-          category_id: string
-          created_at?: string | null
-          locale: string
-          name: string
-          updated_at?: string | null
-        }
-        Update: {
-          category_id?: string
-          created_at?: string | null
-          locale?: string
-          name?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "category_translations_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "category_translations_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories_localized"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "category_translations_locale_fkey"
-            columns: ["locale"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
-        ]
-      }
       cities: {
         Row: {
           country_id: string
           created_at: string | null
+          i18n: Json
           id: string
           is_active: boolean
-          name: string
           slug: string
           sort_order: number | null
           updated_at: string | null
@@ -104,9 +28,9 @@ export type Database = {
         Insert: {
           country_id: string
           created_at?: string | null
+          i18n?: Json
           id?: string
           is_active?: boolean
-          name: string
           slug: string
           sort_order?: number | null
           updated_at?: string | null
@@ -114,9 +38,9 @@ export type Database = {
         Update: {
           country_id?: string
           created_at?: string | null
+          i18n?: Json
           id?: string
           is_active?: boolean
-          name?: string
           slug?: string
           sort_order?: number | null
           updated_at?: string | null
@@ -128,59 +52,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "countries"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cities_country_id_fkey"
-            columns: ["country_id"]
-            isOneToOne: false
-            referencedRelation: "countries_localized"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      city_translations: {
-        Row: {
-          city_id: string
-          created_at: string | null
-          locale: string
-          name: string
-          updated_at: string | null
-        }
-        Insert: {
-          city_id: string
-          created_at?: string | null
-          locale: string
-          name: string
-          updated_at?: string | null
-        }
-        Update: {
-          city_id?: string
-          created_at?: string | null
-          locale?: string
-          name?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "city_translations_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "cities"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "city_translations_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "cities_localized"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "city_translations_locale_fkey"
-            columns: ["locale"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
           },
         ]
       }
@@ -244,6 +115,7 @@ export type Database = {
         Row: {
           code: string
           currency: string
+          i18n: Json
           id: string
           is_active: boolean
           locale_default: string
@@ -253,6 +125,7 @@ export type Database = {
         Insert: {
           code: string
           currency: string
+          i18n?: Json
           id?: string
           is_active?: boolean
           locale_default?: string
@@ -262,6 +135,7 @@ export type Database = {
         Update: {
           code?: string
           currency?: string
+          i18n?: Json
           id?: string
           is_active?: boolean
           locale_default?: string
@@ -278,193 +152,159 @@ export type Database = {
           },
         ]
       }
-      country_translations: {
+      fiscal_id_type_countries: {
         Row: {
           country_id: string
-          created_at: string | null
-          locale: string
-          name: string
-          updated_at: string | null
+          fiscal_id_type_id: string
         }
         Insert: {
           country_id: string
-          created_at?: string | null
-          locale: string
-          name: string
-          updated_at?: string | null
+          fiscal_id_type_id: string
         }
         Update: {
           country_id?: string
-          created_at?: string | null
-          locale?: string
-          name?: string
-          updated_at?: string | null
+          fiscal_id_type_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "country_translations_country_id_fkey"
+            foreignKeyName: "fiscal_id_type_countries_country_id_fkey"
             columns: ["country_id"]
             isOneToOne: false
             referencedRelation: "countries"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "country_translations_country_id_fkey"
+            foreignKeyName: "fiscal_id_type_countries_fiscal_id_type_id_fkey"
+            columns: ["fiscal_id_type_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_id_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fiscal_id_types: {
+        Row: {
+          code: string
+          created_at: string
+          i18n: Json
+          id: string
+          is_active: boolean
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          i18n?: Json
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          i18n?: Json
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      form_definition_cities: {
+        Row: {
+          city_id: string
+          form_id: string
+          is_active: boolean
+        }
+        Insert: {
+          city_id: string
+          form_id: string
+          is_active?: boolean
+        }
+        Update: {
+          city_id?: string
+          form_id?: string
+          is_active?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_definition_cities_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "form_definition_cities_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "form_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_definition_countries: {
+        Row: {
+          country_id: string
+          form_id: string
+          is_active: boolean
+        }
+        Insert: {
+          country_id: string
+          form_id: string
+          is_active?: boolean
+        }
+        Update: {
+          country_id?: string
+          form_id?: string
+          is_active?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_definition_countries_country_id_fkey"
             columns: ["country_id"]
             isOneToOne: false
-            referencedRelation: "countries_localized"
+            referencedRelation: "countries"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "country_translations_locale_fkey"
-            columns: ["locale"]
+            foreignKeyName: "form_definition_countries_form_id_fkey"
+            columns: ["form_id"]
             isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
-        ]
-      }
-      form_field_definition_translations: {
-        Row: {
-          description: string | null
-          field_id: string
-          label: string
-          locale: string
-          option_labels: Json | null
-          placeholder: string | null
-        }
-        Insert: {
-          description?: string | null
-          field_id: string
-          label: string
-          locale: string
-          option_labels?: Json | null
-          placeholder?: string | null
-        }
-        Update: {
-          description?: string | null
-          field_id?: string
-          label?: string
-          locale?: string
-          option_labels?: Json | null
-          placeholder?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "form_field_definition_translations_field_id_fkey"
-            columns: ["field_id"]
-            isOneToOne: false
-            referencedRelation: "form_field_definitions"
+            referencedRelation: "form_definitions"
             referencedColumns: ["id"]
           },
         ]
       }
-      form_field_definitions: {
+      form_definitions: {
         Row: {
-          config: Json | null
-          created_at: string | null
-          group_id: string
-          id: string
-          input_type: string
-          is_active: boolean
-          key: string
-          options: Json | null
-          options_source: string | null
-          persistence_target: Json | null
-          persistence_type: string
-          sort_order: number
-          updated_at: string | null
-        }
-        Insert: {
-          config?: Json | null
-          created_at?: string | null
-          group_id: string
-          id?: string
-          input_type: string
-          is_active?: boolean
-          key: string
-          options?: Json | null
-          options_source?: string | null
-          persistence_target?: Json | null
-          persistence_type: string
-          sort_order?: number
-          updated_at?: string | null
-        }
-        Update: {
-          config?: Json | null
-          created_at?: string | null
-          group_id?: string
-          id?: string
-          input_type?: string
-          is_active?: boolean
-          key?: string
-          options?: Json | null
-          options_source?: string | null
-          persistence_target?: Json | null
-          persistence_type?: string
-          sort_order?: number
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "form_field_definitions_group_id_fkey"
-            columns: ["group_id"]
-            isOneToOne: false
-            referencedRelation: "form_field_groups"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      form_field_group_translations: {
-        Row: {
-          group_id: string
-          locale: string
-          name: string
-        }
-        Insert: {
-          group_id: string
-          locale: string
-          name: string
-        }
-        Update: {
-          group_id?: string
-          locale?: string
-          name?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "form_field_group_translations_group_id_fkey"
-            columns: ["group_id"]
-            isOneToOne: false
-            referencedRelation: "form_field_groups"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      form_field_groups: {
-        Row: {
-          created_at: string | null
+          created_at: string
+          form_key: string
+          i18n: Json
           id: string
           is_active: boolean
-          slug: string
-          sort_order: number
-          updated_at: string | null
+          schema: Json
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
+          form_key: string
+          i18n?: Json
           id?: string
           is_active?: boolean
-          slug: string
-          sort_order?: number
-          updated_at?: string | null
+          schema?: Json
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
+          form_key?: string
+          i18n?: Json
           id?: string
           is_active?: boolean
-          slug?: string
-          sort_order?: number
-          updated_at?: string | null
+          schema?: Json
+          updated_at?: string
         }
         Relationships: []
       }
@@ -657,7 +497,6 @@ export type Database = {
           currency: string
           discount: number | null
           form_data: Json
-          form_id: string | null
           id: string
           legacy_data: Json | null
           legacy_id: string | null
@@ -697,7 +536,6 @@ export type Database = {
           currency: string
           discount?: number | null
           form_data: Json
-          form_id?: string | null
           id?: string
           legacy_data?: Json | null
           legacy_id?: string | null
@@ -737,7 +575,6 @@ export type Database = {
           currency?: string
           discount?: number | null
           form_data?: Json
-          form_id?: string | null
           id?: string
           legacy_data?: Json | null
           legacy_id?: string | null
@@ -781,20 +618,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "orders_country_id_fkey"
-            columns: ["country_id"]
-            isOneToOne: false
-            referencedRelation: "countries_localized"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orders_form_id_fkey"
-            columns: ["form_id"]
-            isOneToOne: false
-            referencedRelation: "service_forms"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "orders_service_city_id_fkey"
             columns: ["service_city_id"]
             isOneToOne: false
@@ -802,24 +625,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "orders_service_city_id_fkey"
-            columns: ["service_city_id"]
-            isOneToOne: false
-            referencedRelation: "cities_localized"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "orders_service_id_fkey"
             columns: ["service_id"]
             isOneToOne: false
             referencedRelation: "services"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orders_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services_localized"
             referencedColumns: ["id"]
           },
           {
@@ -849,7 +658,6 @@ export type Database = {
           full_name: string | null
           gender: string | null
           id: string
-          nif: string | null
           other_language: string[] | null
           phone: string | null
           preferred_city: string | null
@@ -868,7 +676,6 @@ export type Database = {
           full_name?: string | null
           gender?: string | null
           id: string
-          nif?: string | null
           other_language?: string[] | null
           phone?: string | null
           preferred_city?: string | null
@@ -887,7 +694,6 @@ export type Database = {
           full_name?: string | null
           gender?: string | null
           id?: string
-          nif?: string | null
           other_language?: string[] | null
           phone?: string | null
           preferred_city?: string | null
@@ -905,24 +711,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "profiles_preferred_city_fkey"
-            columns: ["preferred_city"]
-            isOneToOne: false
-            referencedRelation: "cities_localized"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "profiles_preferred_country_fkey"
             columns: ["preferred_country"]
             isOneToOne: false
             referencedRelation: "countries"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "profiles_preferred_country_fkey"
-            columns: ["preferred_country"]
-            isOneToOne: false
-            referencedRelation: "countries_localized"
             referencedColumns: ["id"]
           },
           {
@@ -931,195 +723,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "languages"
             referencedColumns: ["code"]
-          },
-        ]
-      }
-      registration_form_cities: {
-        Row: {
-          city_id: string
-          created_at: string | null
-          form_id: string
-        }
-        Insert: {
-          city_id: string
-          created_at?: string | null
-          form_id: string
-        }
-        Update: {
-          city_id?: string
-          created_at?: string | null
-          form_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "registration_form_cities_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "cities"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "registration_form_cities_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "cities_localized"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "registration_form_cities_form_id_fkey"
-            columns: ["form_id"]
-            isOneToOne: false
-            referencedRelation: "registration_forms"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      registration_form_countries: {
-        Row: {
-          country_id: string
-          created_at: string | null
-          form_id: string
-        }
-        Insert: {
-          country_id: string
-          created_at?: string | null
-          form_id: string
-        }
-        Update: {
-          country_id?: string
-          created_at?: string | null
-          form_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "registration_form_countries_country_id_fkey"
-            columns: ["country_id"]
-            isOneToOne: false
-            referencedRelation: "countries"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "registration_form_countries_country_id_fkey"
-            columns: ["country_id"]
-            isOneToOne: false
-            referencedRelation: "countries_localized"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "registration_form_countries_form_id_fkey"
-            columns: ["form_id"]
-            isOneToOne: false
-            referencedRelation: "registration_forms"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      registration_form_translations: {
-        Row: {
-          created_at: string | null
-          form_id: string
-          labels: Json
-          locale: string
-          option_labels: Json | null
-          placeholders: Json
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          form_id: string
-          labels?: Json
-          locale: string
-          option_labels?: Json | null
-          placeholders?: Json
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          form_id?: string
-          labels?: Json
-          locale?: string
-          option_labels?: Json | null
-          placeholders?: Json
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "registration_form_translations_form_id_fkey"
-            columns: ["form_id"]
-            isOneToOne: false
-            referencedRelation: "registration_forms"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "registration_form_translations_locale_fkey"
-            columns: ["locale"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
-        ]
-      }
-      registration_forms: {
-        Row: {
-          city_id: string | null
-          created_at: string | null
-          id: string
-          is_active: boolean
-          name: string
-          parent_id: string | null
-          schema: Json
-          slug: string
-          target_role: string
-          updated_at: string | null
-          version: number
-        }
-        Insert: {
-          city_id?: string | null
-          created_at?: string | null
-          id?: string
-          is_active?: boolean
-          name: string
-          parent_id?: string | null
-          schema?: Json
-          slug: string
-          target_role?: string
-          updated_at?: string | null
-          version?: number
-        }
-        Update: {
-          city_id?: string | null
-          created_at?: string | null
-          id?: string
-          is_active?: boolean
-          name?: string
-          parent_id?: string | null
-          schema?: Json
-          slug?: string
-          target_role?: string
-          updated_at?: string | null
-          version?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "registration_forms_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "cities"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "registration_forms_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "cities_localized"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "registration_forms_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "registration_forms"
-            referencedColumns: ["id"]
           },
         ]
       }
@@ -1157,24 +760,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "service_cities_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "cities_localized"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "service_cities_service_id_fkey"
             columns: ["service_id"]
             isOneToOne: false
             referencedRelation: "services"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_cities_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services_localized"
             referencedColumns: ["id"]
           },
         ]
@@ -1207,232 +796,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "service_countries_country_id_fkey"
-            columns: ["country_id"]
-            isOneToOne: false
-            referencedRelation: "countries_localized"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "service_countries_service_id_fkey"
             columns: ["service_id"]
             isOneToOne: false
             referencedRelation: "services"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_countries_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services_localized"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      service_form_translations: {
-        Row: {
-          created_at: string | null
-          form_id: string
-          labels: Json
-          locale: string
-          option_labels: Json | null
-          placeholders: Json | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          form_id: string
-          labels: Json
-          locale: string
-          option_labels?: Json | null
-          placeholders?: Json | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          form_id?: string
-          labels?: Json
-          locale?: string
-          option_labels?: Json | null
-          placeholders?: Json | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "service_form_translations_form_id_fkey"
-            columns: ["form_id"]
-            isOneToOne: false
-            referencedRelation: "service_forms"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_form_translations_locale_fkey"
-            columns: ["locale"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
-        ]
-      }
-      service_forms: {
-        Row: {
-          city_id: string | null
-          created_at: string | null
-          id: string
-          is_active: boolean
-          schema: Json
-          service_id: string
-          updated_at: string | null
-          version: number
-        }
-        Insert: {
-          city_id?: string | null
-          created_at?: string | null
-          id?: string
-          is_active?: boolean
-          schema: Json
-          service_id: string
-          updated_at?: string | null
-          version?: number
-        }
-        Update: {
-          city_id?: string | null
-          created_at?: string | null
-          id?: string
-          is_active?: boolean
-          schema?: Json
-          service_id?: string
-          updated_at?: string | null
-          version?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "service_forms_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "cities"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_forms_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "cities_localized"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_forms_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_forms_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services_localized"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      service_required_document_translations: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          document_id: string
-          label: string
-          locale: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          document_id: string
-          label: string
-          locale: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          document_id?: string
-          label?: string
-          locale?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "service_required_document_translations_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "service_required_documents"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_required_document_translations_locale_fkey"
-            columns: ["locale"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
-        ]
-      }
-      service_required_documents: {
-        Row: {
-          country_id: string
-          created_at: string | null
-          document_type: string
-          id: string
-          is_required: boolean
-          service_id: string
-          updated_at: string | null
-        }
-        Insert: {
-          country_id: string
-          created_at?: string | null
-          document_type: string
-          id?: string
-          is_required?: boolean
-          service_id: string
-          updated_at?: string | null
-        }
-        Update: {
-          country_id?: string
-          created_at?: string | null
-          document_type?: string
-          id?: string
-          is_required?: boolean
-          service_id?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "service_required_documents_country_id_fkey"
-            columns: ["country_id"]
-            isOneToOne: false
-            referencedRelation: "countries"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_required_documents_country_id_fkey"
-            columns: ["country_id"]
-            isOneToOne: false
-            referencedRelation: "countries_localized"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_required_documents_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_required_documents_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services_localized"
             referencedColumns: ["id"]
           },
         ]
@@ -1471,57 +838,12 @@ export type Database = {
             referencedRelation: "services"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "service_subtype_group_assignments_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services_localized"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      service_subtype_group_translations: {
-        Row: {
-          created_at: string | null
-          group_id: string
-          locale: string
-          name: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          group_id: string
-          locale: string
-          name: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          group_id?: string
-          locale?: string
-          name?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "service_subtype_group_translations_group_id_fkey"
-            columns: ["group_id"]
-            isOneToOne: false
-            referencedRelation: "service_subtype_groups"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_subtype_group_translations_locale_fkey"
-            columns: ["locale"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
         ]
       }
       service_subtype_groups: {
         Row: {
           created_at: string | null
+          i18n: Json
           id: string
           is_active: boolean
           slug: string
@@ -1530,6 +852,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          i18n?: Json
           id?: string
           is_active?: boolean
           slug: string
@@ -1538,6 +861,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          i18n?: Json
           id?: string
           is_active?: boolean
           slug?: string
@@ -1546,49 +870,11 @@ export type Database = {
         }
         Relationships: []
       }
-      service_subtype_translations: {
-        Row: {
-          created_at: string | null
-          locale: string
-          name: string
-          subtype_id: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          locale: string
-          name: string
-          subtype_id: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          locale?: string
-          name?: string
-          subtype_id?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "service_subtype_translations_locale_fkey"
-            columns: ["locale"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "service_subtype_translations_subtype_id_fkey"
-            columns: ["subtype_id"]
-            isOneToOne: false
-            referencedRelation: "service_subtypes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       service_subtypes: {
         Row: {
           created_at: string | null
           group_id: string
+          i18n: Json
           id: string
           is_active: boolean
           slug: string
@@ -1598,6 +884,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           group_id: string
+          i18n?: Json
           id?: string
           is_active?: boolean
           slug: string
@@ -1607,6 +894,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           group_id?: string
+          i18n?: Json
           id?: string
           is_active?: boolean
           slug?: string
@@ -1623,79 +911,12 @@ export type Database = {
           },
         ]
       }
-      service_translations: {
-        Row: {
-          benefits: Json | null
-          created_at: string | null
-          description: string | null
-          faqs: Json | null
-          guarantees: Json | null
-          hero_subtitle: string | null
-          hero_title: string | null
-          includes: string | null
-          locale: string
-          name: string
-          service_id: string
-          updated_at: string | null
-        }
-        Insert: {
-          benefits?: Json | null
-          created_at?: string | null
-          description?: string | null
-          faqs?: Json | null
-          guarantees?: Json | null
-          hero_subtitle?: string | null
-          hero_title?: string | null
-          includes?: string | null
-          locale: string
-          name: string
-          service_id: string
-          updated_at?: string | null
-        }
-        Update: {
-          benefits?: Json | null
-          created_at?: string | null
-          description?: string | null
-          faqs?: Json | null
-          guarantees?: Json | null
-          hero_subtitle?: string | null
-          hero_title?: string | null
-          includes?: string | null
-          locale?: string
-          name?: string
-          service_id?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "service_translations_locale_fkey"
-            columns: ["locale"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "service_translations_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_translations_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services_localized"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       services: {
         Row: {
           allows_recurrence: boolean
-          category_id: string | null
           cover_image_url: string | null
           created_at: string | null
+          i18n: Json
           id: string
           slug: string
           status: string
@@ -1703,9 +924,9 @@ export type Database = {
         }
         Insert: {
           allows_recurrence?: boolean
-          category_id?: string | null
           cover_image_url?: string | null
           created_at?: string | null
+          i18n?: Json
           id?: string
           slug: string
           status?: string
@@ -1713,30 +934,15 @@ export type Database = {
         }
         Update: {
           allows_recurrence?: boolean
-          category_id?: string | null
           cover_image_url?: string | null
           created_at?: string | null
+          i18n?: Json
           id?: string
           slug?: string
           status?: string
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "services_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "services_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories_localized"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       spoken_language_aliases: {
         Row: {
@@ -1764,48 +970,25 @@ export type Database = {
           },
         ]
       }
-      spoken_language_translations: {
-        Row: {
-          language_code: string
-          locale: string
-          name: string
-        }
-        Insert: {
-          language_code: string
-          locale: string
-          name: string
-        }
-        Update: {
-          language_code?: string
-          locale?: string
-          name?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "spoken_language_translations_language_code_fkey"
-            columns: ["language_code"]
-            isOneToOne: false
-            referencedRelation: "spoken_languages"
-            referencedColumns: ["code"]
-          },
-        ]
-      }
       spoken_languages: {
         Row: {
           code: string
           created_at: string
+          i18n: Json
           is_active: boolean
           sort_order: number
         }
         Insert: {
           code: string
           created_at?: string
+          i18n?: Json
           is_active?: boolean
           sort_order?: number
         }
         Update: {
           code?: string
           created_at?: string
+          i18n?: Json
           is_active?: boolean
           sort_order?: number
         }
@@ -1883,24 +1066,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "staff_role_scopes_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "cities_localized"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "staff_role_scopes_country_id_fkey"
             columns: ["country_id"]
             isOneToOne: false
             referencedRelation: "countries"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "staff_role_scopes_country_id_fkey"
-            columns: ["country_id"]
-            isOneToOne: false
-            referencedRelation: "countries_localized"
             referencedColumns: ["id"]
           },
           {
@@ -1956,54 +1125,10 @@ export type Database = {
         }
         Relationships: []
       }
-      survey_question_translations: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          label: string
-          locale: string
-          option_labels: Json | null
-          question_id: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          label: string
-          locale: string
-          option_labels?: Json | null
-          question_id: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          label?: string
-          locale?: string
-          option_labels?: Json | null
-          question_id?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "survey_question_translations_locale_fkey"
-            columns: ["locale"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "survey_question_translations_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: false
-            referencedRelation: "survey_questions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       survey_questions: {
         Row: {
           created_at: string | null
+          i18n: Json
           id: string
           is_active: boolean
           key: string
@@ -2014,6 +1139,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          i18n?: Json
           id?: string
           is_active?: boolean
           key: string
@@ -2024,6 +1150,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          i18n?: Json
           id?: string
           is_active?: boolean
           key?: string
@@ -2152,167 +1279,22 @@ export type Database = {
           },
         ]
       }
-      talent_form_translations: {
-        Row: {
-          created_at: string | null
-          form_id: string
-          labels: Json
-          locale: string
-          option_labels: Json | null
-          placeholders: Json | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          form_id: string
-          labels: Json
-          locale: string
-          option_labels?: Json | null
-          placeholders?: Json | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          form_id?: string
-          labels?: Json
-          locale?: string
-          option_labels?: Json | null
-          placeholders?: Json | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "talent_form_translations_form_id_fkey"
-            columns: ["form_id"]
-            isOneToOne: false
-            referencedRelation: "talent_forms"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "talent_form_translations_locale_fkey"
-            columns: ["locale"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
-        ]
-      }
-      talent_forms: {
-        Row: {
-          city_id: string | null
-          created_at: string | null
-          id: string
-          is_active: boolean
-          schema: Json
-          service_id: string
-          updated_at: string | null
-          version: number
-        }
-        Insert: {
-          city_id?: string | null
-          created_at?: string | null
-          id?: string
-          is_active?: boolean
-          schema?: Json
-          service_id: string
-          updated_at?: string | null
-          version?: number
-        }
-        Update: {
-          city_id?: string | null
-          created_at?: string | null
-          id?: string
-          is_active?: boolean
-          schema?: Json
-          service_id?: string
-          updated_at?: string | null
-          version?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "talent_forms_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "cities"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "talent_forms_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "cities_localized"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "talent_forms_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "talent_forms_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services_localized"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      talent_profile_translations: {
-        Row: {
-          bio: string | null
-          created_at: string | null
-          experience: string | null
-          locale: string
-          talent_id: string
-          updated_at: string | null
-        }
-        Insert: {
-          bio?: string | null
-          created_at?: string | null
-          experience?: string | null
-          locale: string
-          talent_id: string
-          updated_at?: string | null
-        }
-        Update: {
-          bio?: string | null
-          created_at?: string | null
-          experience?: string | null
-          locale?: string
-          talent_id?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "talent_profile_translations_locale_fkey"
-            columns: ["locale"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "talent_profile_translations_talent_id_fkey"
-            columns: ["talent_id"]
-            isOneToOne: false
-            referencedRelation: "talent_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       talent_profiles: {
         Row: {
+          additional_info: string | null
           approved_at: string | null
           approved_by: string | null
           city_id: string | null
           country_id: string | null
           created_at: string | null
           created_by: string | null
+          fiscal_id: string | null
+          fiscal_id_type_id: string | null
           has_car: boolean | null
           id: string
           internal_notes: string | null
           legacy_id: number | null
+          marketing_consent: boolean
           photo_url: string | null
           preferred_payment: string | null
           professional_status: string | null
@@ -2322,16 +1304,20 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          additional_info?: string | null
           approved_at?: string | null
           approved_by?: string | null
           city_id?: string | null
           country_id?: string | null
           created_at?: string | null
           created_by?: string | null
+          fiscal_id?: string | null
+          fiscal_id_type_id?: string | null
           has_car?: boolean | null
           id?: string
           internal_notes?: string | null
           legacy_id?: number | null
+          marketing_consent?: boolean
           photo_url?: string | null
           preferred_payment?: string | null
           professional_status?: string | null
@@ -2341,16 +1327,20 @@ export type Database = {
           user_id: string
         }
         Update: {
+          additional_info?: string | null
           approved_at?: string | null
           approved_by?: string | null
           city_id?: string | null
           country_id?: string | null
           created_at?: string | null
           created_by?: string | null
+          fiscal_id?: string | null
+          fiscal_id_type_id?: string | null
           has_car?: boolean | null
           id?: string
           internal_notes?: string | null
           legacy_id?: number | null
+          marketing_consent?: boolean
           photo_url?: string | null
           preferred_payment?: string | null
           professional_status?: string | null
@@ -2375,13 +1365,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "talent_profiles_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "cities_localized"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "talent_profiles_country_id_fkey"
             columns: ["country_id"]
             isOneToOne: false
@@ -2389,17 +1372,17 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "talent_profiles_country_id_fkey"
-            columns: ["country_id"]
-            isOneToOne: false
-            referencedRelation: "countries_localized"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "talent_profiles_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "talent_profiles_fiscal_id_type_id_fkey"
+            columns: ["fiscal_id_type_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_id_types"
             referencedColumns: ["id"]
           },
           {
@@ -2449,7 +1432,6 @@ export type Database = {
           country_id: string
           created_at: string | null
           form_data: Json | null
-          form_id: string | null
           is_verified: boolean
           service_id: string
           specializations: Json | null
@@ -2461,7 +1443,6 @@ export type Database = {
           country_id: string
           created_at?: string | null
           form_data?: Json | null
-          form_id?: string | null
           is_verified?: boolean
           service_id: string
           specializations?: Json | null
@@ -2473,7 +1454,6 @@ export type Database = {
           country_id?: string
           created_at?: string | null
           form_data?: Json | null
-          form_id?: string | null
           is_verified?: boolean
           service_id?: string
           specializations?: Json | null
@@ -2490,31 +1470,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "talent_services_country_id_fkey"
-            columns: ["country_id"]
-            isOneToOne: false
-            referencedRelation: "countries_localized"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "talent_services_form_id_fkey"
-            columns: ["form_id"]
-            isOneToOne: false
-            referencedRelation: "talent_forms"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "talent_services_service_id_fkey"
             columns: ["service_id"]
             isOneToOne: false
             referencedRelation: "services"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "talent_services_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services_localized"
             referencedColumns: ["id"]
           },
           {
@@ -2569,48 +1528,10 @@ export type Database = {
           },
         ]
       }
-      talent_tag_translations: {
-        Row: {
-          created_at: string
-          locale: string
-          name: string
-          tag_id: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          locale: string
-          name: string
-          tag_id: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          locale?: string
-          name?: string
-          tag_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "talent_tag_translations_locale_fkey"
-            columns: ["locale"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "talent_tag_translations_tag_id_fkey"
-            columns: ["tag_id"]
-            isOneToOne: false
-            referencedRelation: "talent_tags"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       talent_tags: {
         Row: {
           created_at: string
+          i18n: Json
           id: string
           is_active: boolean
           slug: string
@@ -2619,6 +1540,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          i18n?: Json
           id?: string
           is_active?: boolean
           slug: string
@@ -2627,6 +1549,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          i18n?: Json
           id?: string
           is_active?: boolean
           slug?: string
@@ -2716,48 +1639,6 @@ export type Database = {
           },
         ]
       }
-      user_form_responses: {
-        Row: {
-          created_at: string | null
-          field_definition_id: string
-          id: string
-          updated_at: string | null
-          user_id: string
-          value: Json | null
-        }
-        Insert: {
-          created_at?: string | null
-          field_definition_id: string
-          id?: string
-          updated_at?: string | null
-          user_id: string
-          value?: Json | null
-        }
-        Update: {
-          created_at?: string | null
-          field_definition_id?: string
-          id?: string
-          updated_at?: string | null
-          user_id?: string
-          value?: Json | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_form_responses_field_definition_id_fkey"
-            columns: ["field_definition_id"]
-            isOneToOne: false
-            referencedRelation: "form_field_definitions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_form_responses_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -2796,125 +1677,7 @@ export type Database = {
       }
     }
     Views: {
-      categories_localized: {
-        Row: {
-          icon: string | null
-          id: string | null
-          is_active: boolean | null
-          locale: string | null
-          name: string | null
-          slug: string | null
-          sort_order: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "category_translations_locale_fkey"
-            columns: ["locale"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
-        ]
-      }
-      cities_localized: {
-        Row: {
-          country_id: string | null
-          id: string | null
-          is_active: boolean | null
-          locale: string | null
-          name: string | null
-          slug: string | null
-          sort_order: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "cities_country_id_fkey"
-            columns: ["country_id"]
-            isOneToOne: false
-            referencedRelation: "countries"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cities_country_id_fkey"
-            columns: ["country_id"]
-            isOneToOne: false
-            referencedRelation: "countries_localized"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "city_translations_locale_fkey"
-            columns: ["locale"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
-        ]
-      }
-      countries_localized: {
-        Row: {
-          code: string | null
-          currency: string | null
-          id: string | null
-          is_active: boolean | null
-          locale: string | null
-          locale_default: string | null
-          name: string | null
-          sort_order: number | null
-          timezone: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "countries_locale_default_fkey"
-            columns: ["locale_default"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "country_translations_locale_fkey"
-            columns: ["locale"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
-        ]
-      }
-      services_localized: {
-        Row: {
-          allows_recurrence: boolean | null
-          category_id: string | null
-          description: string | null
-          id: string | null
-          includes: string | null
-          locale: string | null
-          name: string | null
-          slug: string | null
-          status: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "service_translations_locale_fkey"
-            columns: ["locale"]
-            isOneToOne: false
-            referencedRelation: "languages"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "services_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "services_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories_localized"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       delete_service: { Args: { p_service_id: string }; Returns: undefined }
@@ -3060,4 +1823,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

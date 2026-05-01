@@ -1,28 +1,27 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { localizedField } from '@/shared/lib/i18n/localize';
 import type { CityOption } from '../types';
 
 export async function getCities(locale: string): Promise<CityOption[]> {
   const supabase = createClient();
 
   const { data, error } = await supabase
-    .from('city_translations')
-    .select('city_id, name, cities!inner (country_id, is_active)')
-    .eq('locale', locale)
-    .eq('cities.is_active', true)
-    .order('name', { ascending: true });
+    .from('cities')
+    .select('id, country_id, i18n')
+    .eq('is_active', true);
 
   if (error) throw error;
 
-  return (data ?? []).map((row) => {
-    const city = row.cities as unknown as {
-      country_id: string;
-    };
-    return {
-      id: row.city_id,
-      name: row.name,
-      country_id: city.country_id,
-    };
-  });
+  const i18nRecord = (i: unknown) =>
+    (i ?? {}) as Record<string, Record<string, unknown>>;
+
+  const options = (data ?? []).map((row) => ({
+    id: row.id,
+    country_id: row.country_id,
+    name: localizedField(i18nRecord(row.i18n), locale, 'name') ?? row.id,
+  }));
+
+  return options.sort((a, b) => a.name.localeCompare(b.name));
 }

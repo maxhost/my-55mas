@@ -67,7 +67,7 @@ export async function listOrders({ locale }: ListOrdersParams): Promise<OrderLis
       ? supabase.from('staff_profiles').select('id, first_name, last_name').in('id', staffIds)
       : Promise.resolve({ data: [], error: null }),
     serviceIds.length > 0
-      ? supabase.from('service_translations').select('service_id, name').in('service_id', serviceIds).eq('locale', locale)
+      ? supabase.from('services').select('id, slug, i18n').in('id', serviceIds)
       : Promise.resolve({ data: [], error: null }),
   ]);
 
@@ -81,7 +81,10 @@ export async function listOrders({ locale }: ListOrdersParams): Promise<OrderLis
   const staffMap = buildStaffNameMap(
     (staffRes.data ?? []) as { id: string; first_name: string | null; last_name: string | null }[]
   );
-  const serviceMap = buildServiceNameMap((servicesRes.data ?? []) as { service_id: string; name: string }[]);
+  const serviceMap = buildServiceNameMap(
+    (servicesRes.data ?? []) as { id: string; slug: string; i18n: unknown }[],
+    locale
+  );
 
   // Step 4: transform
   return orders.map((o) => ({

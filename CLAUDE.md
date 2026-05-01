@@ -1,6 +1,6 @@
 # 55mas
 
-Marketplace donde personas mayores de 55 años ofrecen servicios profesionales. Los clientes contratan a través de formularios dinámicos y un equipo administrativo coordina asignaciones, cobros y seguimiento. Opera en múltiples países e idiomas.
+Marketplace donde personas mayores de 55 años ofrecen servicios profesionales. Los clientes contratan a través de formularios estáticos y un equipo administrativo coordina asignaciones, cobros y seguimiento. Opera en múltiples países e idiomas.
 
 ## Stack y tecnologías
 
@@ -8,7 +8,7 @@ Marketplace donde personas mayores de 55 años ofrecen servicios profesionales. 
 - **Lenguaje:** TypeScript (strict mode)
 - **Base de datos y auth:** Supabase (PostgreSQL, Auth, Storage, Row Level Security)
 - **Estilos:** Tailwind CSS + shadcn/ui
-- **Formularios:** react-hook-form + Zod
+- **Formularios:** Zod (validación) + componentes hardcodeados por flujo
 - **Internacionalización:** next-intl
 - **Email:** Resend (o equivalente via Supabase Edge Functions)
 - **Paradigma:** Feature-Folder Architecture, ~200 LOC máximo por archivo
@@ -26,7 +26,7 @@ Marketplace donde personas mayores de 55 años ofrecen servicios profesionales. 
 - src/app/[locale]/(client)/ — Zona personal del cliente
 - src/app/[locale]/(talent)/ — Portal del talento (perfil, documentación)
 - src/app/[locale]/(admin)/ — Panel de administración
-- src/features/ — Lógica por feature: services/, orders/, talents/, clients/, forms/, notifications/
+- src/features/ — Lógica por feature: services/, orders/, talents/, clients/, subtypes/, survey-questions/, migration/, notifications/
 - src/shared/ — Componentes UI compartidos, hooks, utils, tipos globales
 - src/lib/supabase/ — Cliente Supabase, helpers, tipos generados de DB
 - src/lib/i18n/ — Configuración next-intl, diccionarios

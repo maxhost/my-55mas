@@ -24,10 +24,15 @@ describe('buildNameMap', () => {
 });
 
 describe('buildServiceNameMap', () => {
-  it('maps service_id to name', () => {
-    const rows = [{ service_id: 's1', name: 'Cleaning' }];
-    const map = buildServiceNameMap(rows);
-    expect(map.get('s1')).toBe('Cleaning');
+  it('maps id to localized name', () => {
+    const rows = [{ id: 's1', slug: 'cleaning', i18n: { es: { name: 'Limpieza' }, en: { name: 'Cleaning' } } }];
+    expect(buildServiceNameMap(rows, 'en').get('s1')).toBe('Cleaning');
+    expect(buildServiceNameMap(rows, 'es').get('s1')).toBe('Limpieza');
+  });
+
+  it('falls back to slug when i18n missing', () => {
+    const rows = [{ id: 's1', slug: 'cleaning', i18n: null }];
+    expect(buildServiceNameMap(rows, 'en').get('s1')).toBe('cleaning');
   });
 });
 

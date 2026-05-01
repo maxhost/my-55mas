@@ -40,16 +40,6 @@ export const adminNavGroups: NavGroup[] = [
       { labelKey: 'services', href: '/admin/services', icon: 'briefcase' },
       { labelKey: 'subtypes', href: '/admin/subtypes', icon: 'tags' },
       { labelKey: 'talentTags', href: '/admin/talent-tags', icon: 'tags' },
-      { labelKey: 'talentServices', href: '/admin/talent-services', icon: 'file-text' },
-      { labelKey: 'fieldCatalog', href: '/admin/field-catalog', icon: 'database' },
-    ],
-  },
-  {
-    labelKey: 'groupForms',
-    collapsible: true,
-    defaultOpen: true,
-    items: [
-      { labelKey: 'forms', href: '/admin/forms', icon: 'file-text' },
     ],
   },
   {
