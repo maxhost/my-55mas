@@ -48,6 +48,10 @@ export default async function TalentRegistrationPage({ params: { locale } }: Pro
       <TalentRegistrationForm
         context={context}
         cities={allCities}
+        hints={{
+          locationNotDetected: t('locationNotDetected'),
+          cityManualHint: t('cityManualHint'),
+        }}
         loadServices={loadServices}
         onSubmit={submit}
       />

@@ -75,7 +75,15 @@ export function AddressAutocomplete({
     if (!feature) return;
     const props = feature.properties ?? {};
     const [lng, lat] = feature.geometry?.coordinates ?? [null, null];
+    // Mapbox AddressAutofill retrieve response (search-js-react):
+    // - address_line1, address_line2: street parts
+    // - address_level2: city/locality (preferred)
+    // - place / locality: legacy fallbacks
+    // - country_code: ISO 3166-1 alpha-2 (Mapbox returns lowercase, but normalize anyway)
     const street = [props.address_line1, props.address_line2].filter(Boolean).join(', ');
+    const cityName =
+      props.address_level2 ?? props.place ?? props.locality ?? props.address_level3 ?? '';
+    const countryCode = (props.country_code ?? props.country ?? '').toLowerCase();
     const next: AddressValue = {
       street: street || props.full_address || text,
       postal_code: props.postcode ?? '',
@@ -83,9 +91,17 @@ export function AddressAutocomplete({
       lng: typeof lng === 'number' ? lng : null,
       mapbox_id: feature.id ?? null,
       raw_text: props.full_address ?? text,
-      country_code: (props.country_code ?? '').toLowerCase(),
-      city_name: props.place ?? props.locality ?? '',
+      country_code: countryCode,
+      city_name: cityName,
     };
+    if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.info('[AddressAutocomplete] retrieved:', {
+        country_code: countryCode,
+        city_name: cityName,
+        properties: props,
+      });
+    }
     setText(next.raw_text);
     onChange(next);
   };

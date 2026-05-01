@@ -5,7 +5,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { CountryCode } from 'libphonenumber-js';
 import { Button } from '@/components/ui/button';
-import { useTranslations } from 'next-intl';
 import { PhoneField } from '../fields/phone';
 import { CountryCityField } from '../fields/country-city';
 import { AddressField, emptyAddress } from '../fields/address';
@@ -24,6 +23,8 @@ import type {
 type Props = {
   context: TalentRegistrationContext;
   cities: CityOption[];
+  /** Hints from page-level i18n (TalentRegistration namespace). */
+  hints: { locationNotDetected: string; cityManualHint: string };
   loadServices: (countryId: string, cityId?: string) => Promise<ServiceOption[]>;
   onSubmit: (data: TalentRegistrationSchemaInput) => Promise<{ error?: Record<string, string[]> } | void>;
 };
@@ -53,8 +54,7 @@ function normalize(s: string): string {
     .trim();
 }
 
-export function TalentRegistrationForm({ context, cities, loadServices, onSubmit }: Props) {
-  const t = useTranslations('TalentRegistration');
+export function TalentRegistrationForm({ context, cities, hints, loadServices, onSubmit }: Props) {
   const fieldsI18n = context.i18n.fields;
   const [services, setServices] = useState<ServiceOption[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -176,8 +176,8 @@ export function TalentRegistrationForm({ context, cities, loadServices, onSubmit
         cityLabel={fieldsI18n.city_id?.label ?? 'Ciudad'}
         cityPlaceholder={fieldsI18n.city_id?.placeholder}
         cityError={form.formState.errors.city_id?.message}
-        notDetectedHint={t('locationNotDetected')}
-        manualCityHint={t('cityManualHint')}
+        notDetectedHint={hints.locationNotDetected}
+        manualCityHint={hints.cityManualHint}
         cityNeedsManual={cityNeedsManual}
         required
         cityFieldId="city_id"
