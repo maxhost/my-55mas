@@ -1,8 +1,14 @@
 'use client';
 
 import { useId, useState } from 'react';
-import { AddressAutofill } from '@mapbox/search-js-react';
+import dynamic from 'next/dynamic';
 import { Input } from '@/components/ui/input';
+
+// @mapbox/search-js-react accesses `document` at module load — defer to client only.
+const AddressAutofill = dynamic(
+  () => import('@mapbox/search-js-react').then((m) => m.AddressAutofill as unknown as React.ComponentType<unknown>),
+  { ssr: false }
+);
 
 export type AddressValue = {
   street: string;
@@ -86,7 +92,7 @@ export function AddressAutocomplete({
     <Autofill
       accessToken={TOKEN}
       options={{ country: countryCode, language }}
-      onRetrieve={handleRetrieve}
+      onRetrieve={handleRetrieve as never}
     >
       <Input
         id={id ?? inputId}
