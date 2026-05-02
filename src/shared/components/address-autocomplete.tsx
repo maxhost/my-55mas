@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 const INPUT_CLASS =
@@ -13,16 +13,13 @@ export type AddressValue = {
   lng: number | null;
   mapbox_id: string | null;
   raw_text: string;
-  /** lowercase ISO 3166-1 alpha-2 from Mapbox geocoding */
   country_code: string;
-  /** city/locality name from Mapbox geocoding context.place.name */
   city_name: string;
 };
 
 export type AddressAutocompleteProps = {
   value: AddressValue;
   onChange: (value: AddressValue) => void;
-  /** ISO 3166-1 alpha-2 codes (uppercase) — restricts geocoding to these countries. Empty = no restriction. */
   countryCodes: string[];
   language?: string;
   placeholder?: string;
@@ -32,31 +29,94 @@ export type AddressAutocompleteProps = {
 };
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '';
-const MIN_QUERY_LENGTH = 6;
+const MIN_CHARS = 3;
+const DEBOUNCE_MS = 250;
 
-type GeocodeFeature = {
+type Suggestion = {
+  mapbox_id: string;
+  name: string;
+  place_formatted?: string;
+  full_address?: string;
+};
+
+type FeatureContext = {
+  address?: { name?: string };
+  street?: { name?: string };
+  postcode?: { name?: string };
+  place?: { name?: string };
+  locality?: { name?: string };
+  district?: { name?: string };
+  region?: { name?: string };
+  country?: { country_code?: string; name?: string };
+};
+
+type Feature = {
   geometry?: { coordinates?: [number, number] };
   properties?: {
     full_address?: string;
+    place_formatted?: string;
     name?: string;
     address?: string;
     mapbox_id?: string;
-    context?: {
-      address?: { name?: string };
-      street?: { name?: string };
-      postcode?: { name?: string };
-      place?: { name?: string };
-      country?: { country_code?: string };
-    };
+    context?: FeatureContext;
   };
 };
 
-async function geocodeAddress(
+function newSessionToken(): string {
+  // crypto.randomUUID may not exist on older browsers; fallback to a random hex.
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
+async function fetchSuggestions(
+  query: string,
+  sessionToken: string,
+  countryCodes: string[],
+  language: string | undefined,
+): Promise<Suggestion[]> {
+  if (!TOKEN || query.trim().length < MIN_CHARS) return [];
+  const params = new URLSearchParams({
+    q: query.trim(),
+    access_token: TOKEN,
+    session_token: sessionToken,
+    limit: '5',
+    types: 'address,street,place',
+  });
+  if (countryCodes.length > 0) params.set('country', countryCodes.join(',').toLowerCase());
+  if (language) params.set('language', language);
+  try {
+    const res = await fetch(`https://api.mapbox.com/search/searchbox/v1/suggest?${params}`);
+    if (!res.ok) return [];
+    const data = (await res.json()) as { suggestions?: Suggestion[] };
+    return data.suggestions ?? [];
+  } catch {
+    return [];
+  }
+}
+
+async function retrieveFeature(mapboxId: string, sessionToken: string): Promise<Feature | null> {
+  if (!TOKEN) return null;
+  const params = new URLSearchParams({ access_token: TOKEN, session_token: sessionToken });
+  try {
+    const res = await fetch(
+      `https://api.mapbox.com/search/searchbox/v1/retrieve/${encodeURIComponent(mapboxId)}?${params}`,
+    );
+    if (!res.ok) return null;
+    const data = (await res.json()) as { features?: Feature[] };
+    return data.features?.[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function forwardGeocode(
   query: string,
   countryCodes: string[],
   language: string | undefined,
-): Promise<GeocodeFeature | null> {
-  if (!TOKEN || query.trim().length < MIN_QUERY_LENGTH) return null;
+): Promise<Feature | null> {
+  if (!TOKEN || query.trim().length < MIN_CHARS) return null;
   const params = new URLSearchParams({
     q: query.trim(),
     access_token: TOKEN,
@@ -65,15 +125,43 @@ async function geocodeAddress(
   });
   if (countryCodes.length > 0) params.set('country', countryCodes.join(',').toLowerCase());
   if (language) params.set('language', language);
-
   try {
     const res = await fetch(`https://api.mapbox.com/search/geocode/v6/forward?${params}`);
     if (!res.ok) return null;
-    const data = (await res.json()) as { features?: GeocodeFeature[] };
+    const data = (await res.json()) as { features?: Feature[] };
     return data.features?.[0] ?? null;
   } catch {
     return null;
   }
+}
+
+function parseFeature(feature: Feature, fallbackText: string): AddressValue {
+  const ctx = feature.properties?.context ?? {};
+  const [lng, lat] = feature.geometry?.coordinates ?? [null, null];
+  const street =
+    ctx.address?.name ??
+    ctx.street?.name ??
+    feature.properties?.address ??
+    feature.properties?.name ??
+    fallbackText;
+  // City fallback chain — Mapbox returns it under different keys depending on
+  // whether it's a metropolitan area, town, or smaller locality.
+  const cityName =
+    ctx.place?.name ??
+    ctx.locality?.name ??
+    ctx.district?.name ??
+    ctx.region?.name ??
+    '';
+  return {
+    street,
+    postal_code: ctx.postcode?.name ?? '',
+    lat: typeof lat === 'number' ? lat : null,
+    lng: typeof lng === 'number' ? lng : null,
+    mapbox_id: feature.properties?.mapbox_id ?? null,
+    raw_text: feature.properties?.full_address ?? fallbackText,
+    country_code: (ctx.country?.country_code ?? '').toLowerCase(),
+    city_name: cityName,
+  };
 }
 
 export function AddressAutocomplete({
@@ -87,59 +175,88 @@ export function AddressAutocomplete({
   id,
 }: AddressAutocompleteProps) {
   const inputId = useId();
-  const [text, setText] = useState(value.raw_text || value.street || '');
-  const [isResolving, setIsResolving] = useState(false);
+  const sessionTokenRef = useRef<string>('');
+  if (!sessionTokenRef.current) sessionTokenRef.current = newSessionToken();
 
-  const resolveAndPopulate = async (query: string) => {
-    if (!query || query === value.raw_text && value.country_code) return;
-    setIsResolving(true);
+  const [text, setText] = useState(value.raw_text || value.street || '');
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [open, setOpen] = useState(false);
+  const [resolving, setResolving] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const skipNextSuggestRef = useRef(false);
+
+  // Debounced suggestion fetching.
+  useEffect(() => {
+    if (skipNextSuggestRef.current) {
+      skipNextSuggestRef.current = false;
+      return;
+    }
+    if (text.trim().length < MIN_CHARS) {
+      setSuggestions([]);
+      return;
+    }
+    const handle = setTimeout(async () => {
+      const result = await fetchSuggestions(
+        text,
+        sessionTokenRef.current,
+        countryCodes,
+        language,
+      );
+      setSuggestions(result);
+      if (result.length > 0) setOpen(true);
+    }, DEBOUNCE_MS);
+    return () => clearTimeout(handle);
+  }, [text, countryCodes, language]);
+
+  const handleSelect = async (sug: Suggestion) => {
+    setResolving(true);
+    skipNextSuggestRef.current = true;
     try {
-      const feature = await geocodeAddress(query, countryCodes, language);
-      if (!feature) {
-        // Couldn't resolve — keep what user typed; country/city stay empty so
-        // the manual fallback dropdown shows up.
-        onChange({
-          ...value,
-          street: query,
-          raw_text: query,
-          country_code: '',
-          city_name: '',
-        });
-        return;
-      }
-      const ctx = feature.properties?.context ?? {};
-      const [lng, lat] = feature.geometry?.coordinates ?? [null, null];
-      const next: AddressValue = {
-        street:
-          ctx.address?.name ?? ctx.street?.name ?? feature.properties?.address ?? query,
-        postal_code: ctx.postcode?.name ?? '',
-        lat: typeof lat === 'number' ? lat : null,
-        lng: typeof lng === 'number' ? lng : null,
-        mapbox_id: feature.properties?.mapbox_id ?? null,
-        raw_text: feature.properties?.full_address ?? query,
-        country_code: (ctx.country?.country_code ?? '').toLowerCase(),
-        city_name: ctx.place?.name ?? '',
-      };
+      const feature = await retrieveFeature(sug.mapbox_id, sessionTokenRef.current);
+      const fallback = sug.full_address ?? `${sug.name}, ${sug.place_formatted ?? ''}`.trim();
+      const next = feature ? parseFeature(feature, fallback) : { ...value, raw_text: fallback, street: sug.name };
       setText(next.raw_text);
       onChange(next);
+      // New session_token after retrieve (Mapbox billing convention).
+      sessionTokenRef.current = newSessionToken();
     } finally {
-      setIsResolving(false);
+      setResolving(false);
+      setOpen(false);
+      setSuggestions([]);
+    }
+  };
+
+  const handleBlurFallback = async () => {
+    // Only run if user didn't already select a suggestion (which would have populated country_code).
+    if (value.country_code) return;
+    const trimmed = text.trim();
+    if (trimmed.length < MIN_CHARS) return;
+    setResolving(true);
+    try {
+      const feature = await forwardGeocode(trimmed, countryCodes, language);
+      if (feature) {
+        const next = parseFeature(feature, trimmed);
+        setText(next.raw_text);
+        onChange(next);
+      }
+    } finally {
+      setResolving(false);
     }
   };
 
   return (
-    <div className="relative">
+    <div ref={containerRef} className="relative">
       <input
         id={id ?? inputId}
-        name="address-line1"
         type="text"
         autoComplete="off"
         value={text}
         placeholder={placeholder}
         disabled={disabled}
         aria-invalid={hasError ? 'true' : undefined}
-        aria-busy={isResolving ? 'true' : undefined}
-        className={cn(INPUT_CLASS, isResolving && 'pr-10')}
+        aria-busy={resolving ? 'true' : undefined}
+        className={cn(INPUT_CLASS, resolving && 'pr-10')}
         onChange={(e) => {
           setText(e.target.value);
           // Clear derived fields when user edits manually so stale country/city don't persist.
@@ -151,20 +268,49 @@ export function AddressAutocomplete({
             city_name: '',
           });
         }}
-        onBlur={(e) => {
-          void resolveAndPopulate(e.target.value);
+        onFocus={() => {
+          if (suggestions.length > 0) setOpen(true);
         }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            void resolveAndPopulate((e.target as HTMLInputElement).value);
-          }
+        onBlur={() => {
+          // Delay to allow click on a suggestion (which itself fires blur).
+          if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
+          blurTimeoutRef.current = setTimeout(() => {
+            setOpen(false);
+            void handleBlurFallback();
+          }, 150);
         }}
       />
-      {isResolving && (
+      {resolving && (
         <span className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xs">
           …
         </span>
+      )}
+      {open && suggestions.length > 0 && (
+        <ul
+          className="absolute z-50 mt-1 max-h-72 w-full overflow-auto rounded-lg border bg-popover p-1 text-sm shadow-md"
+          role="listbox"
+        >
+          {suggestions.map((sug) => (
+            <li key={sug.mapbox_id}>
+              <button
+                type="button"
+                role="option"
+                aria-selected={false}
+                className="hover:bg-accent hover:text-accent-foreground flex w-full flex-col items-start gap-0.5 rounded-md px-2 py-1.5 text-left"
+                onMouseDown={(e) => {
+                  // Prevent input blur firing before click handler.
+                  e.preventDefault();
+                }}
+                onClick={() => void handleSelect(sug)}
+              >
+                <span className="font-medium">{sug.name}</span>
+                {sug.place_formatted && (
+                  <span className="text-muted-foreground text-xs">{sug.place_formatted}</span>
+                )}
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
