@@ -6,7 +6,7 @@ import {
   getServicesByLocation,
 } from '@/features/talent-registration/actions/get-services-by-location';
 import { registerTalent } from '@/features/talent-registration/actions/register';
-import { TalentRegistrationFormLoader } from '@/features/talent-registration/components/talent-registration-form-loader';
+import { TalentRegistrationForm } from '@/features/talent-registration';
 import type { TalentRegistrationSchemaInput } from '@/features/talent-registration';
 
 type Props = { params: { locale: string } };
@@ -45,7 +45,7 @@ export default async function TalentRegistrationPage({ params: { locale } }: Pro
         <h1 className="text-3xl font-bold">{t('heading')}</h1>
         <p className="text-muted-foreground">{t('intro')}</p>
       </header>
-      <TalentRegistrationFormLoader
+      <TalentRegistrationForm
         context={context}
         cities={allCities}
         hints={{
