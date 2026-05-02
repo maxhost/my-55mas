@@ -179,6 +179,7 @@ export function TalentRegistrationForm({ context, cities, hints, loadServices, o
         notDetectedHint={hints.locationNotDetected}
         manualCityHint={hints.cityManualHint}
         cityNeedsManual={cityNeedsManual}
+        detectedCityName={address.city_name}
         required
         cityFieldId="city_id"
       />

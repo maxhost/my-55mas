@@ -31,6 +31,8 @@ type Props = {
   cityFieldId?: string;
   /** Whether Mapbox returned a city name that didn't match any DB city — shows manual fallback. */
   cityNeedsManual: boolean;
+  /** City name detected by Mapbox but not matched in DB. Shown in hint to help admin add it. */
+  detectedCityName?: string;
 };
 
 export function CountryCityField({
@@ -48,6 +50,7 @@ export function CountryCityField({
   required,
   cityFieldId,
   cityNeedsManual,
+  detectedCityName,
 }: Props) {
   const country = countries.find((c) => c.id === countryValue);
   const city = cities.find((c) => c.id === cityValue);
@@ -99,7 +102,10 @@ export function CountryCityField({
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-muted-foreground">{manualCityHint}</p>
+            <p className="text-xs text-muted-foreground">
+              {manualCityHint}
+              {detectedCityName ? ` (${detectedCityName})` : null}
+            </p>
           </>
         ) : (
           <div

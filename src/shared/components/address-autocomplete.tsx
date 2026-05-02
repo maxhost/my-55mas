@@ -30,7 +30,7 @@ export type AddressAutocompleteProps = {
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '';
 const MIN_CHARS = 3;
-const DEBOUNCE_MS = 250;
+const DEBOUNCE_MS = 120;
 
 type Suggestion = {
   mapbox_id: string;
@@ -182,6 +182,7 @@ export function AddressAutocomplete({
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
   const [resolving, setResolving] = useState(false);
+  const [searching, setSearching] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipNextSuggestRef = useRef(false);
@@ -194,8 +195,11 @@ export function AddressAutocomplete({
     }
     if (text.trim().length < MIN_CHARS) {
       setSuggestions([]);
+      setSearching(false);
       return;
     }
+    setSearching(true);
+    setOpen(true);
     const handle = setTimeout(async () => {
       const result = await fetchSuggestions(
         text,
@@ -204,7 +208,7 @@ export function AddressAutocomplete({
         language,
       );
       setSuggestions(result);
-      if (result.length > 0) setOpen(true);
+      setSearching(false);
     }, DEBOUNCE_MS);
     return () => clearTimeout(handle);
   }, [text, countryCodes, language]);
@@ -285,11 +289,17 @@ export function AddressAutocomplete({
           …
         </span>
       )}
-      {open && suggestions.length > 0 && (
+      {open && (searching || suggestions.length > 0) && (
         <ul
           className="absolute z-50 mt-1 max-h-72 w-full overflow-auto rounded-lg border bg-popover p-1 text-sm shadow-md"
           role="listbox"
         >
+          {searching && suggestions.length === 0 && (
+            <li className="text-muted-foreground flex items-center gap-2 px-2 py-1.5 text-xs">
+              <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+              Buscando…
+            </li>
+          )}
           {suggestions.map((sug) => (
             <li key={sug.mapbox_id}>
               <button
