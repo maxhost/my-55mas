@@ -484,6 +484,39 @@ export type Database = {
           },
         ]
       }
+      order_subtypes: {
+        Row: {
+          order_id: string
+          question_key: string
+          subtype_id: string
+        }
+        Insert: {
+          order_id: string
+          question_key: string
+          subtype_id: string
+        }
+        Update: {
+          order_id?: string
+          question_key?: string
+          subtype_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_subtypes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_subtypes_subtype_id_fkey"
+            columns: ["subtype_id"]
+            isOneToOne: false
+            referencedRelation: "service_subtypes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           appointment_date: string | null
@@ -918,6 +951,7 @@ export type Database = {
           created_at: string | null
           i18n: Json
           id: string
+          questions: Json
           slug: string
           status: string
           updated_at: string | null
@@ -928,6 +962,7 @@ export type Database = {
           created_at?: string | null
           i18n?: Json
           id?: string
+          questions?: Json
           slug: string
           status?: string
           updated_at?: string | null
@@ -938,6 +973,7 @@ export type Database = {
           created_at?: string | null
           i18n?: Json
           id?: string
+          questions?: Json
           slug?: string
           status?: string
           updated_at?: string | null
