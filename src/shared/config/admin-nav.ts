@@ -59,6 +59,7 @@ export const adminNavGroups: NavGroup[] = [
     defaultOpen: false,
     items: [
       { labelKey: 'migration', href: '/admin/migration', icon: 'upload' },
+      { labelKey: 'testServiceHire', href: '/admin/test-service-hire', icon: 'clipboard-list' },
     ],
   },
 ];
