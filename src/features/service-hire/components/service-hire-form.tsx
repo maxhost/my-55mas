@@ -1,15 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { AddressAutocomplete, emptyAddress } from '@/shared/components/address-autocomplete';
 import { ServiceQuestionsRenderer } from '@/features/service-questions';
 import type { ServiceForHire } from '../actions/get-service-for-hire';
+import { submitServiceHire } from '../actions/submit-service-hire';
 import type { ServiceHireFormState } from '../types';
 import { emptyScheduling } from '../types';
 import { SchedulingBlock } from './scheduling-block';
-import { AuthGatePlaceholder } from './auth-gate-placeholder';
+import { AuthGate, type AuthState } from './auth-gate';
 
 type Props = {
   service: ServiceForHire;
@@ -20,9 +21,11 @@ type Props = {
     notesLabel: string;
     notesPlaceholder: string;
     termsLabel: string;
-    submitDryRun: string;
+    submit: string;
+    submitDisabledHint: string;
+    submitSuccess: string;
     scheduling: React.ComponentProps<typeof SchedulingBlock>['hints'];
-    auth: React.ComponentProps<typeof AuthGatePlaceholder>['hints'];
+    auth: React.ComponentProps<typeof AuthGate>['hints'];
     questions: { yes: string; no: string; fileTooLarge: string; fileWrongType: string };
   };
 };
@@ -38,18 +41,59 @@ export function ServiceHireForm({ service, locale, hints }: Props) {
     notes: '',
     terms_accepted: false,
   });
+  const [authState, setAuthState] = useState<AuthState>({ status: 'idle' });
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submittedOrderId, setSubmittedOrderId] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  const isAuthenticated = authState.status === 'authenticated';
+  const canSubmit = isAuthenticated && state.terms_accepted && !isPending;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // S4 dry-run: print to console so we can verify everything is captured.
-    // Real submit + auth + DB write happens in S5.
-    // eslint-disable-next-line no-console
-    console.log('[ServiceHireForm] submit dry-run', {
-      service: { id: service.id, slug: service.slug },
-      ...state,
+    setSubmitError(null);
+    if (!isAuthenticated) {
+      setSubmitError(hints.submitDisabledHint);
+      return;
+    }
+
+    // Build FormData: state JSON + file entries (named file:{questionKey}:{idx}).
+    // Files are stripped from the JSON so the server only sees URLs after upload.
+    const fd = new FormData();
+    const cleanAnswers: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(state.answers)) {
+      if (Array.isArray(value) && value.every((v) => v instanceof File)) {
+        (value as File[]).forEach((f, i) => {
+          fd.append(`file:${key}:${i}`, f);
+        });
+        cleanAnswers[key] = []; // server replaces with paths after upload
+      } else {
+        cleanAnswers[key] = value;
+      }
+    }
+    fd.append(
+      'state',
+      JSON.stringify({ ...state, serviceId: service.id, answers: cleanAnswers }),
+    );
+
+    startTransition(async () => {
+      const result = await submitServiceHire(fd);
+      if ('error' in result) {
+        setSubmitError(result.error.message);
+        return;
+      }
+      setSubmittedOrderId(result.data.orderId);
     });
-    alert(hints.submitDryRun);
   };
+
+  if (submittedOrderId) {
+    return (
+      <div className="rounded-md border border-green-200 bg-green-50 p-6 text-center">
+        <h2 className="text-xl font-semibold text-green-900">{hints.submitSuccess}</h2>
+        <p className="mt-2 font-mono text-xs text-green-800">order_id: {submittedOrderId}</p>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -102,11 +146,16 @@ export function ServiceHireForm({ service, locale, hints }: Props) {
         <span>{hints.termsLabel}</span>
       </label>
 
-      <AuthGatePlaceholder hints={hints.auth} />
+      <AuthGate authState={authState} onAuthenticated={setAuthState} hints={hints.auth} />
 
-      <Button type="submit" className="w-full">
-        {hints.submitDryRun}
+      {submitError && <p className="text-destructive text-sm">{submitError}</p>}
+
+      <Button type="submit" className="w-full" disabled={!canSubmit}>
+        {isPending ? '…' : hints.submit}
       </Button>
+      {!canSubmit && !isPending && (
+        <p className="text-muted-foreground text-center text-xs">{hints.submitDisabledHint}</p>
+      )}
     </form>
   );
 }
