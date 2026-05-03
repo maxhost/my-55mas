@@ -7,6 +7,8 @@ import { ServiceForm } from '@/features/services/components/service-form';
 import { ServiceConfig } from '@/features/services/components/service-config';
 import { GroupAssignmentEditor } from '@/features/subtypes/components/group-assignment-editor';
 import type { SubtypeGroupWithTranslations } from '@/features/subtypes/types';
+import { QuestionsEditor } from '@/features/service-questions/components/questions-editor';
+import type { Question } from '@/features/service-questions/types';
 import type {
   ServiceDetail,
   CountryOption,
@@ -46,6 +48,7 @@ export function ServiceEditTabs({
         <TabsTrigger value="content">{t('tabContent')}</TabsTrigger>
         <TabsTrigger value="config">{t('tabConfig')}</TabsTrigger>
         <TabsTrigger value="subtypes">{t('tabSubtypes')}</TabsTrigger>
+        <TabsTrigger value="questions">{t('tabQuestions')}</TabsTrigger>
       </TabsList>
 
       <TabsContent value="content" className="pt-6">
@@ -71,6 +74,23 @@ export function ServiceEditTabs({
           assignedGroupIds={assignedGroupIds}
           allGroups={allSubtypes}
           locale={locale}
+        />
+      </TabsContent>
+
+      <TabsContent value="questions" className="pt-6">
+        <QuestionsEditor
+          serviceId={service.id}
+          initialQuestions={(service.questions as unknown as Question[]) ?? []}
+          assignedGroups={assignedSubtypes.map((g) => ({
+            id: g.id,
+            slug: g.slug,
+            translations: g.translations,
+            items: g.items.map((it) => ({
+              id: it.id,
+              slug: it.slug,
+              translations: it.translations,
+            })),
+          }))}
         />
       </TabsContent>
     </Tabs>
