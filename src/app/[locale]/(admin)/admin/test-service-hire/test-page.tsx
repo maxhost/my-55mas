@@ -127,6 +127,18 @@ export function TestServiceHirePage({ services, locale }: Props) {
                 fileTooLarge: tg('fileTooLarge'),
                 fileWrongType: tg('fileWrongType'),
               },
+              addressError: tg('validationAddressRequired'),
+              validation: {
+                addressRequired: tg('validationAddressRequired'),
+                dateRequired: tg('validationDateRequired'),
+                timeStartRequired: tg('validationTimeStartRequired'),
+                frequencyRequired: tg('validationFrequencyRequired'),
+                weekdaysRequired: tg('validationWeekdaysRequired'),
+                dayOfMonthRequired: tg('validationDayOfMonthRequired'),
+                termsRequired: tg('validationTermsRequired'),
+                authRequired: tg('validationAuthRequired'),
+                fieldRequired: tg('validationFieldRequired'),
+              },
             }}
           />
         </div>

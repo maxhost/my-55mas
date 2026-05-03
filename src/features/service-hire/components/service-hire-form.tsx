@@ -11,6 +11,7 @@ import type { ServiceHireFormState } from '../types';
 import { emptyScheduling } from '../types';
 import { SchedulingBlock } from './scheduling-block';
 import { AuthGate, type AuthState } from './auth-gate';
+import { validateServiceHire, type ServiceHireErrors, type ValidationMessages } from '../lib/validate';
 
 type Props = {
   service: ServiceForHire;
@@ -24,9 +25,11 @@ type Props = {
     submit: string;
     submitDisabledHint: string;
     submitSuccess: string;
+    addressError: string;
     scheduling: React.ComponentProps<typeof SchedulingBlock>['hints'];
     auth: React.ComponentProps<typeof AuthGate>['hints'];
     questions: { yes: string; no: string; fileTooLarge: string; fileWrongType: string };
+    validation: ValidationMessages;
   };
 };
 
@@ -42,6 +45,7 @@ export function ServiceHireForm({ service, locale, hints }: Props) {
     terms_accepted: false,
   });
   const [authState, setAuthState] = useState<AuthState>({ status: 'idle' });
+  const [errors, setErrors] = useState<ServiceHireErrors | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submittedOrderId, setSubmittedOrderId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -52,10 +56,15 @@ export function ServiceHireForm({ service, locale, hints }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError(null);
-    if (!isAuthenticated) {
-      setSubmitError(hints.submitDisabledHint);
-      return;
-    }
+
+    const validationErrors = validateServiceHire({
+      state,
+      questions: service.questions,
+      isAuthenticated,
+      messages: hints.validation,
+    });
+    setErrors(validationErrors);
+    if (validationErrors) return;
 
     // Build FormData: state JSON + file entries (named file:{questionKey}:{idx}).
     // Files are stripped from the JSON so the server only sees URLs after upload.
@@ -106,12 +115,17 @@ export function ServiceHireForm({ service, locale, hints }: Props) {
           countryCodes={service.activeCountryCodes}
           language={locale}
           placeholder={hints.addressPlaceholder}
+          hasError={Boolean(errors?.address)}
         />
+        {errors?.address && (
+          <p className="text-destructive text-xs">{errors.address}</p>
+        )}
       </div>
 
       <SchedulingBlock
         value={state.scheduling}
         onChange={(v) => setState((s) => ({ ...s, scheduling: v }))}
+        errors={errors?.scheduling}
         hints={hints.scheduling}
       />
 
@@ -119,6 +133,7 @@ export function ServiceHireForm({ service, locale, hints }: Props) {
         questions={service.questions}
         answers={state.answers}
         onChange={(v) => setState((s) => ({ ...s, answers: v }))}
+        errors={errors?.answers}
         locale={locale}
         assignedGroups={service.assignedGroups}
         hints={hints.questions}
@@ -136,17 +151,21 @@ export function ServiceHireForm({ service, locale, hints }: Props) {
         />
       </div>
 
-      <label className="flex items-start gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={state.terms_accepted}
-          onChange={(e) => setState((s) => ({ ...s, terms_accepted: e.target.checked }))}
-          className="mt-1 h-4 w-4"
-        />
-        <span>{hints.termsLabel}</span>
-      </label>
+      <div>
+        <label className="flex items-start gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={state.terms_accepted}
+            onChange={(e) => setState((s) => ({ ...s, terms_accepted: e.target.checked }))}
+            className="mt-1 h-4 w-4"
+          />
+          <span>{hints.termsLabel}</span>
+        </label>
+        {errors?.terms && <p className="text-destructive text-xs">{errors.terms}</p>}
+      </div>
 
       <AuthGate authState={authState} onAuthenticated={setAuthState} hints={hints.auth} />
+      {errors?.auth && <p className="text-destructive text-xs">{errors.auth}</p>}
 
       {submitError && <p className="text-destructive text-sm">{submitError}</p>}
 

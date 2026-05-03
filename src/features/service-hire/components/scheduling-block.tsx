@@ -10,12 +10,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { SchedulingValue } from '../types';
+import type { SchedulingErrors } from '../lib/validate';
 
 const WEEKDAY_LABELS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
 type Props = {
   value: SchedulingValue;
   onChange: (v: SchedulingValue) => void;
+  errors?: SchedulingErrors;
   hints: {
     title: string;
     scheduleType: string;
@@ -33,7 +35,7 @@ type Props = {
   };
 };
 
-export function SchedulingBlock({ value, onChange, hints }: Props) {
+export function SchedulingBlock({ value, onChange, errors, hints }: Props) {
   const isRecurring = value.schedule_type === 'recurring';
 
   const toggleWeekday = (idx: number, checked: boolean) => {
@@ -80,7 +82,11 @@ export function SchedulingBlock({ value, onChange, hints }: Props) {
             value={value.start_date}
             onChange={(e) => onChange({ ...value, start_date: e.target.value })}
             className="h-9 text-sm"
+            aria-invalid={errors?.start_date ? 'true' : undefined}
           />
+          {errors?.start_date && (
+            <p className="text-destructive text-xs">{errors.start_date}</p>
+          )}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="sched-start">{hints.timeStart}</Label>
@@ -90,7 +96,11 @@ export function SchedulingBlock({ value, onChange, hints }: Props) {
             value={value.time_start}
             onChange={(e) => onChange({ ...value, time_start: e.target.value })}
             className="h-9 text-sm"
+            aria-invalid={errors?.time_start ? 'true' : undefined}
           />
+          {errors?.time_start && (
+            <p className="text-destructive text-xs">{errors.time_start}</p>
+          )}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="sched-end">{hints.timeEnd}</Label>
@@ -131,6 +141,10 @@ export function SchedulingBlock({ value, onChange, hints }: Props) {
             </Select>
           </div>
 
+          {errors?.frequency && (
+            <p className="text-destructive text-xs">{errors.frequency}</p>
+          )}
+
           {value.frequency === 'weekly' && (
             <div className="space-y-1.5">
               <Label>{hints.weekdays}</Label>
@@ -155,6 +169,9 @@ export function SchedulingBlock({ value, onChange, hints }: Props) {
                   );
                 })}
               </div>
+              {errors?.weekdays && (
+                <p className="text-destructive text-xs">{errors.weekdays}</p>
+              )}
             </div>
           )}
 
@@ -171,7 +188,11 @@ export function SchedulingBlock({ value, onChange, hints }: Props) {
                   onChange({ ...value, day_of_month: Number(e.target.value) || 1 })
                 }
                 className="h-9 w-24 text-sm"
+                aria-invalid={errors?.day_of_month ? 'true' : undefined}
               />
+              {errors?.day_of_month && (
+                <p className="text-destructive text-xs">{errors.day_of_month}</p>
+              )}
             </div>
           )}
 
