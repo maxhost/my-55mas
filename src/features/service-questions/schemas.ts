@@ -76,6 +76,7 @@ export const questionSchema = z
 
 export const saveQuestionsSchema = z.object({
   serviceId: z.string().uuid(),
+  target: z.enum(['client', 'talent']),
   questions: z
     .array(questionSchema)
     .superRefine((arr, ctx) => {

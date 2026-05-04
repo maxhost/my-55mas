@@ -42,13 +42,25 @@ export function ServiceEditTabs({
 
   const assignedGroupIds = assignedSubtypes.map((g) => g.id);
 
+  const mappedAssignedGroups = assignedSubtypes.map((g) => ({
+    id: g.id,
+    slug: g.slug,
+    translations: g.translations,
+    items: g.items.map((it) => ({
+      id: it.id,
+      slug: it.slug,
+      translations: it.translations,
+    })),
+  }));
+
   return (
     <Tabs defaultValue="content">
       <TabsList>
         <TabsTrigger value="content">{t('tabContent')}</TabsTrigger>
         <TabsTrigger value="config">{t('tabConfig')}</TabsTrigger>
         <TabsTrigger value="subtypes">{t('tabSubtypes')}</TabsTrigger>
-        <TabsTrigger value="questions">{t('tabQuestions')}</TabsTrigger>
+        <TabsTrigger value="client-questions">{t('tabClientQuestions')}</TabsTrigger>
+        <TabsTrigger value="talent-questions">{t('tabTalentQuestions')}</TabsTrigger>
       </TabsList>
 
       <TabsContent value="content" className="pt-6">
@@ -77,20 +89,21 @@ export function ServiceEditTabs({
         />
       </TabsContent>
 
-      <TabsContent value="questions" className="pt-6">
+      <TabsContent value="client-questions" className="pt-6">
         <QuestionsEditor
           serviceId={service.id}
+          target="client"
           initialQuestions={(service.questions as unknown as Question[]) ?? []}
-          assignedGroups={assignedSubtypes.map((g) => ({
-            id: g.id,
-            slug: g.slug,
-            translations: g.translations,
-            items: g.items.map((it) => ({
-              id: it.id,
-              slug: it.slug,
-              translations: it.translations,
-            })),
-          }))}
+          assignedGroups={mappedAssignedGroups}
+        />
+      </TabsContent>
+
+      <TabsContent value="talent-questions" className="pt-6">
+        <QuestionsEditor
+          serviceId={service.id}
+          target="talent"
+          initialQuestions={(service.talent_questions as unknown as Question[]) ?? []}
+          assignedGroups={mappedAssignedGroups}
         />
       </TabsContent>
     </Tabs>

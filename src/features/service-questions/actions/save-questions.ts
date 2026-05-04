@@ -14,12 +14,15 @@ export async function saveServiceQuestions(input: SaveQuestionsInput): Promise<R
     return { error: parsed.error.flatten().fieldErrors as Record<string, string[]> };
   }
 
-  const { serviceId, questions } = parsed.data;
+  const { serviceId, target, questions } = parsed.data;
   const supabase = createClient();
+
+  const column = target === 'client' ? 'questions' : 'talent_questions';
+  const payload = { [column]: questions as unknown as Json };
 
   const { error } = await supabase
     .from('services')
-    .update({ questions: questions as unknown as Json })
+    .update(payload)
     .eq('id', serviceId);
 
   if (error) return { error: { _db: [error.message] } };

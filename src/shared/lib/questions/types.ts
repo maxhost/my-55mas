@@ -42,8 +42,12 @@ export type Question = {
   fileConfig?: FileConfig;
 };
 
+/** Which column on `services` we are persisting to: client-facing or talent-facing question list. */
+export type QuestionTarget = 'client' | 'talent';
+
 export type SaveQuestionsInput = {
   serviceId: string;
+  target: QuestionTarget;
   questions: Question[];
 };
 

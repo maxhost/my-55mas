@@ -6,11 +6,17 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { saveServiceQuestions } from '../actions/save-questions';
-import type { AssignedSubtypeGroup, Question } from '@/shared/lib/questions/types';
+import type {
+  AssignedSubtypeGroup,
+  Question,
+  QuestionTarget,
+} from '@/shared/lib/questions/types';
 import { QuestionCard } from './question-card';
 
 type Props = {
   serviceId: string;
+  /** Which question list to persist: client-facing (services.questions) or talent-facing (services.talent_questions). */
+  target: QuestionTarget;
   initialQuestions: Question[];
   assignedGroups: AssignedSubtypeGroup[];
 };
@@ -24,7 +30,7 @@ function defaultQuestion(index: number): Question {
   };
 }
 
-export function QuestionsEditor({ serviceId, initialQuestions, assignedGroups }: Props) {
+export function QuestionsEditor({ serviceId, target, initialQuestions, assignedGroups }: Props) {
   const t = useTranslations('AdminServiceQuestions');
   const tc = useTranslations('Common');
   const locale = useLocale();
@@ -55,7 +61,7 @@ export function QuestionsEditor({ serviceId, initialQuestions, assignedGroups }:
 
   const handleSave = () => {
     startTransition(async () => {
-      const result = await saveServiceQuestions({ serviceId, questions });
+      const result = await saveServiceQuestions({ serviceId, target, questions });
       if ('error' in result) {
         const msg = Object.values(result.error).flat().filter(Boolean)[0];
         toast.error(msg ?? tc('saveError'));

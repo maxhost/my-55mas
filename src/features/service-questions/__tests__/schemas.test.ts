@@ -122,16 +122,38 @@ describe('questionSchema', () => {
 });
 
 describe('saveQuestionsSchema', () => {
-  it('accepts empty array', () => {
+  it('accepts empty array with target=client', () => {
     expect(
-      saveQuestionsSchema.safeParse({ serviceId: validUuid, questions: [] }).success,
+      saveQuestionsSchema.safeParse({ serviceId: validUuid, target: 'client', questions: [] })
+        .success,
     ).toBe(true);
+  });
+
+  it('accepts empty array with target=talent', () => {
+    expect(
+      saveQuestionsSchema.safeParse({ serviceId: validUuid, target: 'talent', questions: [] })
+        .success,
+    ).toBe(true);
+  });
+
+  it('rejects unknown target', () => {
+    expect(
+      saveQuestionsSchema.safeParse({ serviceId: validUuid, target: 'admin', questions: [] })
+        .success,
+    ).toBe(false);
+  });
+
+  it('rejects missing target', () => {
+    expect(saveQuestionsSchema.safeParse({ serviceId: validUuid, questions: [] }).success).toBe(
+      false,
+    );
   });
 
   it('rejects duplicate keys', () => {
     expect(
       saveQuestionsSchema.safeParse({
         serviceId: validUuid,
+        target: 'client',
         questions: [
           { key: 'a', type: 'text', required: false, i18n: {} },
           { key: 'a', type: 'number', required: false, i18n: {} },
@@ -142,7 +164,8 @@ describe('saveQuestionsSchema', () => {
 
   it('rejects invalid serviceId', () => {
     expect(
-      saveQuestionsSchema.safeParse({ serviceId: 'nope', questions: [] }).success,
+      saveQuestionsSchema.safeParse({ serviceId: 'nope', target: 'client', questions: [] })
+        .success,
     ).toBe(false);
   });
 });
