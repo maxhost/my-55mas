@@ -71,6 +71,23 @@ Browser renderiza Server/Client Components → Server Actions ejecutan lógica d
 
 Si un archivo se acerca a 300 líneas, dividirlo antes de que llegue.
 
+### Excepciones documentadas
+
+Los límites de **feature total (1 500)** y **sub-módulo (800)** son guidelines,
+no reglas duras. Una feature puede excederlos cuando:
+
+1. Es una unidad de negocio cohesiva (wizard multi-step, flujo end-to-end…)
+   cuya partición rompería el "test de independencia" (regla 3 de aislamiento).
+2. Cada archivo individual respeta el límite de 300 LOC.
+3. Cada función respeta el límite de 60 LOC.
+4. Lo genuinamente reusable ya se movió a `src/shared/`.
+5. No hay cross-feature imports desde la feature.
+
+Los límites de **archivo (300)** y **función (60)** son duros — siempre se
+respetan o se factoriza. Toda excepción debe documentarse en
+`docs/features/{feature}.md` con sección explícita explicando la razón y el
+plan futuro de migración. Ver ejemplo en `docs/features/talent-onboarding.md`.
+
 ## 6. Regla de sesiones de desarrollo
 
 - **Una sesión = una sola responsabilidad.** Nunca mezclar capas en el mismo prompt: UI + lógica de negocio, o DB + API, van en sesiones separadas.

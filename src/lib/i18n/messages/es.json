@@ -44,6 +44,7 @@
     "notifications": "Notificaciones",
     "migration": "Migración",
     "testServiceHire": "Test contratación",
+    "talentRegistration": "Registro de talento",
     "groupOperations": "Operaciones",
     "groupUsers": "Usuarios",
     "groupStaff": "Staff",
@@ -66,7 +67,8 @@
     "tabContent": "Contenido",
     "tabSubtypes": "Sub-tipos",
     "tabConfig": "Configuración",
-    "tabQuestions": "Preguntas",
+    "tabClientQuestions": "Preguntas cliente",
+    "tabTalentQuestions": "Preguntas talento",
     "slug": "Slug",
     "description": "Descripción",
     "includes": "Incluye",
@@ -472,5 +474,103 @@
     "no": "No",
     "fileTooLarge": "Excede el tamaño máximo permitido",
     "fileWrongType": "Tipo de archivo no permitido"
+  },
+  "TalentOnboarding": {
+    "pageTitle": "Completa tu perfil",
+    "pageDescription": "Completa la información para empezar a ofrecer servicios.",
+    "common": {
+      "saveAndContinue": "Guardar y continuar",
+      "saveAndBackToSummary": "Guardar y volver al resumen",
+      "validationError": "Revisa el formulario.",
+      "yes": "Sí",
+      "no": "No",
+      "fileTooLarge": "Excede el tamaño máximo permitido.",
+      "fileWrongType": "Tipo de archivo no permitido."
+    },
+    "header": {
+      "progress": "Paso {current} de {total}",
+      "summary": "Resumen",
+      "step1": "Datos personales",
+      "step2": "Contacto y dirección",
+      "step3": "Situación profesional",
+      "step4": "Servicios y precio",
+      "step5": "Pagos",
+      "step6": "Idiomas",
+      "step7": "Otros"
+    },
+    "summary": {
+      "title": "Resumen de tu información",
+      "description": "Revisa todo antes de confirmar. Podés editar cualquier sección.",
+      "sectionPersonal": "Datos personales",
+      "sectionContact": "Contacto y dirección",
+      "sectionProfessional": "Situación profesional",
+      "sectionServices": "Servicios y precio",
+      "sectionPayments": "Pagos",
+      "sectionLanguages": "Idiomas",
+      "sectionSurvey": "Otros",
+      "edit": "Editar",
+      "finalContinue": "Confirmar y continuar",
+      "errorPrefix": "Error",
+      "noServices": "Sin servicios seleccionados.",
+      "noLanguages": "Sin idiomas seleccionados.",
+      "noSurvey": "Sin respuestas adicionales."
+    },
+    "step1": {
+      "title": "Datos personales",
+      "genderLabel": "Género",
+      "genderMale": "Masculino",
+      "genderFemale": "Femenino",
+      "birthDateLabel": "Fecha de nacimiento",
+      "ageError": "Debes tener al menos 55 años para continuar."
+    },
+    "step2": {
+      "title": "Contacto y dirección",
+      "preferredContactLabel": "Método de contacto preferido",
+      "contactWhatsapp": "WhatsApp",
+      "contactEmail": "Email",
+      "contactPhone": "Teléfono",
+      "countryLabel": "País",
+      "addressLabel": "Dirección",
+      "addressPlaceholder": "Calle, número, ciudad…",
+      "cityLabel": "Ciudad",
+      "cityPlaceholder": "Selecciona tu ciudad",
+      "cityNotDetectedHint": "No detectamos tu ciudad. Selecciónala de la lista."
+    },
+    "step3": {
+      "title": "Situación profesional",
+      "professionalStatusLabel": "Situación profesional actual",
+      "statusPreRetired": "Prejubilación",
+      "statusUnemployed": "Desempleo",
+      "statusEmployed": "En activo",
+      "statusRetired": "Jubilación",
+      "previousExperienceLabel": "Experiencia profesional anterior",
+      "previousExperiencePlaceholder": "Cuéntanos sobre tu experiencia previa (opcional)"
+    },
+    "step4": {
+      "title": "Servicios y precio",
+      "pickServicesLabel": "¿Qué servicios vas a brindar?",
+      "noServicesAvailable": "No hay servicios disponibles en tu país. Contacta a soporte.",
+      "noServiceSelected": "Selecciona al menos un servicio.",
+      "suggestedPriceLabel": "Precio sugerido",
+      "overridePriceLabel": "No acepto el precio sugerido",
+      "customPriceLabel": "Tu precio"
+    },
+    "step5": {
+      "title": "Pagos",
+      "socialSecurityLabel": "¿Estás dado de alta en la Seguridad Social?",
+      "preferredPaymentLabel": "Método de pago preferencial",
+      "paymentMonthlyInvoice": "Facturas mensuales",
+      "paymentAccumulateCredit": "Acumular importe para servicios 55+"
+    },
+    "step6": {
+      "title": "Idiomas",
+      "languagesLabel": "¿Qué idiomas hablas?",
+      "atLeastOneLanguage": "Debes seleccionar al menos un idioma."
+    },
+    "step7": {
+      "title": "Otros",
+      "description": "Algunas preguntas adicionales para conocerte mejor.",
+      "noQuestions": "No hay preguntas adicionales en este momento."
+    }
   }
 }

@@ -60,6 +60,7 @@ export const adminNavGroups: NavGroup[] = [
     items: [
       { labelKey: 'migration', href: '/admin/migration', icon: 'upload' },
       { labelKey: 'testServiceHire', href: '/admin/test-service-hire', icon: 'clipboard-list' },
+      { labelKey: 'talentRegistration', href: '/admin/test-talent-registration', icon: 'user-check' },
     ],
   },
 ];

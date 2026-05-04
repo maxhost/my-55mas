@@ -44,6 +44,7 @@
     "notifications": "Notifications",
     "migration": "Migration",
     "testServiceHire": "Test hire",
+    "talentRegistration": "Talent registration",
     "groupOperations": "Operations",
     "groupUsers": "Users",
     "groupStaff": "Staff",
@@ -66,7 +67,8 @@
     "tabContent": "Content",
     "tabSubtypes": "Subtypes",
     "tabConfig": "Settings",
-    "tabQuestions": "Questions",
+    "tabClientQuestions": "Client questions",
+    "tabTalentQuestions": "Talent questions",
     "slug": "Slug",
     "description": "Description",
     "includes": "Includes",
@@ -472,5 +474,103 @@
     "no": "No",
     "fileTooLarge": "Exceeds the maximum allowed size",
     "fileWrongType": "File type not allowed"
+  },
+  "TalentOnboarding": {
+    "pageTitle": "Complete your profile",
+    "pageDescription": "Fill in your details to start offering services.",
+    "common": {
+      "saveAndContinue": "Save and continue",
+      "saveAndBackToSummary": "Save and back to summary",
+      "validationError": "Please check the form.",
+      "yes": "Yes",
+      "no": "No",
+      "fileTooLarge": "Exceeds the maximum allowed size.",
+      "fileWrongType": "File type not allowed."
+    },
+    "header": {
+      "progress": "Step {current} of {total}",
+      "summary": "Summary",
+      "step1": "Personal data",
+      "step2": "Contact & address",
+      "step3": "Professional situation",
+      "step4": "Services & pricing",
+      "step5": "Payments",
+      "step6": "Languages",
+      "step7": "Other"
+    },
+    "summary": {
+      "title": "Summary of your information",
+      "description": "Review everything before confirming. You can edit any section.",
+      "sectionPersonal": "Personal data",
+      "sectionContact": "Contact & address",
+      "sectionProfessional": "Professional situation",
+      "sectionServices": "Services & pricing",
+      "sectionPayments": "Payments",
+      "sectionLanguages": "Languages",
+      "sectionSurvey": "Other",
+      "edit": "Edit",
+      "finalContinue": "Confirm and continue",
+      "errorPrefix": "Error",
+      "noServices": "No services selected.",
+      "noLanguages": "No languages selected.",
+      "noSurvey": "No additional responses."
+    },
+    "step1": {
+      "title": "Personal data",
+      "genderLabel": "Gender",
+      "genderMale": "Male",
+      "genderFemale": "Female",
+      "birthDateLabel": "Date of birth",
+      "ageError": "You must be at least 55 years old to continue."
+    },
+    "step2": {
+      "title": "Contact & address",
+      "preferredContactLabel": "Preferred contact method",
+      "contactWhatsapp": "WhatsApp",
+      "contactEmail": "Email",
+      "contactPhone": "Phone",
+      "countryLabel": "Country",
+      "addressLabel": "Address",
+      "addressPlaceholder": "Street, number, city…",
+      "cityLabel": "City",
+      "cityPlaceholder": "Select your city",
+      "cityNotDetectedHint": "We could not detect your city. Please select it from the list."
+    },
+    "step3": {
+      "title": "Professional situation",
+      "professionalStatusLabel": "Current professional situation",
+      "statusPreRetired": "Pre-retirement",
+      "statusUnemployed": "Unemployed",
+      "statusEmployed": "Employed",
+      "statusRetired": "Retired",
+      "previousExperienceLabel": "Previous professional experience",
+      "previousExperiencePlaceholder": "Tell us about your previous experience (optional)"
+    },
+    "step4": {
+      "title": "Services & pricing",
+      "pickServicesLabel": "Which services will you provide?",
+      "noServicesAvailable": "No services available in your country. Contact support.",
+      "noServiceSelected": "Select at least one service.",
+      "suggestedPriceLabel": "Suggested price",
+      "overridePriceLabel": "I don't accept the suggested price",
+      "customPriceLabel": "Your price"
+    },
+    "step5": {
+      "title": "Payments",
+      "socialSecurityLabel": "Are you registered with Social Security?",
+      "preferredPaymentLabel": "Preferred payment method",
+      "paymentMonthlyInvoice": "Monthly invoices",
+      "paymentAccumulateCredit": "Accumulate credit for 55+ services"
+    },
+    "step6": {
+      "title": "Languages",
+      "languagesLabel": "Which languages do you speak?",
+      "atLeastOneLanguage": "You must select at least one language."
+    },
+    "step7": {
+      "title": "Other",
+      "description": "A few additional questions to know you better.",
+      "noQuestions": "No additional questions at this time."
+    }
   }
 }

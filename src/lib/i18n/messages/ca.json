@@ -44,6 +44,7 @@
     "notifications": "Notificacions",
     "migration": "Migració",
     "testServiceHire": "Test contractació",
+    "talentRegistration": "Registre de talent",
     "groupOperations": "Operacions",
     "groupUsers": "Usuaris",
     "groupStaff": "Staff",
@@ -66,7 +67,8 @@
     "tabContent": "Contingut",
     "tabSubtypes": "Subtipus",
     "tabConfig": "Configuració",
-    "tabQuestions": "Preguntes",
+    "tabClientQuestions": "Preguntes client",
+    "tabTalentQuestions": "Preguntes talent",
     "slug": "Slug",
     "description": "Descripció",
     "includes": "Inclou",
@@ -472,5 +474,103 @@
     "no": "No",
     "fileTooLarge": "Excedeix la mida màxima permesa",
     "fileWrongType": "Tipus d'arxiu no permès"
+  },
+  "TalentOnboarding": {
+    "pageTitle": "Completa el teu perfil",
+    "pageDescription": "Omple la teva informació per començar a oferir serveis.",
+    "common": {
+      "saveAndContinue": "Guardar i continuar",
+      "saveAndBackToSummary": "Guardar i tornar al resum",
+      "validationError": "Revisa el formulari.",
+      "yes": "Sí",
+      "no": "No",
+      "fileTooLarge": "Supera la mida màxima permesa.",
+      "fileWrongType": "Tipus d'arxiu no permès."
+    },
+    "header": {
+      "progress": "Pas {current} de {total}",
+      "summary": "Resum",
+      "step1": "Dades personals",
+      "step2": "Contacte i adreça",
+      "step3": "Situació professional",
+      "step4": "Serveis i preu",
+      "step5": "Pagaments",
+      "step6": "Idiomes",
+      "step7": "Altres"
+    },
+    "summary": {
+      "title": "Resum de la teva informació",
+      "description": "Revisa-ho tot abans de confirmar. Pots editar qualsevol secció.",
+      "sectionPersonal": "Dades personals",
+      "sectionContact": "Contacte i adreça",
+      "sectionProfessional": "Situació professional",
+      "sectionServices": "Serveis i preu",
+      "sectionPayments": "Pagaments",
+      "sectionLanguages": "Idiomes",
+      "sectionSurvey": "Altres",
+      "edit": "Editar",
+      "finalContinue": "Confirmar i continuar",
+      "errorPrefix": "Error",
+      "noServices": "Sense serveis seleccionats.",
+      "noLanguages": "Sense idiomes seleccionats.",
+      "noSurvey": "Sense respostes addicionals."
+    },
+    "step1": {
+      "title": "Dades personals",
+      "genderLabel": "Gènere",
+      "genderMale": "Masculí",
+      "genderFemale": "Femení",
+      "birthDateLabel": "Data de naixement",
+      "ageError": "Has de tenir almenys 55 anys per continuar."
+    },
+    "step2": {
+      "title": "Contacte i adreça",
+      "preferredContactLabel": "Mètode de contacte preferit",
+      "contactWhatsapp": "WhatsApp",
+      "contactEmail": "Email",
+      "contactPhone": "Telèfon",
+      "countryLabel": "País",
+      "addressLabel": "Adreça",
+      "addressPlaceholder": "Carrer, número, ciutat…",
+      "cityLabel": "Ciutat",
+      "cityPlaceholder": "Selecciona la teva ciutat",
+      "cityNotDetectedHint": "No hem detectat la teva ciutat. Selecciona-la de la llista."
+    },
+    "step3": {
+      "title": "Situació professional",
+      "professionalStatusLabel": "Situació professional actual",
+      "statusPreRetired": "Prejubilació",
+      "statusUnemployed": "Atur",
+      "statusEmployed": "En actiu",
+      "statusRetired": "Jubilació",
+      "previousExperienceLabel": "Experiència professional anterior",
+      "previousExperiencePlaceholder": "Explica'ns la teva experiència anterior (opcional)"
+    },
+    "step4": {
+      "title": "Serveis i preu",
+      "pickServicesLabel": "Quins serveis oferiràs?",
+      "noServicesAvailable": "No hi ha serveis disponibles al teu país. Contacta amb suport.",
+      "noServiceSelected": "Selecciona almenys un servei.",
+      "suggestedPriceLabel": "Preu suggerit",
+      "overridePriceLabel": "No accepto el preu suggerit",
+      "customPriceLabel": "El teu preu"
+    },
+    "step5": {
+      "title": "Pagaments",
+      "socialSecurityLabel": "Estàs donat d'alta a la Seguretat Social?",
+      "preferredPaymentLabel": "Mètode de pagament preferencial",
+      "paymentMonthlyInvoice": "Factures mensuals",
+      "paymentAccumulateCredit": "Acumular crèdit per a serveis 55+"
+    },
+    "step6": {
+      "title": "Idiomes",
+      "languagesLabel": "Quins idiomes parles?",
+      "atLeastOneLanguage": "Has de seleccionar almenys un idioma."
+    },
+    "step7": {
+      "title": "Altres",
+      "description": "Algunes preguntes addicionals per conèixer-te millor.",
+      "noQuestions": "No hi ha preguntes addicionals en aquest moment."
+    }
   }
 }
