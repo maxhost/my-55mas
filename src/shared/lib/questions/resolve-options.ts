@@ -1,5 +1,5 @@
-import type { AssignedSubtypeGroup, ManualOption, Question } from '../types';
-import type { SelectOption } from '../components/renderers/select-input';
+import type { AssignedSubtypeGroup, ManualOption, Question } from './types';
+import type { SelectOption } from '@/shared/components/question-renderers/select-input';
 
 /**
  * Resolves the visible options for a single/multiSelect question, in the

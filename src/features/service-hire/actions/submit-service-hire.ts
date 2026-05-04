@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { Json } from '@/lib/supabase/database.types';
-import type { Question } from '@/features/service-questions';
+import type { Question } from '@/shared/lib/questions';
 import { submitServiceHireSchema } from '../schemas';
 
 type SubmitResult = { data: { orderId: string } } | { error: { message: string } };

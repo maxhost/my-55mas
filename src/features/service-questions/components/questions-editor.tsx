@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { saveServiceQuestions } from '../actions/save-questions';
-import type { AssignedSubtypeGroup, Question } from '../types';
+import type { AssignedSubtypeGroup, Question } from '@/shared/lib/questions/types';
 import { QuestionCard } from './question-card';
 
 type Props = {

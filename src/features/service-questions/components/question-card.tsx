@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { locales } from '@/lib/i18n/config';
-import { QUESTION_TYPES, DEFAULT_FILE_CONFIG, type AssignedSubtypeGroup, type Question, type QuestionType } from '../types';
+import { QUESTION_TYPES, DEFAULT_FILE_CONFIG, type AssignedSubtypeGroup, type Question, type QuestionType } from '@/shared/lib/questions/types';
 import { ManualOptionsEditor } from './manual-options-editor';
 import { SubtypeSourceEditor } from './subtype-source-editor';
 import { FileConfigEditor } from './file-config-editor';

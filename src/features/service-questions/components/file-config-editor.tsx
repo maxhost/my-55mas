@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
-import { FILE_TYPE_OPTIONS, type FileConfig } from '../types';
+import { FILE_TYPE_OPTIONS, type FileConfig } from '@/shared/lib/questions/types';
 
 type Props = {
   config: FileConfig;

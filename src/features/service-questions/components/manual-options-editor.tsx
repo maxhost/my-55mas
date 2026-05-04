@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Plus, X } from 'lucide-react';
 import { locales } from '@/lib/i18n/config';
-import type { ManualOption } from '../types';
+import type { ManualOption } from '@/shared/lib/questions/types';
 
 type Props = {
   options: ManualOption[];

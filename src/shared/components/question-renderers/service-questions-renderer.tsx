@@ -1,15 +1,15 @@
 'use client';
 
 import { Label } from '@/components/ui/label';
-import { resolveOptions, resolveQuestionLabels } from '../lib/resolve-options';
-import type { AssignedSubtypeGroup, Question } from '../types';
-import { TextInputRenderer } from './renderers/text-input';
-import { TextareaRenderer } from './renderers/textarea';
-import { NumberInputRenderer } from './renderers/number-input';
-import { BooleanInputRenderer } from './renderers/boolean-input';
-import { SelectInputRenderer } from './renderers/select-input';
-import { MultiSelectInputRenderer } from './renderers/multi-select-input';
-import { FileInputRenderer } from './renderers/file-input';
+import { resolveOptions, resolveQuestionLabels } from '@/shared/lib/questions/resolve-options';
+import type { AssignedSubtypeGroup, Question } from '@/shared/lib/questions/types';
+import { TextInputRenderer } from './text-input';
+import { TextareaRenderer } from './textarea';
+import { NumberInputRenderer } from './number-input';
+import { BooleanInputRenderer } from './boolean-input';
+import { SelectInputRenderer } from './select-input';
+import { MultiSelectInputRenderer } from './multi-select-input';
+import { FileInputRenderer } from './file-input';
 
 export type AnswersMap = Record<string, unknown>;
 

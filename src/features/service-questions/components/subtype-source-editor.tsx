@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { AssignedSubtypeGroup } from '../types';
+import type { AssignedSubtypeGroup } from '@/shared/lib/questions/types';
 
 type Props = {
   groupSlug: string | undefined;

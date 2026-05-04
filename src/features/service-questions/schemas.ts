@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { locales } from '@/lib/i18n/config';
-import { QUESTION_TYPES } from './types';
+import { QUESTION_TYPES } from '@/shared/lib/questions/types';
 
 const localeKey = z.enum(locales as unknown as [string, ...string[]]);
 

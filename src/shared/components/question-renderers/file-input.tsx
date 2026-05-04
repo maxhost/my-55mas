@@ -3,7 +3,7 @@
 import { useId } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { FileConfig } from '../../types';
+import type { FileConfig } from '@/shared/lib/questions/types';
 
 type Props = {
   id: string;

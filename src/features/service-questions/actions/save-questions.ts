@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import type { Json } from '@/lib/supabase/database.types';
 import { saveQuestionsSchema } from '../schemas';
-import type { SaveQuestionsInput } from '../types';
+import type { SaveQuestionsInput } from '@/shared/lib/questions/types';
 
 type Result = { data: { id: string } } | { error: Record<string, string[]> };
 

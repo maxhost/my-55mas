@@ -1,5 +1,5 @@
 import type { AddressValue } from '@/shared/components/address-autocomplete';
-import type { AnswersMap } from '@/features/service-questions';
+import type { AnswersMap } from '@/shared/components/question-renderers';
 
 export type SchedulingValue = {
   schedule_type: 'once' | 'recurring';

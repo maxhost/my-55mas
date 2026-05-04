@@ -5,7 +5,7 @@ import { localizedField } from '@/shared/lib/i18n/localize';
 import type {
   AssignedSubtypeGroup,
   Question,
-} from '@/features/service-questions';
+} from '@/shared/lib/questions';
 
 export type ServiceForHire = {
   id: string;

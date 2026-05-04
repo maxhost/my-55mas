@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { validateServiceHire, type ValidationMessages } from '../lib/validate';
 import { emptyAddress } from '@/shared/components/address-autocomplete';
 import type { ServiceHireFormState } from '../types';
-import type { Question } from '@/features/service-questions';
+import type { Question } from '@/shared/lib/questions';
 
 const m: ValidationMessages = {
   addressRequired: 'addr',

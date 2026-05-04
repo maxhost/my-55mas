@@ -3,7 +3,7 @@ import {
   resolveOptions,
   resolveQuestionLabels,
   isAnswerMissing,
-} from '../lib/resolve-options';
+} from '../resolve-options';
 import type { AssignedSubtypeGroup, Question } from '../types';
 
 const groups: AssignedSubtypeGroup[] = [

@@ -8,7 +8,7 @@ import { ServiceConfig } from '@/features/services/components/service-config';
 import { GroupAssignmentEditor } from '@/features/subtypes/components/group-assignment-editor';
 import type { SubtypeGroupWithTranslations } from '@/features/subtypes/types';
 import { QuestionsEditor } from '@/features/service-questions/components/questions-editor';
-import type { Question } from '@/features/service-questions/types';
+import type { Question } from '@/shared/lib/questions/types';
 import type {
   ServiceDetail,
   CountryOption,

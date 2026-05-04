@@ -1,4 +1,4 @@
-import { isAnswerMissing, type Question } from '@/features/service-questions';
+import { isAnswerMissing, type Question } from '@/shared/lib/questions';
 import type { ServiceHireFormState } from '../types';
 
 export type SchedulingErrors = {

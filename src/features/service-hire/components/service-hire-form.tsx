@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { AddressAutocomplete, emptyAddress } from '@/shared/components/address-autocomplete';
-import { ServiceQuestionsRenderer } from '@/features/service-questions';
+import { ServiceQuestionsRenderer } from '@/shared/components/question-renderers';
 import type { ServiceForHire } from '../actions/get-service-for-hire';
 import { submitServiceHire } from '../actions/submit-service-hire';
 import type { ServiceHireFormState } from '../types';
