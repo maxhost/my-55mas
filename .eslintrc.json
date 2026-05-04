@@ -42,6 +42,10 @@
             "allow": ["shared", "lib", "components-ui"]
           },
           {
+            "from": "features",
+            "allow": [["features", { "feature": "service-questions" }]]
+          },
+          {
             "from": "shared",
             "allow": ["shared", "lib", "components-ui"]
           },
