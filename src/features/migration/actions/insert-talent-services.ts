@@ -77,6 +77,10 @@ export async function insertTalentServices(
         const { error } = await admin.from('talent_service_subtypes').insert({
           talent_id: talentProfileId,
           subtype_id: matched.id,
+          // Migration tool imports rows without an explicit talent_question.
+          // Use 'legacy_import' as the discriminator so the PK (talent, subtype, question_key)
+          // remains unique and the new onboarding flow doesn't collide with imported data.
+          question_key: 'legacy_import',
         });
 
         if (error) {

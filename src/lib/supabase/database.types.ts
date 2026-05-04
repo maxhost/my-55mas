@@ -691,7 +691,6 @@ export type Database = {
           full_name: string | null
           gender: string | null
           id: string
-          other_language: string[] | null
           phone: string | null
           preferred_city: string | null
           preferred_contact: string | null
@@ -709,7 +708,6 @@ export type Database = {
           full_name?: string | null
           gender?: string | null
           id: string
-          other_language?: string[] | null
           phone?: string | null
           preferred_city?: string | null
           preferred_contact?: string | null
@@ -727,7 +725,6 @@ export type Database = {
           full_name?: string | null
           gender?: string | null
           id?: string
-          other_language?: string[] | null
           phone?: string | null
           preferred_city?: string | null
           preferred_contact?: string | null
@@ -954,6 +951,7 @@ export type Database = {
           questions: Json
           slug: string
           status: string
+          talent_questions: Json
           updated_at: string | null
         }
         Insert: {
@@ -965,6 +963,7 @@ export type Database = {
           questions?: Json
           slug: string
           status?: string
+          talent_questions?: Json
           updated_at?: string | null
         }
         Update: {
@@ -976,6 +975,7 @@ export type Database = {
           questions?: Json
           slug?: string
           status?: string
+          talent_questions?: Json
           updated_at?: string | null
         }
         Relationships: []
@@ -1327,12 +1327,15 @@ export type Database = {
           fiscal_id: string | null
           fiscal_id_type_id: string | null
           has_car: boolean | null
+          has_social_security: boolean | null
           id: string
           internal_notes: string | null
           legacy_id: number | null
           marketing_consent: boolean
+          onboarding_completed_at: string | null
           photo_url: string | null
           preferred_payment: string | null
+          previous_experience: string | null
           professional_status: string | null
           status: string
           terms_accepted: boolean
@@ -1350,12 +1353,15 @@ export type Database = {
           fiscal_id?: string | null
           fiscal_id_type_id?: string | null
           has_car?: boolean | null
+          has_social_security?: boolean | null
           id?: string
           internal_notes?: string | null
           legacy_id?: number | null
           marketing_consent?: boolean
+          onboarding_completed_at?: string | null
           photo_url?: string | null
           preferred_payment?: string | null
+          previous_experience?: string | null
           professional_status?: string | null
           status?: string
           terms_accepted?: boolean
@@ -1373,12 +1379,15 @@ export type Database = {
           fiscal_id?: string | null
           fiscal_id_type_id?: string | null
           has_car?: boolean | null
+          has_social_security?: boolean | null
           id?: string
           internal_notes?: string | null
           legacy_id?: number | null
           marketing_consent?: boolean
+          onboarding_completed_at?: string | null
           photo_url?: string | null
           preferred_payment?: string | null
+          previous_experience?: string | null
           professional_status?: string | null
           status?: string
           terms_accepted?: boolean
@@ -1433,16 +1442,19 @@ export type Database = {
       talent_service_subtypes: {
         Row: {
           created_at: string | null
+          question_key: string
           subtype_id: string
           talent_id: string
         }
         Insert: {
           created_at?: string | null
+          question_key: string
           subtype_id: string
           talent_id: string
         }
         Update: {
           created_at?: string | null
+          question_key?: string
           subtype_id?: string
           talent_id?: string
         }
@@ -1514,6 +1526,39 @@ export type Database = {
           },
           {
             foreignKeyName: "talent_services_talent_id_fkey"
+            columns: ["talent_id"]
+            isOneToOne: false
+            referencedRelation: "talent_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      talent_spoken_languages: {
+        Row: {
+          created_at: string
+          language_code: string
+          talent_id: string
+        }
+        Insert: {
+          created_at?: string
+          language_code: string
+          talent_id: string
+        }
+        Update: {
+          created_at?: string
+          language_code?: string
+          talent_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "talent_spoken_languages_language_code_fkey"
+            columns: ["language_code"]
+            isOneToOne: false
+            referencedRelation: "spoken_languages"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "talent_spoken_languages_talent_id_fkey"
             columns: ["talent_id"]
             isOneToOne: false
             referencedRelation: "talent_profiles"
