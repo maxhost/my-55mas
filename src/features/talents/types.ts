@@ -1,6 +1,13 @@
 // ── Talent Status ────────────────────────────────────
 
-export const TALENT_STATUSES = ['pending', 'approved', 'rejected', 'suspended'] as const;
+export const TALENT_STATUSES = [
+  'registered',
+  'evaluation',
+  'active',
+  'archived',
+  'excluded',
+  'inactive',
+] as const;
 export type TalentStatus = (typeof TALENT_STATUSES)[number];
 
 // ── Service Chip (for talent list) ──────────────────

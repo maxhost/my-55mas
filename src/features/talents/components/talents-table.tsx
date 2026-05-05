@@ -1,6 +1,7 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/badge';
 import {
   Table,
@@ -17,10 +18,12 @@ type Props = {
 };
 
 const statusVariant: Record<TalentStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  pending: 'secondary',
-  approved: 'default',
-  rejected: 'destructive',
-  suspended: 'outline',
+  registered: 'secondary',
+  evaluation: 'secondary',
+  active: 'default',
+  archived: 'outline',
+  excluded: 'destructive',
+  inactive: 'outline',
 };
 
 const eurFormatter = new Intl.NumberFormat('es-ES', {
@@ -30,6 +33,7 @@ const eurFormatter = new Intl.NumberFormat('es-ES', {
 
 export function TalentsTable({ talents }: Props) {
   const t = useTranslations('AdminTalents');
+  const locale = useLocale();
 
   if (talents.length === 0) {
     return (
@@ -54,7 +58,12 @@ export function TalentsTable({ talents }: Props) {
         {talents.map((talent) => (
           <TableRow key={talent.id}>
             <TableCell className="font-medium">
-              {talent.full_name ?? '—'}
+              <Link
+                href={`/${locale}/admin/talents/${talent.id}`}
+                className="text-foreground hover:text-primary hover:underline"
+              >
+                {talent.full_name ?? '—'}
+              </Link>
             </TableCell>
             <TableCell>
               <ServiceChips

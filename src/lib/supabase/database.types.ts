@@ -1315,6 +1315,165 @@ export type Database = {
           },
         ]
       }
+      talent_notes: {
+        Row: {
+          author_id: string | null
+          body: string
+          created_at: string
+          id: string
+          is_system: boolean
+          pinned: boolean
+          talent_id: string
+        }
+        Insert: {
+          author_id?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          is_system?: boolean
+          pinned?: boolean
+          talent_id: string
+        }
+        Update: {
+          author_id?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          is_system?: boolean
+          pinned?: boolean
+          talent_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "talent_notes_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "talent_notes_talent_id_fkey"
+            columns: ["talent_id"]
+            isOneToOne: false
+            referencedRelation: "talent_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      talent_payment_items: {
+        Row: {
+          created_at: string
+          hours: number | null
+          id: string
+          notes: string | null
+          order_id: string
+          payment_id: string
+          total: number
+          unit_amount: number | null
+        }
+        Insert: {
+          created_at?: string
+          hours?: number | null
+          id?: string
+          notes?: string | null
+          order_id: string
+          payment_id: string
+          total: number
+          unit_amount?: number | null
+        }
+        Update: {
+          created_at?: string
+          hours?: number | null
+          id?: string
+          notes?: string | null
+          order_id?: string
+          payment_id?: string
+          total?: number
+          unit_amount?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "talent_payment_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "talent_payment_items_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "talent_payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      talent_payments: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          currency: string
+          id: string
+          notes: string | null
+          paid_at: string | null
+          payment_method: string | null
+          payment_proof_url: string | null
+          period_month: string
+          status: string
+          talent_id: string
+          total_amount: number
+          total_hours: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          currency: string
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_proof_url?: string | null
+          period_month: string
+          status?: string
+          talent_id: string
+          total_amount?: number
+          total_hours?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_proof_url?: string | null
+          period_month?: string
+          status?: string
+          talent_id?: string
+          total_amount?: number
+          total_hours?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "talent_payments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "talent_payments_talent_id_fkey"
+            columns: ["talent_id"]
+            isOneToOne: false
+            referencedRelation: "talent_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       talent_profiles: {
         Row: {
           additional_info: string | null

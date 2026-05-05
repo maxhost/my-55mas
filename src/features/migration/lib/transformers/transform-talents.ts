@@ -50,14 +50,20 @@ const CONTACT_MAP: Record<string, string> = {
 };
 
 const STATUS_MAP: Record<string, string> = {
-  aceite: 'approved',
-  approved: 'approved',
-  pending: 'pending',
-  pendente: 'pending',
-  rejected: 'rejected',
-  rejeitado: 'rejected',
-  suspended: 'suspended',
-  suspenso: 'suspended',
+  aceite: 'active',
+  approved: 'active',
+  active: 'active',
+  pending: 'registered',
+  pendente: 'registered',
+  registered: 'registered',
+  evaluation: 'evaluation',
+  rejected: 'excluded',
+  rejeitado: 'excluded',
+  excluded: 'excluded',
+  suspended: 'inactive',
+  suspenso: 'inactive',
+  inactive: 'inactive',
+  archived: 'archived',
 };
 
 const PROFESSIONAL_STATUS_MAP: Record<string, string> = {
@@ -188,8 +194,8 @@ export function transformTalents(
       : null;
 
     const status = mapped.status
-      ? STATUS_MAP[mapped.status.toLowerCase()] ?? 'pending'
-      : 'pending';
+      ? STATUS_MAP[mapped.status.toLowerCase()] ?? 'registered'
+      : 'registered';
 
     const legacyId = mapped.legacy_id ? Number(mapped.legacy_id) : null;
 
