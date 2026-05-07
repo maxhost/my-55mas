@@ -69,12 +69,20 @@ export function SearchTalentModal({
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wasOpenRef = useRef(false);
 
-  // Reset filters to the order defaults whenever the modal opens.
+  // Reset filters / clear stale results / show loader ONLY when the modal
+  // transitions from closed to open. Without the ref guard, parent
+  // re-renders that change the `context` object identity would re-fire this
+  // effect and wipe the user's in-flight filter state.
   useEffect(() => {
-    if (open) {
+    const justOpened = open && !wasOpenRef.current;
+    wasOpenRef.current = open;
+    if (justOpened) {
       setFilters(context.defaultFilters);
       setExpandedTalentId(null);
+      setResults([]);
+      setLoading(true);
     }
   }, [open, context.defaultFilters]);
 
