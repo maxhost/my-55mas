@@ -505,6 +505,39 @@ revalidatePath('/[locale]/(admin)/admin/talents/[id]', 'page');
 revalidatePath(`/${locale}/admin/talents/${id}`);
 ```
 
+### Placeholders en hints: usar `[count]`, NO `{count}`
+
+next-intl pasa los strings por ICU MessageFormat. Si un value en el JSON
+contiene `{name}` y la llamada `t('key')` no recibe `{ name }`, ICU detecta
+el placeholder no resuelto y next-intl devuelve la key cruda como fallback
+(ej: `AdminClientDetail.highlights.pendingOrdersSuffix` se renderiza tal
+cual en pantalla).
+
+En este pattern los hints son strings que el componente substituye él mismo
+con `String.replace`, así que el page.tsx NO le pasa el valor al `t()`.
+Solución: usar `[count]` (o cualquier delimitador no-ICU) en el JSON:
+
+```json
+// CORRECTO (ICU lo trata como texto literal)
+"pendingOrdersSuffix": "([count] órdenes)",
+"reviewsCount": "([count] reviews)",
+"relativeMinutes": "hace [count]m",
+
+// INCORRECTO (ICU intenta substituir y falla en runtime)
+"pendingOrdersSuffix": "({count} órdenes)"
+```
+
+Y en el componente:
+
+```tsx
+hints.pendingOrdersSuffix.replace('[count]', String(count));
+```
+
+Excepción: si el page.tsx SÍ tiene el count y va a llamar `t('key',
+{ count })`, entonces el JSON sí puede usar `{count}` como ICU puro
+(ej: `moreServices`, `rowsDetected` en este repo). Para hints servidos al
+componente, usar `[count]`.
+
 ## Folder layout para una nueva detail feature
 
 ```

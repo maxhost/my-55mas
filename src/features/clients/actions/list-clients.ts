@@ -31,6 +31,9 @@ export async function listClients({
       .select(
         'id, user_id, company_name, status, created_at, profiles!inner(full_name, preferred_country, preferred_city)'
       )
+      // Soft-deleted clients are hidden from the listing; the row stays in
+      // the DB so historical orders/payments keep their FK targets.
+      .is('deleted_at', null)
       .order('created_at', { ascending: false })
       .range(from, from + PAGE_SIZE - 1);
 

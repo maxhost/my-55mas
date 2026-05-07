@@ -93,7 +93,7 @@ export function PaymentsTab({
               {currencyFormatter.format(initialStats.pendiente)}
             </span>
             <span className="text-muted-foreground ml-1">
-              {hints.pendingOrdersSuffix.replace('{count}', String(initialStats.pendingOrders))}
+              {hints.pendingOrdersSuffix.replace('[count]', String(initialStats.pendingOrders))}
             </span>
           </div>
         </div>

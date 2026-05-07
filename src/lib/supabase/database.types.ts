@@ -55,6 +55,111 @@ export type Database = {
           },
         ]
       }
+      client_payment_items: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          order_id: string
+          payment_id: string
+          total: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_id: string
+          payment_id: string
+          total: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_id?: string
+          payment_id?: string
+          total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_payment_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_payment_items_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "client_payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_payments: {
+        Row: {
+          client_id: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          id: string
+          notes: string | null
+          paid_at: string | null
+          payment_method: string | null
+          payment_proof_url: string | null
+          period_month: string
+          status: string
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          currency: string
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_proof_url?: string | null
+          period_month: string
+          status?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_proof_url?: string | null
+          period_month?: string
+          status?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_payments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_payments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_profiles: {
         Row: {
           billing_address: string | null
@@ -63,6 +168,8 @@ export type Database = {
           company_name: string | null
           company_tax_id: string | null
           created_at: string | null
+          deleted_at: string | null
+          fiscal_id_type_id: string | null
           id: string
           is_business: boolean
           legacy_id: number | null
@@ -78,6 +185,8 @@ export type Database = {
           company_name?: string | null
           company_tax_id?: string | null
           created_at?: string | null
+          deleted_at?: string | null
+          fiscal_id_type_id?: string | null
           id?: string
           is_business?: boolean
           legacy_id?: number | null
@@ -93,6 +202,8 @@ export type Database = {
           company_name?: string | null
           company_tax_id?: string | null
           created_at?: string | null
+          deleted_at?: string | null
+          fiscal_id_type_id?: string | null
           id?: string
           is_business?: boolean
           legacy_id?: number | null
@@ -102,6 +213,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "client_profiles_fiscal_id_type_id_fkey"
+            columns: ["fiscal_id_type_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_id_types"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "client_profiles_user_id_fkey"
             columns: ["user_id"]
@@ -329,6 +447,249 @@ export type Database = {
         }
         Relationships: []
       }
+      order_billing_lines: {
+        Row: {
+          client_payment_id: string | null
+          created_at: string
+          description: string
+          discount_pct: number
+          id: string
+          order_id: string
+          qty: number
+          scope: string
+          talent_id: string | null
+          talent_payment_id: string | null
+          total: number
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          client_payment_id?: string | null
+          created_at?: string
+          description: string
+          discount_pct?: number
+          id?: string
+          order_id: string
+          qty: number
+          scope: string
+          talent_id?: string | null
+          talent_payment_id?: string | null
+          total: number
+          unit_price: number
+          updated_at?: string
+        }
+        Update: {
+          client_payment_id?: string | null
+          created_at?: string
+          description?: string
+          discount_pct?: number
+          id?: string
+          order_id?: string
+          qty?: number
+          scope?: string
+          talent_id?: string | null
+          talent_payment_id?: string | null
+          total?: number
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_billing_lines_client_payment_id_fkey"
+            columns: ["client_payment_id"]
+            isOneToOne: false
+            referencedRelation: "client_payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_billing_lines_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_billing_lines_talent_id_fkey"
+            columns: ["talent_id"]
+            isOneToOne: false
+            referencedRelation: "talent_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_billing_lines_talent_payment_id_fkey"
+            columns: ["talent_payment_id"]
+            isOneToOne: false
+            referencedRelation: "talent_payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_hours_logs: {
+        Row: {
+          confirmed_at: string | null
+          confirmed_by: string | null
+          confirmed_qty: number | null
+          created_at: string
+          description: string | null
+          id: string
+          kind: string
+          order_id: string
+          reported_by: string | null
+          reported_qty: number
+          talent_id: string | null
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          confirmed_qty?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          kind: string
+          order_id: string
+          reported_by?: string | null
+          reported_qty?: number
+          talent_id?: string | null
+          unit_price?: number
+          updated_at?: string
+        }
+        Update: {
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          confirmed_qty?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          kind?: string
+          order_id?: string
+          reported_by?: string | null
+          reported_qty?: number
+          talent_id?: string | null
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_hours_logs_confirmed_by_fkey"
+            columns: ["confirmed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_hours_logs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_hours_logs_reported_by_fkey"
+            columns: ["reported_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_hours_logs_talent_id_fkey"
+            columns: ["talent_id"]
+            isOneToOne: false
+            referencedRelation: "talent_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_notes: {
+        Row: {
+          author_id: string | null
+          body: string
+          created_at: string
+          id: string
+          is_system: boolean
+          order_id: string
+        }
+        Insert: {
+          author_id?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          is_system?: boolean
+          order_id: string
+        }
+        Update: {
+          author_id?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          is_system?: boolean
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_notes_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_notes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_recurrence: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          hours_per_session: number | null
+          order_id: string
+          repeat_every: number
+          start_date: string | null
+          time_window_end: string | null
+          time_window_start: string | null
+          updated_at: string
+          weekdays: number[]
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          hours_per_session?: number | null
+          order_id: string
+          repeat_every?: number
+          start_date?: string | null
+          time_window_end?: string | null
+          time_window_start?: string | null
+          updated_at?: string
+          weekdays?: number[]
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          hours_per_session?: number | null
+          order_id?: string
+          repeat_every?: number
+          start_date?: string | null
+          time_window_end?: string | null
+          time_window_start?: string | null
+          updated_at?: string
+          weekdays?: number[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_recurrence_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_schedules: {
         Row: {
           created_at: string
@@ -517,6 +878,125 @@ export type Database = {
           },
         ]
       }
+      order_tag_assignments: {
+        Row: {
+          assigned_by: string | null
+          created_at: string
+          order_id: string
+          tag_id: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          created_at?: string
+          order_id: string
+          tag_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          created_at?: string
+          order_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_tag_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_tag_assignments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_tag_assignments_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "order_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_tags: {
+        Row: {
+          created_at: string
+          i18n: Json
+          id: string
+          is_active: boolean
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          i18n?: Json
+          id?: string
+          is_active?: boolean
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          i18n?: Json
+          id?: string
+          is_active?: boolean
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      order_talents: {
+        Row: {
+          assigned_by: string | null
+          created_at: string
+          is_primary: boolean
+          order_id: string
+          talent_id: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          created_at?: string
+          is_primary?: boolean
+          order_id: string
+          talent_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          created_at?: string
+          is_primary?: boolean
+          order_id?: string
+          talent_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_talents_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_talents_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_talents_talent_id_fkey"
+            columns: ["talent_id"]
+            isOneToOne: false
+            referencedRelation: "talent_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           appointment_date: string | null
@@ -536,6 +1016,7 @@ export type Database = {
           notes: string | null
           order_number: number
           payment_status: string | null
+          preferred_language: string | null
           price_subtotal: number
           price_tax: number
           price_tax_rate: number
@@ -554,6 +1035,7 @@ export type Database = {
           stripe_id: string | null
           talent_amount: number | null
           talent_id: string | null
+          talents_needed: number
           unit_price: number | null
           updated_at: string | null
         }
@@ -575,6 +1057,7 @@ export type Database = {
           notes?: string | null
           order_number?: number
           payment_status?: string | null
+          preferred_language?: string | null
           price_subtotal: number
           price_tax?: number
           price_tax_rate?: number
@@ -593,6 +1076,7 @@ export type Database = {
           stripe_id?: string | null
           talent_amount?: number | null
           talent_id?: string | null
+          talents_needed?: number
           unit_price?: number | null
           updated_at?: string | null
         }
@@ -614,6 +1098,7 @@ export type Database = {
           notes?: string | null
           order_number?: number
           payment_status?: string | null
+          preferred_language?: string | null
           price_subtotal?: number
           price_tax?: number
           price_tax_rate?: number
@@ -632,6 +1117,7 @@ export type Database = {
           stripe_id?: string | null
           talent_amount?: number | null
           talent_id?: string | null
+          talents_needed?: number
           unit_price?: number | null
           updated_at?: string | null
         }
@@ -1920,6 +2406,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_client: {
+        Args: { p_client_id: string }
+        Returns: {
+          client_id: string
+          user_id: string
+        }[]
+      }
       delete_service: { Args: { p_service_id: string }; Returns: undefined }
       save_service_config: {
         Args: {

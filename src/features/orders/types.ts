@@ -1,15 +1,31 @@
 // ── Order Status ────────────────────────────────────
 
 export const ORDER_STATUSES = [
-  'nuevo',
-  'buscando_talento',
+  'pendiente',
   'asignado',
-  'en_curso',
+  'confirmado',
   'completado',
+  'pendiente_de_pago',
+  'terminado',
+  'rechazado',
+  'archivado',
   'cancelado',
 ] as const;
 
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+export const ORDER_SCHEDULE_TYPES = [
+  'once',
+  'daily',
+  'weekly',
+  'biweekly',
+  'monthly',
+  'quarterly',
+  'semiannual',
+  'annual',
+] as const;
+
+export type OrderScheduleType = (typeof ORDER_SCHEDULE_TYPES)[number];
 
 // ── Order List Item ────────────────────────────────
 

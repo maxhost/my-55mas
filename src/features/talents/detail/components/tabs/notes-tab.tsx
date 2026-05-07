@@ -32,15 +32,15 @@ function formatRelative(value: string, hints: NotesTabHints, locale: string): st
   if (deltaSec < MINUTE) return hints.relativeJustNow;
   if (deltaSec < HOUR) {
     const count = Math.floor(deltaSec / MINUTE);
-    return hints.relativeMinutes.replace('{count}', String(count));
+    return hints.relativeMinutes.replace('[count]', String(count));
   }
   if (deltaSec < DAY) {
     const count = Math.floor(deltaSec / HOUR);
-    return hints.relativeHours.replace('{count}', String(count));
+    return hints.relativeHours.replace('[count]', String(count));
   }
   if (deltaSec < WEEK) {
     const count = Math.floor(deltaSec / DAY);
-    return hints.relativeDays.replace('{count}', String(count));
+    return hints.relativeDays.replace('[count]', String(count));
   }
   try {
     return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(new Date(ts));

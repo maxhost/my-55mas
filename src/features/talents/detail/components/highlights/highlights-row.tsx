@@ -6,7 +6,10 @@ type Props = {
 };
 
 function formatReviewsCount(template: string, count: number): string {
-  return template.replace('{count}', String(count));
+  // The i18n string uses `[count]` (not `{count}`) as placeholder so that
+  // next-intl / ICU MessageFormat does not parse it as an unfilled variable
+  // and fail to render. We substitute manually here.
+  return template.replace('[count]', String(count));
 }
 
 export function HighlightsRow({ stats, hints }: Props) {

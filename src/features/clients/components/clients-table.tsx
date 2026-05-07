@@ -1,6 +1,7 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/badge';
 import {
   Table,
@@ -23,6 +24,7 @@ const statusVariant: Record<ClientStatus, 'default' | 'outline'> = {
 
 export function ClientsTable({ clients }: Props) {
   const t = useTranslations('AdminClients');
+  const locale = useLocale();
 
   if (clients.length === 0) {
     return (
@@ -47,7 +49,12 @@ export function ClientsTable({ clients }: Props) {
         {clients.map((client) => (
           <TableRow key={client.id}>
             <TableCell className="font-medium">
-              {client.full_name ?? '—'}
+              <Link
+                href={`/${locale}/admin/clients/${client.id}`}
+                className="text-foreground hover:text-primary hover:underline"
+              >
+                {client.full_name ?? '—'}
+              </Link>
             </TableCell>
             <TableCell className="text-muted-foreground">
               {client.country_name ?? '—'}

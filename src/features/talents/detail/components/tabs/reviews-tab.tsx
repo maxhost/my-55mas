@@ -23,7 +23,7 @@ function formatRating(
   if (ratingCount === 0) {
     return `★ ${EMPTY_PLACEHOLDER}`;
   }
-  const countLabel = reviewsCountTemplate.replace('{count}', String(ratingCount));
+  const countLabel = reviewsCountTemplate.replace('[count]', String(ratingCount));
   return `★ ${ratingAvg.toFixed(1)} ${countLabel}`;
 }
 

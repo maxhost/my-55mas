@@ -1,6 +1,7 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/badge';
 import {
   Table,
@@ -17,11 +18,14 @@ type Props = {
 };
 
 const statusVariant: Record<OrderStatus, 'default' | 'secondary' | 'outline' | 'destructive'> = {
-  nuevo: 'secondary',
-  buscando_talento: 'secondary',
+  pendiente: 'secondary',
   asignado: 'default',
-  en_curso: 'default',
-  completado: 'outline',
+  confirmado: 'default',
+  completado: 'default',
+  pendiente_de_pago: 'secondary',
+  terminado: 'outline',
+  rechazado: 'destructive',
+  archivado: 'outline',
   cancelado: 'destructive',
 };
 
@@ -34,6 +38,7 @@ function formatDate(iso: string | null, locale: string): string {
 
 export function OrdersTable({ orders }: Props) {
   const t = useTranslations('AdminOrders');
+  const locale = useLocale();
 
   if (orders.length === 0) {
     return (
@@ -60,7 +65,14 @@ export function OrdersTable({ orders }: Props) {
       <TableBody>
         {orders.map((order) => (
           <TableRow key={order.id}>
-            <TableCell className="font-mono text-sm">{order.order_number}</TableCell>
+            <TableCell className="font-mono text-sm">
+              <Link
+                href={`/${locale}/admin/orders/${order.id}`}
+                className="text-foreground hover:text-primary hover:underline"
+              >
+                #{order.order_number}
+              </Link>
+            </TableCell>
             <TableCell>{order.service_name ?? '—'}</TableCell>
             <TableCell className="font-medium">{order.client_name ?? '—'}</TableCell>
             <TableCell className="text-muted-foreground">
