@@ -20,9 +20,15 @@ export async function getOrderTalents(orderId: string): Promise<AssignedTalent[]
     .maybeSingle();
   if (!order) return [];
 
+  // FK hint required: talent_profiles → profiles has 3 candidate FKs
+  // (approved_by, created_by, user_id) so supabase-js can't auto-pick one.
+  // Without `!talent_profiles_user_id_fkey` PostgREST returns an empty
+  // embed and the page shows no assigned talents.
   const { data: assigned } = await supabase
     .from('order_talents')
-    .select('talent_id, is_primary, talent_profiles(id, user_id, profiles(id, full_name, email, phone))')
+    .select(
+      'talent_id, is_primary, talent_profiles(id, user_id, profiles!talent_profiles_user_id_fkey(id, full_name, email, phone))',
+    )
     .eq('order_id', orderId);
   if (!assigned || assigned.length === 0) return [];
 

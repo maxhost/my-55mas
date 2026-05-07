@@ -31,7 +31,12 @@ export async function getOrderBilling(orderId: string): Promise<BillingTabData> 
       .order('created_at', { ascending: true }),
     supabase
       .from('order_talents')
-      .select('talent_id, talent_profiles(id, profiles(id, full_name))')
+      // FK hint required: talent_profiles → profiles has 3 candidate FKs
+      // (approved_by, created_by, user_id). Without the hint the embed
+      // resolves to empty and talent names disappear.
+      .select(
+        'talent_id, talent_profiles(id, profiles!talent_profiles_user_id_fkey(id, full_name))',
+      )
       .eq('order_id', orderId),
   ]);
 
@@ -62,7 +67,7 @@ export async function getOrderBilling(orderId: string): Promise<BillingTabData> 
   if (missingNames.length > 0) {
     const { data: tps } = await supabase
       .from('talent_profiles')
-      .select('id, profiles(id, full_name)')
+      .select('id, profiles!talent_profiles_user_id_fkey(id, full_name)')
       .in('id', missingNames);
     for (const tp of (tps ?? []) as unknown as Array<{
       id: string;
