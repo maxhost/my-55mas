@@ -116,10 +116,14 @@ export type ServiceTabData = {
   notesData: NotesValues;
 };
 
+// Geo refs (used by service tab context + talent search filters).
+export type CountryRef = { id: string; code: string; name: string };
+export type CityRef = { id: string; country_id: string; name: string };
+
 export type ServiceTabContext = {
   spokenLanguages: { code: string; name: string }[];
-  countries: { id: string; code: string; name: string }[];
-  cities: { id: string; country_id: string; name: string }[];
+  countries: CountryRef[];
+  cities: CityRef[];
 };
 
 // ── Tab Especialistas ───────────────────────────────────────
@@ -143,6 +147,7 @@ export type TalentSearchResult = {
   email: string | null;
   phone: string | null;
   rating_avg: number | null;
+  rating_count: number;
   completed_count: number;
   /**
    * True when the talent has a `talent_services` row for the order's
@@ -151,7 +156,50 @@ export type TalentSearchResult = {
    * non-qualified talents, but qualified ones rank first.
    */
   is_qualified: boolean;
+  // Geo + service inventory (for accordion detail + filters):
+  country_id: string | null;
+  country_name: string | null;
+  city_id: string | null;
+  city_name: string | null;
+  postal_code: string | null;
+  registered_services_count: number;
 };
+
+export type TalentSearchFilters = {
+  countryId: string | null;
+  cityId: string | null;
+  postalCode: string;        // empty string = no filter
+  serviceId: string | null;
+  query: string;             // empty string = no filter
+};
+
+export type TalentSearchFiltersHints = {
+  searchPlaceholder: string;
+  filtersLabel: string;
+  filterCountry: string;
+  filterCity: string;
+  filterPostalCode: string;
+  filterService: string;
+  postalCodePlaceholder: string;
+  clearFilters: string;
+  notProvided: string;
+};
+
+export type TalentSearchRowHints = {
+  selectButton: string;
+  qualifiedBadge: string;
+  reviewsCount: string;       // duplicated from SpecialistsTabHints.reviewsCount for component independence
+  servicesCount: string;
+  expandLabel: string;
+  collapseLabel: string;
+  detailCountryLabel: string;
+  detailCityLabel: string;
+  detailPostalCodeLabel: string;
+  detailRegisteredServicesLabel: string;
+  notProvided: string;
+};
+
+export type ServiceOption = { id: string; name: string };
 
 // ── Tab Horas ───────────────────────────────────────────────
 
@@ -329,19 +377,24 @@ export type SpecialistsTabHints = {
   empty: string;
   noStaffAssigned: string;
   addTalentButton: string;
-  // Modal
+  // Modal-level:
   modalTitle: string;
   modalSearchPlaceholder: string;
   modalEmpty: string;
   modalCancel: string;
-  // Validation
+  loading: string;
+  // Validation:
   maxReachedToast: string;     // "Sólo se pueden seleccionar [count] talentos"
   selectSuccess: string;
   selectError: string;
   removeSuccess: string;
   removeError: string;
+  // Shared strings used by both the assigned-talents table and the search row:
   reviewsCount: string;        // "([count] reviews)"
   qualifiedBadge: string;      // shown next to talents with talent_services for this order's service+country
+  // Sub-hints injected into child components:
+  filters: TalentSearchFiltersHints;
+  row: TalentSearchRowHints;
 };
 
 export type HoursTabHints = {

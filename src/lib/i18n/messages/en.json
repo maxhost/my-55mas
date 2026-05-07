@@ -998,7 +998,32 @@
       "removeSuccess": "Talent removed",
       "removeError": "Could not remove the talent",
       "reviewsCount": "([count] reviews)",
-      "qualifiedBadge": "Qualified"
+      "qualifiedBadge": "Qualified",
+      "loading": "Loading talents…",
+      "filters": {
+        "searchPlaceholder": "Search by name…",
+        "filtersLabel": "Filters",
+        "filterCountry": "Country",
+        "filterCity": "City",
+        "filterPostalCode": "Postal code",
+        "filterService": "Service",
+        "postalCodePlaceholder": "e.g. 08036",
+        "clearFilters": "Clear filters",
+        "notProvided": "Any"
+      },
+      "row": {
+        "selectButton": "Select",
+        "qualifiedBadge": "Qualified",
+        "reviewsCount": "([count] reviews)",
+        "servicesCount": "[count] services",
+        "expandLabel": "Expand",
+        "collapseLabel": "Collapse",
+        "detailCountryLabel": "Country",
+        "detailCityLabel": "City",
+        "detailPostalCodeLabel": "Postal code",
+        "detailRegisteredServicesLabel": "Registered services",
+        "notProvided": "—"
+      }
     },
     "hours": {
       "totalHoursLabel": "Total hours",

@@ -998,7 +998,32 @@
       "removeSuccess": "Talent retirat",
       "removeError": "No s'ha pogut retirar el talent",
       "reviewsCount": "([count] ressenyes)",
-      "qualifiedBadge": "Qualificat"
+      "qualifiedBadge": "Qualificat",
+      "loading": "Carregant talents…",
+      "filters": {
+        "searchPlaceholder": "Cercar per nom…",
+        "filtersLabel": "Filtres",
+        "filterCountry": "País",
+        "filterCity": "Ciutat",
+        "filterPostalCode": "Codi postal",
+        "filterService": "Servei",
+        "postalCodePlaceholder": "Ex.: 08036",
+        "clearFilters": "Netejar filtres",
+        "notProvided": "Qualsevol"
+      },
+      "row": {
+        "selectButton": "Seleccionar",
+        "qualifiedBadge": "Qualificat",
+        "reviewsCount": "([count] ressenyes)",
+        "servicesCount": "[count] serveis",
+        "expandLabel": "Expandir",
+        "collapseLabel": "Col·lapsar",
+        "detailCountryLabel": "País",
+        "detailCityLabel": "Ciutat",
+        "detailPostalCodeLabel": "Codi postal",
+        "detailRegisteredServicesLabel": "Serveis registrats",
+        "notProvided": "—"
+      }
     },
     "hours": {
       "totalHoursLabel": "Total d'hores",

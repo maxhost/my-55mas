@@ -12,6 +12,7 @@ import {
   getOrderServiceData,
   getOrderTagOptions,
   getOrderTalents,
+  getTalentSearchContext,
   OrderDetailTabs,
 } from '@/features/orders/detail';
 import type {
@@ -47,6 +48,7 @@ export default async function AdminOrderDetailPage({ params: { locale, id } }: P
   const [
     serviceRes,
     assigned,
+    talentSearchContext,
     hoursData,
     billingData,
     documents,
@@ -55,6 +57,7 @@ export default async function AdminOrderDetailPage({ params: { locale, id } }: P
   ] = await Promise.all([
     getOrderServiceData(id, locale),
     getOrderTalents(id),
+    getTalentSearchContext(id, locale),
     getOrderHours(id),
     getOrderBilling(id),
     getOrderDocuments(id, locale),
@@ -94,6 +97,7 @@ export default async function AdminOrderDetailPage({ params: { locale, id } }: P
           initialServiceData={serviceRes.data}
           initialServiceContext={serviceRes.context}
           initialAssigned={assigned}
+          initialTalentSearchContext={talentSearchContext}
           initialHours={hoursData}
           initialBilling={billingData}
           initialDocuments={documents}
@@ -226,6 +230,31 @@ function readSpecialists(t: T) {
     removeError: t('specialists.removeError'),
     reviewsCount: t('specialists.reviewsCount'),
     qualifiedBadge: t('specialists.qualifiedBadge'),
+    loading: t('specialists.loading'),
+    filters: {
+      searchPlaceholder: t('specialists.filters.searchPlaceholder'),
+      filtersLabel: t('specialists.filters.filtersLabel'),
+      filterCountry: t('specialists.filters.filterCountry'),
+      filterCity: t('specialists.filters.filterCity'),
+      filterPostalCode: t('specialists.filters.filterPostalCode'),
+      filterService: t('specialists.filters.filterService'),
+      postalCodePlaceholder: t('specialists.filters.postalCodePlaceholder'),
+      clearFilters: t('specialists.filters.clearFilters'),
+      notProvided: t('specialists.filters.notProvided'),
+    },
+    row: {
+      selectButton: t('specialists.row.selectButton'),
+      qualifiedBadge: t('specialists.row.qualifiedBadge'),
+      reviewsCount: t('specialists.row.reviewsCount'),
+      servicesCount: t('specialists.row.servicesCount'),
+      expandLabel: t('specialists.row.expandLabel'),
+      collapseLabel: t('specialists.row.collapseLabel'),
+      detailCountryLabel: t('specialists.row.detailCountryLabel'),
+      detailCityLabel: t('specialists.row.detailCityLabel'),
+      detailPostalCodeLabel: t('specialists.row.detailPostalCodeLabel'),
+      detailRegisteredServicesLabel: t('specialists.row.detailRegisteredServicesLabel'),
+      notProvided: t('specialists.row.notProvided'),
+    },
   };
 }
 

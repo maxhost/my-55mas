@@ -32,6 +32,7 @@ import type {
   ServiceTabData,
   ServiceTabHints,
   SpecialistsTabHints,
+  TalentSearchContext,
 } from '@/features/orders/detail';
 
 type Props = {
@@ -40,6 +41,7 @@ type Props = {
   initialServiceData: ServiceTabData;
   initialServiceContext: ServiceTabContext;
   initialAssigned: AssignedTalent[];
+  initialTalentSearchContext: TalentSearchContext;
   initialHours: HoursTabData;
   initialBilling: BillingTabData;
   initialDocuments: OrderDocumentEntry[];
@@ -64,6 +66,7 @@ export function OrderDetailTabs(props: Props) {
     initialServiceData,
     initialServiceContext,
     initialAssigned,
+    initialTalentSearchContext,
     initialHours,
     initialBilling,
     initialDocuments,
@@ -131,8 +134,10 @@ export function OrderDetailTabs(props: Props) {
         <TabsContent value="specialists" className="pt-4">
           <SpecialistsTab
             orderId={order.id}
+            locale={locale}
             initialAssigned={initialAssigned}
             talentsNeeded={order.talents_needed}
+            searchContext={initialTalentSearchContext}
             hints={hints.specialists}
           />
         </TabsContent>

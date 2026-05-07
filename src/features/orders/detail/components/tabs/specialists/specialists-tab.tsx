@@ -12,6 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { removeOrderTalent } from '@/features/orders/detail/actions/remove-order-talent';
+import type { TalentSearchContext } from '@/features/orders/detail/actions/get-talent-search-context';
 import type {
   AssignedTalent,
   SpecialistsTabHints,
@@ -20,8 +21,10 @@ import { SearchTalentModal } from './search-talent-modal';
 
 type Props = {
   orderId: string;
+  locale: string;
   initialAssigned: AssignedTalent[];
   talentsNeeded: number;
+  searchContext: TalentSearchContext;
   hints: SpecialistsTabHints;
 };
 
@@ -38,8 +41,10 @@ function formatRating(
 
 export function SpecialistsTab({
   orderId,
+  locale,
   initialAssigned,
   talentsNeeded,
+  searchContext,
   hints,
 }: Props) {
   const [assigned, setAssigned] = useState<AssignedTalent[]>(initialAssigned);
@@ -132,6 +137,8 @@ export function SpecialistsTab({
         open={modalOpen}
         onOpenChange={setModalOpen}
         orderId={orderId}
+        locale={locale}
+        context={searchContext}
         currentAssignedCount={assigned.length}
         talentsNeeded={talentsNeeded}
         onTalentAdded={handleAdded}

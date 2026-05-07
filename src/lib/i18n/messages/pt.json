@@ -998,7 +998,32 @@
       "removeSuccess": "Talento removido",
       "removeError": "Não foi possível remover o talento",
       "reviewsCount": "([count] avaliações)",
-      "qualifiedBadge": "Qualificado"
+      "qualifiedBadge": "Qualificado",
+      "loading": "A carregar talentos…",
+      "filters": {
+        "searchPlaceholder": "Pesquisar por nome…",
+        "filtersLabel": "Filtros",
+        "filterCountry": "País",
+        "filterCity": "Cidade",
+        "filterPostalCode": "Código postal",
+        "filterService": "Serviço",
+        "postalCodePlaceholder": "Ex.: 1200-432",
+        "clearFilters": "Limpar filtros",
+        "notProvided": "Qualquer"
+      },
+      "row": {
+        "selectButton": "Selecionar",
+        "qualifiedBadge": "Qualificado",
+        "reviewsCount": "([count] avaliações)",
+        "servicesCount": "[count] serviços",
+        "expandLabel": "Expandir",
+        "collapseLabel": "Colapsar",
+        "detailCountryLabel": "País",
+        "detailCityLabel": "Cidade",
+        "detailPostalCodeLabel": "Código postal",
+        "detailRegisteredServicesLabel": "Serviços registados",
+        "notProvided": "—"
+      }
     },
     "hours": {
       "totalHoursLabel": "Total de horas",
