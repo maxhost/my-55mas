@@ -17,6 +17,7 @@ type Props = {
   data: HoursTabData;
   hints: HoursTabHints;
   locale: string;
+  readOnly?: boolean;
 };
 
 function newOtherId(): string {
@@ -45,7 +46,13 @@ function emptyOtherLog(): HoursLogEntry {
   };
 }
 
-export function HoursTab({ orderId, data, hints, locale: _locale }: Props) {
+export function HoursTab({
+  orderId,
+  data,
+  hints,
+  locale: _locale,
+  readOnly = false,
+}: Props) {
   const [totalHoursLog, setTotalHoursLog] = useState<HoursLogEntry>(
     data.totalHoursLog,
   );
@@ -101,6 +108,7 @@ export function HoursTab({ orderId, data, hints, locale: _locale }: Props) {
         log={totalHoursLog}
         onChange={setTotalHoursLog}
         reportedSummary={buildReportedSummary(hints.reportedQtyLabel, totalHoursLog)}
+        readOnly={readOnly}
       />
 
       <Separator />
@@ -115,6 +123,7 @@ export function HoursTab({ orderId, data, hints, locale: _locale }: Props) {
           hints.reportedQtyLabel,
           totalKilometersLog,
         )}
+        readOnly={readOnly}
       />
 
       <Separator />
@@ -132,20 +141,25 @@ export function HoursTab({ orderId, data, hints, locale: _locale }: Props) {
           onRemove={() => removeOther(entry.id)}
           removeLabel={hints.removeOtherButton}
           reportedSummary={buildReportedSummary(hints.reportedQtyLabel, entry)}
+          readOnly={readOnly}
         />
       ))}
 
-      <div>
-        <Button type="button" variant="outline" size="sm" onClick={addOther}>
-          {hints.addOtherButton}
-        </Button>
-      </div>
+      {!readOnly && (
+        <div>
+          <Button type="button" variant="outline" size="sm" onClick={addOther}>
+            {hints.addOtherButton}
+          </Button>
+        </div>
+      )}
 
-      <div className="flex justify-end">
-        <Button type="button" onClick={handleSave} disabled={isSaving}>
-          {hints.saveLabel}
-        </Button>
-      </div>
+      {!readOnly && (
+        <div className="flex justify-end">
+          <Button type="button" onClick={handleSave} disabled={isSaving}>
+            {hints.saveLabel}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

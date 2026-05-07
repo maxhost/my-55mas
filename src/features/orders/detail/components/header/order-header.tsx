@@ -21,6 +21,7 @@ type Props = {
   onStatusChanged: () => void;
   onTagsChanged: () => void;
   onCancelled: () => void;
+  readOnly?: boolean;
 };
 
 function formatDuration(minutes: number | null): string | null {
@@ -88,6 +89,7 @@ export function OrderHeader({
   onStatusChanged,
   onTagsChanged,
   onCancelled,
+  readOnly = false,
 }: Props) {
   const [cancelOpen, setCancelOpen] = useState(false);
 
@@ -111,14 +113,16 @@ export function OrderHeader({
             <span>{order.service_name ?? '—'}</span>
           </h1>
         </div>
-        <div className="flex shrink-0 items-start">
-          <Button
-            variant="destructive"
-            onClick={() => setCancelOpen(true)}
-          >
-            {hints.cancelOrderButton}
-          </Button>
-        </div>
+        {!readOnly && (
+          <div className="flex shrink-0 items-start">
+            <Button
+              variant="destructive"
+              onClick={() => setCancelOpen(true)}
+            >
+              {hints.cancelOrderButton}
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
@@ -165,13 +169,23 @@ export function OrderHeader({
         </MetaItem>
       </div>
 
-      <OrderTagsDisplay
-        orderId={order.id}
-        assignedTags={order.tags}
-        availableTags={availableTags}
-        hints={hints}
-        onTagsChanged={onTagsChanged}
-      />
+      {readOnly ? (
+        <div className="flex flex-wrap items-center gap-2">
+          {order.tags.map((tag) => (
+            <Badge key={tag.id} variant="outline">
+              {tag.name}
+            </Badge>
+          ))}
+        </div>
+      ) : (
+        <OrderTagsDisplay
+          orderId={order.id}
+          assignedTags={order.tags}
+          availableTags={availableTags}
+          hints={hints}
+          onTagsChanged={onTagsChanged}
+        />
+      )}
 
       <ClientSummary client={order.client} hints={hints} />
 

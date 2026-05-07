@@ -1099,5 +1099,11 @@
       "relativeHours": "[count]h ago",
       "relativeDays": "[count]d ago"
     }
+  },
+  "AdminArchive": {
+    "title": "Archive",
+    "description": "Orders archived, closed, cancelled, or rejected.",
+    "noArchive": "No archived orders.",
+    "backToList": "Back to archive"
   }
 }

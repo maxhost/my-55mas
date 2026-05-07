@@ -1,2 +1,15 @@
-export type { OrderListItem, OrderStatus, OrderScheduleType, CountryOption, CityOption, PersonOption } from './types';
-export { ORDER_STATUSES, ORDER_SCHEDULE_TYPES } from './types';
+export type {
+  ArchiveStatus,
+  CityOption,
+  CountryOption,
+  OrderListItem,
+  OrderScheduleType,
+  OrderStatus,
+  PersonOption,
+} from './types';
+export {
+  ARCHIVE_STATUSES,
+  ORDER_SCHEDULE_TYPES,
+  ORDER_STATUSES,
+  isArchiveStatus,
+} from './types';

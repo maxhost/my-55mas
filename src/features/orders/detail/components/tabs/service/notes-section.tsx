@@ -23,6 +23,7 @@ type Props = {
   onToggle: () => void;
   onSaved: () => void;
   onDirtyChange: (dirty: boolean) => void;
+  readOnly?: boolean;
 };
 
 export function NotesSection({
@@ -33,6 +34,7 @@ export function NotesSection({
   onToggle,
   onSaved,
   onDirtyChange,
+  readOnly = false,
 }: Props) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<NotesValues>(data);
@@ -137,6 +139,7 @@ export function NotesSection({
       }}
       onSave={handleSave}
       saving={isPending}
+      readOnly={readOnly}
       sectionHints={hints.section}
       previewText={previewText}
       readMode={readMode}

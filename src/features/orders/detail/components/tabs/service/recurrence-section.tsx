@@ -22,6 +22,7 @@ type Props = {
   onToggle: () => void;
   onSaved: () => void;
   onDirtyChange: (dirty: boolean) => void;
+  readOnly?: boolean;
 };
 
 function buildSummary(form: RecurrenceValues, hints: ServiceTabHints): string {
@@ -34,7 +35,7 @@ function buildSummary(form: RecurrenceValues, hints: ServiceTabHints): string {
   return `${typeLabel} · ${hints.repeatEveryLabel}: ${form.repeat_every} · ${hints.weekdaysLabel}: ${days} · ${start} → ${end}`;
 }
 
-export function RecurrenceSection({ orderId, data, hints, open, onToggle, onSaved, onDirtyChange }: Props) {
+export function RecurrenceSection({ orderId, data, hints, open, onToggle, onSaved, onDirtyChange, readOnly = false }: Props) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<RecurrenceValues>(data);
   const [isPending, startTransition] = useTransition();
@@ -187,6 +188,7 @@ export function RecurrenceSection({ orderId, data, hints, open, onToggle, onSave
       onStartEdit={() => { setForm(data); setEditing(true); }}
       onCancelEdit={() => { setForm(data); setEditing(false); onDirtyChange(false); }}
       onSave={handleSave} saving={isPending}
+      readOnly={readOnly}
       sectionHints={hints.section} previewText={previewText}
       readMode={readMode} editMode={editMode}
     />

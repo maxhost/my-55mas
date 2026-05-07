@@ -17,6 +17,7 @@ type Props = {
   initialData: BillingTabData;
   hints: BillingTabHints;
   locale: string;
+  readOnly?: boolean;
 };
 
 type AddingLineFor =
@@ -43,7 +44,7 @@ function round(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-export function BillingTab({ orderId, initialData, hints, locale }: Props) {
+export function BillingTab({ orderId, initialData, hints, locale, readOnly = false }: Props) {
   const [data, setData] = useState<BillingTabData>(initialData);
   const [addingLineFor, setAddingLineFor] = useState<AddingLineFor>(null);
 
@@ -93,6 +94,7 @@ export function BillingTab({ orderId, initialData, hints, locale }: Props) {
         locale={locale}
         onAddLineRequested={() => setAddingLineFor({ scope: 'client', talentId: null })}
         onInvoiced={handleClientInvoiced}
+        readOnly={readOnly}
       />
 
       {data.talentBlocks.length === 0 ? (
@@ -112,6 +114,7 @@ export function BillingTab({ orderId, initialData, hints, locale }: Props) {
               setAddingLineFor({ scope: 'talent', talentId: block.talent_id })
             }
             onInvoiced={() => handleTalentInvoiced(block.talent_id)}
+            readOnly={readOnly}
           />
         ))
       )}

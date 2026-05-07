@@ -26,6 +26,7 @@ type Props = {
   locale: string;
   onAddLineRequested: () => void;
   onInvoiced: () => void;
+  readOnly?: boolean;
 };
 
 function formatCurrency(value: number, locale: string, currency: string): string {
@@ -46,6 +47,7 @@ export function TalentBillingSection({
   locale,
   onAddLineRequested,
   onInvoiced,
+  readOnly = false,
 }: Props) {
   const [pending, startTransition] = useTransition();
 
@@ -119,16 +121,18 @@ export function TalentBillingSection({
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <Button
-            variant="link"
-            size="sm"
-            onClick={onAddLineRequested}
-            disabled={block.invoiced}
-            className="px-0 text-primary"
-          >
-            <Plus />
-            {hints.addLineButton}
-          </Button>
+          {!readOnly && (
+            <Button
+              variant="link"
+              size="sm"
+              onClick={onAddLineRequested}
+              disabled={block.invoiced}
+              className="px-0 text-primary"
+            >
+              <Plus />
+              {hints.addLineButton}
+            </Button>
+          )}
         </div>
         <div className="flex min-w-[220px] flex-col gap-1 text-sm">
           <div className="flex items-center justify-between gap-4">
@@ -142,17 +146,19 @@ export function TalentBillingSection({
         </div>
       </div>
 
-      <div className="flex justify-end">
-        {block.invoiced ? null : (
-          <Button
-            variant="default"
-            onClick={handleInvoice}
-            disabled={pending || block.lines.length === 0}
-          >
-            {hints.invoiceButton}
-          </Button>
-        )}
-      </div>
+      {!readOnly && (
+        <div className="flex justify-end">
+          {block.invoiced ? null : (
+            <Button
+              variant="default"
+              onClick={handleInvoice}
+              disabled={pending || block.lines.length === 0}
+            >
+              {hints.invoiceButton}
+            </Button>
+          )}
+        </div>
+      )}
     </section>
   );
 }

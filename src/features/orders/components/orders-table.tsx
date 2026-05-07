@@ -15,7 +15,11 @@ import type { OrderListItem, OrderStatus } from '../types';
 
 type Props = {
   orders: OrderListItem[];
+  /** URL prefix for the `#order_number` link. Default `/admin/orders/`. */
+  linkBasePath?: string;
 };
+
+const DEFAULT_LINK_BASE = '/admin/orders/';
 
 const statusVariant: Record<OrderStatus, 'default' | 'secondary' | 'outline' | 'destructive'> = {
   pendiente: 'secondary',
@@ -36,9 +40,10 @@ function formatDate(iso: string | null, locale: string): string {
   return d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-export function OrdersTable({ orders }: Props) {
+export function OrdersTable({ orders, linkBasePath }: Props) {
   const t = useTranslations('AdminOrders');
   const locale = useLocale();
+  const linkBase = linkBasePath ?? DEFAULT_LINK_BASE;
 
   if (orders.length === 0) {
     return (
@@ -67,7 +72,7 @@ export function OrdersTable({ orders }: Props) {
           <TableRow key={order.id}>
             <TableCell className="font-mono text-sm">
               <Link
-                href={`/${locale}/admin/orders/${order.id}`}
+                href={`/${locale}${linkBase}${order.id}`}
                 className="text-foreground hover:text-primary hover:underline"
               >
                 #{order.order_number}

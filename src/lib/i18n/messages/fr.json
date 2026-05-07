@@ -1099,5 +1099,11 @@
       "relativeHours": "il y a [count] h",
       "relativeDays": "il y a [count] j"
     }
+  },
+  "AdminArchive": {
+    "title": "Archives",
+    "description": "Commandes archivées, clôturées, annulées ou rejetées.",
+    "noArchive": "Aucune commande aux archives.",
+    "backToList": "Retour aux archives"
   }
 }

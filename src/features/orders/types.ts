@@ -14,6 +14,24 @@ export const ORDER_STATUSES = [
 
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
 
+/**
+ * Statuses considered "archived". The `/admin/archive` listing scopes
+ * results to this set, and the archive detail renders read-only while the
+ * order is in any of these.
+ */
+export const ARCHIVE_STATUSES = [
+  'archivado',
+  'terminado',
+  'cancelado',
+  'rechazado',
+] as const satisfies readonly OrderStatus[];
+
+export type ArchiveStatus = (typeof ARCHIVE_STATUSES)[number];
+
+export function isArchiveStatus(status: OrderStatus): status is ArchiveStatus {
+  return (ARCHIVE_STATUSES as readonly OrderStatus[]).includes(status);
+}
+
 export const ORDER_SCHEDULE_TYPES = [
   'once',
   'daily',

@@ -25,6 +25,7 @@ type Props = {
   onToggle: () => void;
   onSaved: () => void;
   onDirtyChange: (dirty: boolean) => void;
+  readOnly?: boolean;
 };
 
 function formatAnswer(value: unknown): string | null {
@@ -52,6 +53,7 @@ export function ServiceAnswersSection({
   onToggle,
   onSaved,
   onDirtyChange,
+  readOnly = false,
 }: Props) {
   const [editing, setEditing] = useState(false);
   const [answers, setAnswers] = useState<AnswersMap>(data.answers);
@@ -156,6 +158,7 @@ export function ServiceAnswersSection({
       }}
       onSave={handleSave}
       saving={isPending}
+      readOnly={readOnly}
       sectionHints={hints.section}
       previewText={previewText}
       readMode={readMode}

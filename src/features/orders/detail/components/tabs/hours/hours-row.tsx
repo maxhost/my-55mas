@@ -17,6 +17,7 @@ type Props = {
   onRemove?: () => void;
   removeLabel?: string;
   reportedSummary: string;
+  readOnly?: boolean;
 };
 
 function parseNumber(raw: string): number {
@@ -42,6 +43,7 @@ export function HoursRow({
   onRemove,
   removeLabel,
   reportedSummary,
+  readOnly = false,
 }: Props) {
   const firstColumn = showDescription ? (
     <Input
@@ -51,6 +53,7 @@ export function HoursRow({
       onChange={(event) =>
         onChange({ ...log, description: event.target.value || null })
       }
+      readOnly={readOnly}
     />
   ) : (
     label
@@ -75,6 +78,7 @@ export function HoursRow({
               onChange({ ...log, unit_price: parseNumber(event.target.value) })
             }
             className="pl-6"
+            readOnly={readOnly}
           />
         </div>
 
@@ -93,11 +97,12 @@ export function HoursRow({
                 confirmed_qty: parseNullableNumber(event.target.value),
               })
             }
+            readOnly={readOnly}
           />
         </div>
       </div>
 
-      {onRemove ? (
+      {!readOnly && onRemove ? (
         <Button
           type="button"
           variant="ghost"

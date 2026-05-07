@@ -3,7 +3,13 @@
 import { useMemo, useState } from 'react';
 import { OrdersToolbar } from './orders-toolbar';
 import { OrdersTable } from './orders-table';
-import type { OrderListItem, CountryOption, CityOption, PersonOption } from '../types';
+import type {
+  CityOption,
+  CountryOption,
+  OrderListItem,
+  OrderStatus,
+  PersonOption,
+} from '../types';
 
 type Props = {
   orders: OrderListItem[];
@@ -11,6 +17,10 @@ type Props = {
   cityOptions: CityOption[];
   talentOptions: PersonOption[];
   clientOptions: PersonOption[];
+  /** Restrict the status filter dropdown. Default = all statuses. */
+  statusOptions?: readonly OrderStatus[];
+  /** Base path for the row link (default `/admin/orders/`). */
+  linkBasePath?: string;
 };
 
 export function OrdersList({
@@ -19,6 +29,8 @@ export function OrdersList({
   cityOptions,
   talentOptions,
   clientOptions,
+  statusOptions,
+  linkBasePath,
 }: Props) {
   const [search, setSearch] = useState('');
   const [countryFilter, setCountryFilter] = useState('all');
@@ -105,8 +117,9 @@ export function OrdersList({
         cityOptions={cityOptionsFiltered}
         talentOptions={talentOptions}
         clientOptions={clientOptions}
+        statusOptions={statusOptions}
       />
-      <OrdersTable orders={filtered} />
+      <OrdersTable orders={filtered} linkBasePath={linkBasePath} />
     </div>
   );
 }

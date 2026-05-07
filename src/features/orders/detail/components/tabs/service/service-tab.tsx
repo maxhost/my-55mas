@@ -31,6 +31,7 @@ type Props = {
   hints: ServiceTabHints;
   locale: string;
   onSectionSaved: () => void;
+  readOnly?: boolean;
 };
 
 const INITIAL_DIRTY: Record<SectionKey, boolean> = {
@@ -48,6 +49,7 @@ export function ServiceTab({
   hints,
   locale,
   onSectionSaved,
+  readOnly = false,
 }: Props) {
   const [openSection, setOpenSection] = useState<SectionKey | null>('language');
   const [dirtyMap, setDirtyMap] = useState<Record<SectionKey, boolean>>(INITIAL_DIRTY);
@@ -68,7 +70,7 @@ export function ServiceTab({
     [openSection, dirtyMap, hints.section.unsavedPrompt, setDirty],
   );
 
-  const common = { orderId, context, hints, locale, onSaved: onSectionSaved };
+  const common = { orderId, context, hints, locale, onSaved: onSectionSaved, readOnly };
   const wire = (key: SectionKey) => ({
     open: openSection === key,
     onToggle: () => handleToggle(key),
@@ -103,6 +105,7 @@ export type SectionShellProps = {
   onSave: () => void;
   saving: boolean;
   canEdit?: boolean;
+  readOnly?: boolean;
   sectionHints: SectionHints;
   previewText: string;
   readMode: ReactNode;
@@ -119,11 +122,16 @@ export function SectionShell({
   onSave,
   saving,
   canEdit = true,
+  readOnly = false,
   sectionHints,
   previewText,
   readMode,
   editMode,
 }: SectionShellProps) {
+  // In read-only mode, edit-mode is unreachable: the body always shows readMode
+  // and the "Editar" button is hidden.
+  const effectiveEditing = readOnly ? false : editing;
+  const showEditButton = !readOnly && canEdit;
   return (
     <Card size="sm">
       <CardHeader
@@ -146,10 +154,10 @@ export function SectionShell({
       </CardHeader>
       {open && (
         <CardContent className="flex flex-col gap-4 border-t pt-4">
-          {!editing ? (
+          {!effectiveEditing ? (
             <>
               {readMode}
-              {canEdit && (
+              {showEditButton && (
                 <div className="flex justify-end">
                   <Button variant="outline" size="sm" onClick={onStartEdit}>
                     <Pencil className="mr-1.5 size-3.5" />

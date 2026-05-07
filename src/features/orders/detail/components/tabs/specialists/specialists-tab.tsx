@@ -26,6 +26,7 @@ type Props = {
   talentsNeeded: number;
   searchContext: TalentSearchContext;
   hints: SpecialistsTabHints;
+  readOnly?: boolean;
 };
 
 function formatRating(
@@ -46,6 +47,7 @@ export function SpecialistsTab({
   talentsNeeded,
   searchContext,
   hints,
+  readOnly = false,
 }: Props) {
   const [assigned, setAssigned] = useState<AssignedTalent[]>(initialAssigned);
   const [modalOpen, setModalOpen] = useState(false);
@@ -82,9 +84,11 @@ export function SpecialistsTab({
         <span className="text-sm text-muted-foreground">
           {`Talents asignados: ${assigned.length}/${talentsNeeded}`}
         </span>
-        <Button variant="default" onClick={() => setModalOpen(true)}>
-          {hints.addTalentButton}
-        </Button>
+        {!readOnly && (
+          <Button variant="default" onClick={() => setModalOpen(true)}>
+            {hints.addTalentButton}
+          </Button>
+        )}
       </div>
 
       {assigned.length === 0 ? (
@@ -101,7 +105,9 @@ export function SpecialistsTab({
                 <TableHead>{hints.columnPhone}</TableHead>
                 <TableHead>{hints.columnRating}</TableHead>
                 <TableHead>{hints.columnCompleted}</TableHead>
-                <TableHead className="text-right">{hints.columnAction}</TableHead>
+                {!readOnly && (
+                  <TableHead className="text-right">{hints.columnAction}</TableHead>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -116,16 +122,18 @@ export function SpecialistsTab({
                     {formatRating(t.rating_avg, t.rating_count, hints.reviewsCount)}
                   </TableCell>
                   <TableCell>{t.completed_count}</TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleRemove(t.id)}
-                      disabled={pendingRemoveId === t.id}
-                    >
-                      {hints.unselectButton}
-                    </Button>
-                  </TableCell>
+                  {!readOnly && (
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemove(t.id)}
+                        disabled={pendingRemoveId === t.id}
+                      >
+                        {hints.unselectButton}
+                      </Button>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
@@ -133,17 +141,19 @@ export function SpecialistsTab({
         </div>
       )}
 
-      <SearchTalentModal
-        open={modalOpen}
-        onOpenChange={setModalOpen}
-        orderId={orderId}
-        locale={locale}
-        context={searchContext}
-        currentAssignedCount={assigned.length}
-        talentsNeeded={talentsNeeded}
-        onTalentAdded={handleAdded}
-        hints={hints}
-      />
+      {!readOnly && (
+        <SearchTalentModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          orderId={orderId}
+          locale={locale}
+          context={searchContext}
+          currentAssignedCount={assigned.length}
+          talentsNeeded={talentsNeeded}
+          onTalentAdded={handleAdded}
+          hints={hints}
+        />
+      )}
     </div>
   );
 }

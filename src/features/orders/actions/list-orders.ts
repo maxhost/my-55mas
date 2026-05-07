@@ -9,7 +9,11 @@ import {
 } from './list-orders-helpers';
 import type { OrderListItem, OrderStatus } from '../types';
 
-type ListOrdersParams = { locale: string };
+type ListOrdersParams = {
+  locale: string;
+  /** Restrict results to these statuses. Empty/undefined = all statuses. */
+  statuses?: OrderStatus[];
+};
 
 type OrderRow = {
   id: string;
@@ -27,20 +31,27 @@ type OrderRow = {
 
 const PAGE_SIZE = 1000;
 
-export async function listOrders({ locale }: ListOrdersParams): Promise<OrderListItem[]> {
+export async function listOrders({
+  locale,
+  statuses,
+}: ListOrdersParams): Promise<OrderListItem[]> {
   const supabase = createClient();
 
   // Step 1: paginated fetch
   const orders: OrderRow[] = [];
   let from = 0;
   while (true) {
-    const { data: page, error } = await supabase
+    let query = supabase
       .from('orders')
       .select(
-        'id, order_number, client_id, talent_id, staff_member_id, service_id, country_id, service_city_id, status, schedule_type, appointment_date'
+        'id, order_number, client_id, talent_id, staff_member_id, service_id, country_id, service_city_id, status, schedule_type, appointment_date',
       )
       .order('order_number', { ascending: false })
       .range(from, from + PAGE_SIZE - 1);
+    if (statuses && statuses.length > 0) {
+      query = query.in('status', statuses);
+    }
+    const { data: page, error } = await query;
 
     if (error) throw error;
     if (!page || page.length === 0) break;

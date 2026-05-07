@@ -1099,5 +1099,11 @@
       "relativeHours": "fa [count]h",
       "relativeDays": "fa [count]d"
     }
+  },
+  "AdminArchive": {
+    "title": "Arxiu",
+    "description": "Comandes arxivades, tancades, cancel·lades o rebutjades.",
+    "noArchive": "No hi ha comandes a l'arxiu.",
+    "backToList": "Tornar a l'arxiu"
   }
 }

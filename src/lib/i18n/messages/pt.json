@@ -1099,5 +1099,11 @@
       "relativeHours": "há [count]h",
       "relativeDays": "há [count]d"
     }
+  },
+  "AdminArchive": {
+    "title": "Arquivo",
+    "description": "Pedidos arquivados, encerrados, cancelados ou rejeitados.",
+    "noArchive": "Sem pedidos no arquivo.",
+    "backToList": "Voltar ao arquivo"
   }
 }

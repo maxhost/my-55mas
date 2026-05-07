@@ -31,6 +31,7 @@ type Props = {
   onToggle: () => void;
   onSaved: () => void;
   onDirtyChange: (dirty: boolean) => void;
+  readOnly?: boolean;
 };
 
 export function AddressSection({
@@ -42,6 +43,7 @@ export function AddressSection({
   onToggle,
   onSaved,
   onDirtyChange,
+  readOnly = false,
 }: Props) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<AddressValues>(data);
@@ -176,6 +178,7 @@ export function AddressSection({
       }}
       onSave={handleSave}
       saving={isPending}
+      readOnly={readOnly}
       sectionHints={hints.section}
       previewText={previewText}
       readMode={readMode}

@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/select';
 import { Search } from 'lucide-react';
 import { ORDER_STATUSES } from '../types';
-import type { CountryOption, CityOption, PersonOption } from '../types';
+import type { CountryOption, CityOption, OrderStatus, PersonOption } from '../types';
 
 type Props = {
   search: string;
@@ -34,6 +34,8 @@ type Props = {
   cityOptions: CityOption[];
   talentOptions: PersonOption[];
   clientOptions: PersonOption[];
+  /** Restrict the status filter dropdown to this subset. Default = all statuses. */
+  statusOptions?: readonly OrderStatus[];
 };
 
 export function OrdersToolbar({
@@ -57,7 +59,9 @@ export function OrdersToolbar({
   cityOptions,
   talentOptions,
   clientOptions,
+  statusOptions,
 }: Props) {
+  const visibleStatuses = statusOptions ?? ORDER_STATUSES;
   const t = useTranslations('AdminOrders');
 
   return (
@@ -141,12 +145,12 @@ export function OrdersToolbar({
       <Select value={statusFilter} onValueChange={(val) => onStatusFilterChange(val ?? 'all')}>
         <SelectTrigger className="w-[160px]">
           <SelectValue placeholder={t('filterByStatus')}>
-            {statusFilter === 'all' ? t('allStatuses') : t(statusFilter as 'nuevo')}
+            {statusFilter === 'all' ? t('allStatuses') : t(statusFilter as 'pendiente')}
           </SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">{t('allStatuses')}</SelectItem>
-          {ORDER_STATUSES.map((s) => (
+          {visibleStatuses.map((s) => (
             <SelectItem key={s} value={s}>{t(s)}</SelectItem>
           ))}
         </SelectContent>

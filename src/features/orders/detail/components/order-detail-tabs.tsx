@@ -47,6 +47,14 @@ type Props = {
   initialDocuments: OrderDocumentEntry[];
   initialActivity: OrderActivityNote[];
   locale: string;
+  /**
+   * When true, all editing controls in child tabs are hidden EXCEPT the
+   * status Select in the header (the only way to take the order out of a
+   * read-only state, e.g. unarchiving). Used by `/admin/archive/[id]`.
+   */
+  readOnly?: boolean;
+  /** Where to navigate after the order is cancelled. Default `/admin/orders`. */
+  onCancelledRedirect?: string;
   hints: {
     header: HeaderHints;
     tabs: DetailTabsHints;
@@ -72,6 +80,8 @@ export function OrderDetailTabs(props: Props) {
     initialDocuments,
     initialActivity,
     locale,
+    readOnly = false,
+    onCancelledRedirect,
     hints,
   } = props;
 
@@ -95,7 +105,7 @@ export function OrderDetailTabs(props: Props) {
   }
 
   function handleCancelled() {
-    router.push(`/${locale}/admin/orders`);
+    router.push(onCancelledRedirect ?? `/${locale}/admin/orders`);
   }
 
   return (
@@ -105,6 +115,7 @@ export function OrderDetailTabs(props: Props) {
         availableTags={availableTags}
         hints={hints.header}
         locale={locale}
+        readOnly={readOnly}
         onStatusChanged={refetchOrder}
         onTagsChanged={refetchOrder}
         onCancelled={handleCancelled}
@@ -127,6 +138,7 @@ export function OrderDetailTabs(props: Props) {
             context={initialServiceContext}
             hints={hints.service}
             locale={locale}
+            readOnly={readOnly}
             onSectionSaved={refetchServiceData}
           />
         </TabsContent>
@@ -138,12 +150,19 @@ export function OrderDetailTabs(props: Props) {
             initialAssigned={initialAssigned}
             talentsNeeded={order.talents_needed}
             searchContext={initialTalentSearchContext}
+            readOnly={readOnly}
             hints={hints.specialists}
           />
         </TabsContent>
 
         <TabsContent value="hours" className="pt-4">
-          <HoursTab orderId={order.id} data={initialHours} hints={hints.hours} locale={locale} />
+          <HoursTab
+            orderId={order.id}
+            data={initialHours}
+            hints={hints.hours}
+            locale={locale}
+            readOnly={readOnly}
+          />
         </TabsContent>
 
         <TabsContent value="billing" className="pt-4">
@@ -152,6 +171,7 @@ export function OrderDetailTabs(props: Props) {
             initialData={initialBilling}
             hints={hints.billing}
             locale={locale}
+            readOnly={readOnly}
           />
         </TabsContent>
 
@@ -169,6 +189,7 @@ export function OrderDetailTabs(props: Props) {
             initialNotes={initialActivity}
             hints={hints.activity}
             locale={locale}
+            readOnly={readOnly}
           />
         </TabsContent>
       </Tabs>

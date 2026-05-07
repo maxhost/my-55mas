@@ -16,6 +16,7 @@ type Props = {
   initialNotes: OrderActivityNote[];
   hints: ActivityTabHints;
   locale: string;
+  readOnly?: boolean;
 };
 
 const MINUTE = 60;
@@ -54,7 +55,13 @@ function sortNotes(notes: OrderActivityNote[]): OrderActivityNote[] {
   );
 }
 
-export function ActivityTab({ orderId, initialNotes, hints, locale }: Props) {
+export function ActivityTab({
+  orderId,
+  initialNotes,
+  hints,
+  locale,
+  readOnly = false,
+}: Props) {
   const [notes, setNotes] = useState<OrderActivityNote[]>(() => sortNotes(initialNotes));
   const [body, setBody] = useState('');
   const [isPending, startTransition] = useTransition();
@@ -78,20 +85,22 @@ export function ActivityTab({ orderId, initialNotes, hints, locale }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2 rounded-xl border bg-card p-4">
-        <Textarea
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          placeholder={hints.composerPlaceholder}
-          rows={3}
-          disabled={isPending}
-        />
-        <div className="flex justify-end">
-          <Button type="button" onClick={handleSubmit} disabled={!canSubmit}>
-            {hints.addButton}
-          </Button>
+      {!readOnly && (
+        <div className="flex flex-col gap-2 rounded-xl border bg-card p-4">
+          <Textarea
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder={hints.composerPlaceholder}
+            rows={3}
+            disabled={isPending}
+          />
+          <div className="flex justify-end">
+            <Button type="button" onClick={handleSubmit} disabled={!canSubmit}>
+              {hints.addButton}
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
 
       {notes.length === 0 ? (
         <p className="text-sm text-muted-foreground">{hints.empty}</p>

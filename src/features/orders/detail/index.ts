@@ -33,6 +33,11 @@ export { addOrderActivityNote } from './actions/add-order-activity-note';
 
 // Lib helpers.
 export { composeOrderDetail } from './lib/compose-order-detail';
+export {
+  loadOrderDetailPageData,
+  type OrderDetailPageData,
+  type OrderDetailPageHints,
+} from './lib/load-order-detail-page-data';
 
 // Top-level component for the admin order detail route.
 export { OrderDetailTabs } from './components/order-detail-tabs';
