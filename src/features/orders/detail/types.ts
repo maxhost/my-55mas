@@ -173,6 +173,18 @@ export type TalentSearchFilters = {
   query: string;             // empty string = no filter
 };
 
+export type TalentSearchPagination = {
+  page: number;              // 0-indexed
+  pageSize: number;
+};
+
+export type TalentSearchPage = {
+  rows: TalentSearchResult[];
+  totalCount: number;
+};
+
+export const DEFAULT_TALENT_SEARCH_PAGE_SIZE = 20;
+
 export type TalentSearchFiltersHints = {
   searchPlaceholder: string;
   filtersLabel: string;
@@ -183,6 +195,12 @@ export type TalentSearchFiltersHints = {
   postalCodePlaceholder: string;
   clearFilters: string;
   notProvided: string;
+};
+
+export type TalentSearchPaginationHints = {
+  pageInfo: string;            // template: "Mostrando [from]-[to] de [total]"
+  prev: string;
+  next: string;
 };
 
 export type TalentSearchRowHints = {
@@ -395,6 +413,7 @@ export type SpecialistsTabHints = {
   // Sub-hints injected into child components:
   filters: TalentSearchFiltersHints;
   row: TalentSearchRowHints;
+  pagination: TalentSearchPaginationHints;
 };
 
 export type HoursTabHints = {

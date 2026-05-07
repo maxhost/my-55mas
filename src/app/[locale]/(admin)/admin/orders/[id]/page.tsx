@@ -255,6 +255,11 @@ function readSpecialists(t: T) {
       detailRegisteredServicesLabel: t('specialists.row.detailRegisteredServicesLabel'),
       notProvided: t('specialists.row.notProvided'),
     },
+    pagination: {
+      pageInfo: t('specialists.pagination.pageInfo'),
+      prev: t('specialists.pagination.prev'),
+      next: t('specialists.pagination.next'),
+    },
   };
 }
 

@@ -1023,6 +1023,11 @@
         "detailPostalCodeLabel": "Code postal",
         "detailRegisteredServicesLabel": "Services enregistrés",
         "notProvided": "—"
+      },
+      "pagination": {
+        "pageInfo": "Affichage [from]-[to] sur [total]",
+        "prev": "Précédent",
+        "next": "Suivant"
       }
     },
     "hours": {

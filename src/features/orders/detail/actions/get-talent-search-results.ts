@@ -3,7 +3,13 @@
 import { createClient } from '@/lib/supabase/server';
 import { localizedField } from '@/shared/lib/i18n/localize';
 import type { I18nRecord } from '@/shared/lib/json';
-import type { TalentSearchFilters, TalentSearchResult } from '../types';
+import type {
+  TalentSearchFilters,
+  TalentSearchPage,
+  TalentSearchPagination,
+  TalentSearchResult,
+} from '../types';
+import { DEFAULT_TALENT_SEARCH_PAGE_SIZE } from '../types';
 
 const HIDDEN_TALENT_STATUSES = ['archived', 'excluded', 'inactive'];
 
@@ -48,13 +54,23 @@ type AddressShape = { postal_code?: string };
  *   - registered_services_count: distinct service_ids the talent has
  *     registered (across all countries) — gives admin a sense of breadth.
  *
+
  * Sort: qualified → rating DESC → completed DESC → name ASC.
+ *
+ * Pagination strategy: the action filters + sorts the WHOLE candidate set
+ * (after server-side base filters) in memory, then slices the requested
+ * page. For datasets up to a few hundred candidates this is fine. If the
+ * pool grows past ~1000, push filtering + sorting into SQL (likely with a
+ * dedicated view or RPC) to avoid the in-memory enrichment overhead.
+ *
+ * Returns `{ rows, totalCount }` so the UI can show "Showing N-M of T".
  */
 export async function getTalentSearchResults(
   orderId: string,
   filters: TalentSearchFilters,
+  pagination: TalentSearchPagination,
   locale: string,
-): Promise<TalentSearchResult[]> {
+): Promise<TalentSearchPage> {
   const supabase = createClient();
 
   const { data: order } = await supabase
@@ -62,7 +78,7 @@ export async function getTalentSearchResults(
     .select('service_id, country_id')
     .eq('id', orderId)
     .maybeSingle();
-  if (!order) return [];
+  if (!order) return { rows: [], totalCount: 0 };
 
   const assignedSet = await loadAssignedSet(supabase, orderId);
   const candidatesByService = await loadCandidatesByServiceFilter(
@@ -70,7 +86,9 @@ export async function getTalentSearchResults(
     filters.serviceId,
     filters.countryId,
   );
-  if (filters.serviceId !== null && candidatesByService.size === 0) return [];
+  if (filters.serviceId !== null && candidatesByService.size === 0) {
+    return { rows: [], totalCount: 0 };
+  }
 
   const baseRows = await loadTalentRows(supabase, {
     countryId: filters.countryId,
@@ -78,7 +96,7 @@ export async function getTalentSearchResults(
     candidatesByService: filters.serviceId !== null ? candidatesByService : null,
   });
   const candidates = baseRows.filter((t) => !assignedSet.has(t.id));
-  if (candidates.length === 0) return [];
+  if (candidates.length === 0) return { rows: [], totalCount: 0 };
 
   const candidateIds = candidates.map((t) => t.id);
   const userIds = candidates.map((t) => t.user_id);
@@ -100,7 +118,23 @@ export async function getTalentSearchResults(
     }),
   );
 
-  return applyPostFiltersAndSort(enriched, filters);
+  const sorted = applyPostFiltersAndSort(enriched, filters);
+  return paginate(sorted, pagination);
+}
+
+function paginate(
+  rows: TalentSearchResult[],
+  pagination: TalentSearchPagination,
+): TalentSearchPage {
+  const pageSize = Math.max(1, pagination.pageSize || DEFAULT_TALENT_SEARCH_PAGE_SIZE);
+  const totalCount = rows.length;
+  const maxPage = Math.max(0, Math.ceil(totalCount / pageSize) - 1);
+  // Defensive clamp: if the caller asks for a page past the end (e.g. after
+  // a filter narrowed the result set), return the last available page.
+  const page = Math.min(Math.max(0, pagination.page || 0), maxPage);
+  const from = page * pageSize;
+  const to = from + pageSize;
+  return { rows: rows.slice(from, to), totalCount };
 }
 
 // ── Filtering / loading helpers ─────────────────────────────────────────
