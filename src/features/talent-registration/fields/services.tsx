@@ -1,11 +1,8 @@
 'use client';
 
-import { z } from 'zod';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import type { ServiceOption } from '../types';
-
-export const servicesSchema = z.array(z.string().uuid()).min(1);
 
 type Props = {
   options: ServiceOption[];

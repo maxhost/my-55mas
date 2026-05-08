@@ -1,11 +1,8 @@
 'use client';
 
-import { z } from 'zod';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import type { FieldProps } from '../types';
-
-export const marketingConsentSchema = z.boolean();
 
 export function MarketingConsentInput({
   id,

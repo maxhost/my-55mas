@@ -192,30 +192,82 @@ Form submit. Crea todo + redirect.
 - [ ] Cada archivo < 300 LOC, cada función < 60 LOC
 - [ ] Feature total < 1500 LOC
 
-## Patrón "un archivo por field" (para devs futuros)
+## Estructura de fields: schema vs componente
+
+**Regla crítica (RSC boundary):** los Zod schemas viven en
+`fields/schemas.ts` (server-safe, **sin** `'use client'`). Los componentes
+React de los fields viven en `fields/<name>.tsx` con `'use client'` y
+**no** declaran ni re-exportan schemas.
+
+**Por qué importa:** la Server Action `actions/register.ts` importa
+`TalentRegistrationSchema` desde `schemas.ts`, que a su vez importa
+fragmentos desde `fields/schemas.ts`. Si un schema vive en un `.tsx`
+marcado `'use client'`, Next.js convierte la cadena de imports en client
+references al compilar — `schema._parse` queda como un stub cliente y
+`safeParse()` falla en runtime con: `Attempted to call _parse() from the
+server but _parse is on the client`. El bug no se detecta en tsc; sólo
+explota al hacer submit del form.
+
+**NUNCA hagas esto en un archivo `.tsx` con `'use client'`:**
+
+```tsx
+// fields/foo.tsx ❌
+'use client';
+import { z } from 'zod';
+export const fooSchema = z.string(); // ← server-only consumers se rompen
+```
+
+**Sí hacé esto:**
+
+```ts
+// fields/schemas.ts ✅ (sin 'use client')
+import { z } from 'zod';
+export const fooSchema = z.string();
+```
+
+```tsx
+// fields/foo.tsx ✅ (sin import de zod)
+'use client';
+export function FooInput(props: FieldProps<string>) { ... }
+```
+
+## Patrón para agregar/quitar un field
 
 **Añadir un field nuevo (e.g., `linkedin_url`):**
 
-1. Crear `src/features/talent-registration/fields/linkedin-url.tsx`:
-   ```tsx
+1. Agregar el schema en `src/features/talent-registration/fields/schemas.ts`:
+   ```ts
    export const linkedinUrlSchema = z.string().url().optional();
+   ```
+2. Crear el componente en `src/features/talent-registration/fields/linkedin-url.tsx`:
+   ```tsx
+   'use client';
+   import type { FieldProps } from '../types';
    export function LinkedinUrlInput(props: FieldProps<string>) { ... }
    ```
-2. Agregar a `fields.ts` (registry + orden).
-3. Agregar a `schemas.ts`: `linkedin_url: linkedinUrlSchema`.
-4. Decidir mapping DB:
-   - Columna nueva en `talent_profiles` → migration en S(N)+1
-   - O en `talent_profiles.data` jsonb (si existe en el futuro)
-5. Agregar el write en `actions/register.ts` (paso correspondiente).
-6. Actualizar `form_definitions['talent_registration'].schema.fields` (UPDATE SQL) para que admin pueda traducir el field nuevo en Phase B.
+   El componente **no** importa zod ni declara schemas.
+3. Agregar a `fields.ts` (registry + orden de render).
+4. Agregar a `schemas.ts` top-level la composición:
+   ```ts
+   import { linkedinUrlSchema } from './fields/schemas';
+   // ...
+   linkedin_url: linkedinUrlSchema,
+   ```
+5. Decidir mapping DB:
+   - Columna nueva en `talent_profiles` → migration nueva.
+   - O en `talent_profiles.data` jsonb (si existe en el futuro).
+6. Agregar el write en `actions/register.ts` (paso correspondiente).
+7. Actualizar `form_definitions['talent_registration'].schema.fields`
+   (UPDATE SQL) para que admin pueda traducir el field nuevo.
 
-**Quitar un field:** operación inversa (4-5 archivos coordinados).
+**Quitar un field:** operación inversa (mismos 5-7 archivos coordinados).
 
 ## Estructura de archivos
 
 ```
 src/features/talent-registration/
 ├── fields/
+│   ├── schemas.ts        # ★ todos los Zod schemas (server-safe)
 │   ├── full-name.tsx
 │   ├── email.tsx
 │   ├── password.tsx
@@ -228,9 +280,9 @@ src/features/talent-registration/
 │   ├── disclaimer.tsx
 │   ├── terms-accepted.tsx
 │   └── marketing-consent.tsx
-├── fields.ts          # registry + orden
-├── schemas.ts         # Zod compuesto
-├── types.ts           # Input/Context types
+├── fields.ts             # registry + orden
+├── schemas.ts            # Zod compuesto (importa de fields/schemas.ts)
+├── types.ts              # Input/Context types
 ├── actions/
 │   ├── get-form-context.ts
 │   ├── get-services-by-location.ts
@@ -238,9 +290,11 @@ src/features/talent-registration/
 ├── components/
 │   └── talent-registration-form.tsx  # orchestrator (Client)
 ├── __tests__/
-│   ├── schemas.test.ts
-│   ├── register.test.ts
-│   └── form.test.tsx
+│   ├── simple-fields-schemas.test.ts
+│   ├── complex-fields-schemas.test.ts
+│   ├── special-fields-schemas.test.ts
+│   ├── register-server-import.test.ts # ★ regression: schema runs in server context
+│   └── ...
 └── index.ts
 ```
 

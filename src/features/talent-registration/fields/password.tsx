@@ -1,11 +1,8 @@
 'use client';
 
-import { z } from 'zod';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { FieldProps } from '../types';
-
-export const passwordSchema = z.string().min(8).max(72);
 
 export function PasswordInput({
   id,

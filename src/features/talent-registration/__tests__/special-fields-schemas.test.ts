@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { servicesSchema } from '../fields/services';
-import { termsAcceptedSchema } from '../fields/terms-accepted';
+import { servicesSchema, termsAcceptedSchema } from '../fields/schemas';
 
 describe('servicesSchema', () => {
   it('accepts at least one service uuid', () => {

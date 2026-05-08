@@ -1,15 +1,19 @@
 import { z } from 'zod';
-import { fullNameSchema } from './fields/full-name';
-import { emailSchema } from './fields/email';
-import { passwordSchema } from './fields/password';
-import { phoneSchema } from './fields/phone';
-import { countryIdSchema, cityIdSchema } from './fields/country-city';
-import { addressSchema } from './fields/address';
-import { fiscalIdSchema, fiscalIdTypeIdSchema } from './fields/fiscal-id';
-import { servicesSchema } from './fields/services';
-import { additionalInfoSchema } from './fields/additional-info';
-import { termsAcceptedSchema } from './fields/terms-accepted';
-import { marketingConsentSchema } from './fields/marketing-consent';
+import {
+  additionalInfoSchema,
+  addressSchema,
+  cityIdSchema,
+  countryIdSchema,
+  emailSchema,
+  fiscalIdSchema,
+  fiscalIdTypeIdSchema,
+  fullNameSchema,
+  marketingConsentSchema,
+  passwordSchema,
+  phoneSchema,
+  servicesSchema,
+  termsAcceptedSchema,
+} from './fields/schemas';
 
 export const TalentRegistrationSchema = z.object({
   full_name: fullNameSchema,

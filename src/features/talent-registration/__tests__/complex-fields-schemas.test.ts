@@ -1,8 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { phoneSchema } from '../fields/phone';
-import { countryIdSchema, cityIdSchema } from '../fields/country-city';
-import { addressSchema } from '../fields/address';
-import { fiscalIdSchema, fiscalIdTypeIdSchema } from '../fields/fiscal-id';
+import {
+  addressSchema,
+  cityIdSchema,
+  countryIdSchema,
+  fiscalIdSchema,
+  fiscalIdTypeIdSchema,
+  phoneSchema,
+} from '../fields/schemas';
 
 describe('phoneSchema', () => {
   it('accepts a valid Spanish phone in E.164', () => {

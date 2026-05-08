@@ -1,6 +1,5 @@
 'use client';
 
-import { z } from 'zod';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -11,9 +10,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { FiscalIdTypeOption } from '../types';
-
-export const fiscalIdTypeIdSchema = z.string().uuid();
-export const fiscalIdSchema = z.string().min(4).max(50);
 
 type Props = {
   fiscalIdTypes: FiscalIdTypeOption[];

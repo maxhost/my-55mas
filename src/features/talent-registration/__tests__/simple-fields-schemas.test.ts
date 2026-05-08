@@ -1,9 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { fullNameSchema } from '../fields/full-name';
-import { emailSchema } from '../fields/email';
-import { passwordSchema } from '../fields/password';
-import { additionalInfoSchema } from '../fields/additional-info';
-import { marketingConsentSchema } from '../fields/marketing-consent';
+import {
+  additionalInfoSchema,
+  emailSchema,
+  fullNameSchema,
+  marketingConsentSchema,
+  passwordSchema,
+} from '../fields/schemas';
 
 describe('fullNameSchema', () => {
   it('accepts a valid name', () => {

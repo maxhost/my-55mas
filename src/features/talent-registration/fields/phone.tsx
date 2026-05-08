@@ -1,15 +1,9 @@
 'use client';
 
-import { z } from 'zod';
-import { isValidPhoneNumber, type CountryCode } from 'libphonenumber-js';
+import { type CountryCode } from 'libphonenumber-js';
 import { Label } from '@/components/ui/label';
 import { PhoneInput } from '@/shared/components/phone-input';
 import type { FieldProps } from '../types';
-
-export const phoneSchema = z
-  .string()
-  .min(1)
-  .refine((v) => isValidPhoneNumber(v), { message: 'invalid_phone' });
 
 type Props = FieldProps<string> & {
   countryCodes: CountryCode[];

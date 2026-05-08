@@ -1,11 +1,8 @@
 'use client';
 
-import { z } from 'zod';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import type { FieldProps } from '../types';
-
-export const additionalInfoSchema = z.string().max(2000).optional();
 
 export function AdditionalInfoInput({
   id,

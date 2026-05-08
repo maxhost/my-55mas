@@ -1,6 +1,5 @@
 'use client';
 
-import { z } from 'zod';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -10,9 +9,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { CityOption, CountryOption } from '../types';
-
-export const countryIdSchema = z.string().uuid();
-export const cityIdSchema = z.string().uuid();
 
 type Props = {
   countries: CountryOption[];

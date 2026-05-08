@@ -1,6 +1,5 @@
 'use client';
 
-import { z } from 'zod';
 import { Label } from '@/components/ui/label';
 import {
   AddressAutocomplete,
@@ -8,17 +7,6 @@ import {
   type AddressValue,
 } from '@/shared/components/address-autocomplete';
 import type { FieldProps } from '../types';
-
-export const addressSchema = z.object({
-  street: z.string().min(1),
-  postal_code: z.string(),
-  lat: z.number().nullable(),
-  lng: z.number().nullable(),
-  mapbox_id: z.string().nullable(),
-  raw_text: z.string().min(1),
-  country_code: z.string(),
-  city_name: z.string(),
-});
 
 export { emptyAddress };
 

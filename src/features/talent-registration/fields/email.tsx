@@ -1,11 +1,8 @@
 'use client';
 
-import { z } from 'zod';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { FieldProps } from '../types';
-
-export const emailSchema = z.string().email();
 
 export function EmailInput({
   id,
