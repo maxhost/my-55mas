@@ -43,7 +43,7 @@ export async function getPaymentDetail(
     orderIds.length > 0
       ? (await supabase
           .from('orders')
-          .select('id, order_number, appointment_date, service_id')
+          .select('id, order_number, appointment_date, timezone, service_id')
           .in('id', orderIds)).data ?? []
       : [];
 
@@ -64,6 +64,7 @@ export async function getPaymentDetail(
       {
         order_number: o.order_number,
         appointment_date: o.appointment_date,
+        timezone: o.timezone,
         service_name: o.service_id ? serviceNames.get(o.service_id) ?? null : null,
       },
     ]),
@@ -76,6 +77,7 @@ export async function getPaymentDetail(
       order_id: it.order_id,
       order_number: order?.order_number ?? 0,
       appointment_date: order?.appointment_date ?? null,
+      timezone: order?.timezone ?? 'Europe/Madrid',
       service_name: order?.service_name ?? null,
       total: Number(it.total),
       notes: it.notes,

@@ -39,7 +39,7 @@ export async function getClientOrders(
   let q = supabase
     .from('orders')
     .select(
-      'id, order_number, appointment_date, service_id, talent_id, status, payment_status, price_total, currency',
+      'id, order_number, appointment_date, timezone, service_id, talent_id, status, payment_status, price_total, currency',
       { count: 'exact' },
     )
     .eq('client_id', cp.user_id);
@@ -93,6 +93,7 @@ export async function getClientOrders(
     id: o.id,
     order_number: o.order_number,
     appointment_date: o.appointment_date,
+    timezone: o.timezone,
     service_name: o.service_id ? serviceNames.get(o.service_id) ?? null : null,
     talent_name: o.talent_id ? talentNames.get(o.talent_id) ?? null : null,
     status: o.status,

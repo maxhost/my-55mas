@@ -18,6 +18,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { getPaymentDetail } from '@/features/clients/detail/actions/get-payment-detail';
+import { formatDateInTz } from '@/shared/lib/datetime';
 import type {
   ClientPaymentDetail,
   PaymentsTabHints,
@@ -155,7 +156,11 @@ export function PaymentDetailSheet({
                             #{item.order_number}
                           </Link>
                         </TableCell>
-                        <TableCell>{formatDate(item.appointment_date)}</TableCell>
+                        <TableCell>
+                          {item.appointment_date
+                            ? formatDateInTz(item.appointment_date, item.timezone, locale)
+                            : '—'}
+                        </TableCell>
                         <TableCell>{item.service_name ?? '—'}</TableCell>
                         <TableCell className="text-right">
                           {currencyFormatter.format(item.total)}

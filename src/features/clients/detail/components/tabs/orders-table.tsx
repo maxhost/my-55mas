@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo } from 'react';
 
 import {
   Table,
@@ -11,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { formatDateInTz } from '@/shared/lib/datetime';
 import type { ClientOrderRow, OrdersTabHints } from '@/features/clients/detail/types';
 
 type Props = {
@@ -21,8 +21,6 @@ type Props = {
 };
 
 export function OrdersTable({ orders, isPending, locale, hints }: Props) {
-  const dateFmt = useMemo(() => new Intl.DateTimeFormat(locale), [locale]);
-
   const fmtCurrency = (amount: number | null, currency: string | null) => {
     if (amount === null || amount === undefined) return '—';
     return new Intl.NumberFormat(locale, {
@@ -30,7 +28,8 @@ export function OrdersTable({ orders, isPending, locale, hints }: Props) {
       currency: currency ?? 'EUR',
     }).format(amount);
   };
-  const fmtDate = (iso: string | null) => (iso ? dateFmt.format(new Date(iso)) : '—');
+  const fmtDate = (iso: string | null, tz: string) =>
+    iso ? formatDateInTz(iso, tz, locale) : '—';
 
   return (
     <Table>
@@ -69,7 +68,7 @@ export function OrdersTable({ orders, isPending, locale, hints }: Props) {
                   {o.order_number}
                 </Link>
               </TableCell>
-              <TableCell>{fmtDate(o.appointment_date)}</TableCell>
+              <TableCell>{fmtDate(o.appointment_date, o.timezone)}</TableCell>
               <TableCell>{o.service_name ?? '—'}</TableCell>
               <TableCell>{o.talent_name ?? '—'}</TableCell>
               <TableCell>{o.status}</TableCell>

@@ -734,6 +734,7 @@
     "weekdays": "Días de la semana",
     "dayOfMonth": "Día del mes",
     "endDate": "Fecha de finalización",
+    "localTimeNote": "Hora local del servicio",
     "authTitle": "¿Cómo querés continuar?",
     "authGuest": "Continuar como invitado",
     "authSignup": "Crear cuenta nueva",

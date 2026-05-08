@@ -55,6 +55,8 @@ export type TalentOrderRow = {
   id: string;
   order_number: number;
   appointment_date: string | null;
+  /** IANA service timezone (used to render appointment_date). */
+  timezone: string;
   service_name: string | null;
   client_name: string | null;
   status: string;
@@ -97,6 +99,8 @@ export type TalentPaymentItem = {
   order_id: string;
   order_number: number;
   appointment_date: string | null;
+  /** IANA service timezone (used to render appointment_date). */
+  timezone: string;
   service_name: string | null;
   hours: number | null;
   unit_amount: number | null;

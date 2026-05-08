@@ -1,5 +1,9 @@
 import { localizedField } from '@/shared/lib/i18n/localize';
 import type { I18nRecord } from '@/shared/lib/json';
+import {
+  addMinutesToIso,
+  formatTimeInTz,
+} from '@/shared/lib/datetime';
 import type {
   OrderClientSummary,
   OrderDetail,
@@ -17,6 +21,7 @@ type OrderRow = {
   payment_status: string | null;
   appointment_date: string | null;
   schedule_type: string;
+  timezone: string;
   price_total: number | string;
   price_subtotal: number | string;
   price_tax: number | string;
@@ -50,8 +55,8 @@ export function composeOrderDetail(args: {
 }): OrderDetail {
   const { order, service, client, staffMember, tags, scheduleSummary, locale } = args;
 
-  const start = order.appointment_date ? new Date(order.appointment_date) : null;
-  const end = start ? new Date(start.getTime() + DEFAULT_DURATION_MIN * 60_000) : null;
+  const startIso = order.appointment_date;
+  const endIso = startIso ? addMinutesToIso(startIso, DEFAULT_DURATION_MIN) : null;
 
   return {
     id: order.id,
@@ -65,9 +70,10 @@ export function composeOrderDetail(args: {
     appointment_date: order.appointment_date,
     schedule_type: order.schedule_type as OrderScheduleType,
     schedule_summary: scheduleSummary,
+    timezone: order.timezone,
     estimated_duration_minutes: DEFAULT_DURATION_MIN,
-    start_time: start ? formatTime(start) : null,
-    end_time: end ? formatTime(end) : null,
+    start_time: startIso ? formatTimeInTz(startIso, order.timezone) : null,
+    end_time: endIso ? formatTimeInTz(endIso, order.timezone) : null,
     price_total: Number(order.price_total),
     price_subtotal: Number(order.price_subtotal),
     price_tax: Number(order.price_tax),
@@ -96,6 +102,3 @@ function composeClient(profile: ProfileRow, clientId: string): OrderClientSummar
   };
 }
 
-function formatTime(d: Date): string {
-  return d.toISOString().substring(11, 16); // HH:mm in UTC; client adjusts via Intl
-}

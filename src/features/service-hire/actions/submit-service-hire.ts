@@ -5,8 +5,11 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { Json } from '@/lib/supabase/database.types';
 import { INITIAL_ORDER_STATUS } from '@/shared/lib/domain-defaults';
+import { composeAppointmentUtc } from '@/shared/lib/datetime';
 import type { Question } from '@/shared/lib/questions';
 import { submitServiceHireSchema } from '../schemas';
+
+const FALLBACK_TIMEZONE = 'Europe/Madrid';
 
 type SubmitResult = { data: { orderId: string } } | { error: { message: string } };
 
@@ -52,11 +55,19 @@ export async function submitServiceHire(formData: FormData): Promise<SubmitResul
   // Resolve country_id + city_id from address country_code / city_name.
   const { data: country } = await supabase
     .from('countries')
-    .select('id')
+    .select('id, timezone')
     .eq('code', state.address.country_code.toUpperCase())
     .maybeSingle();
   if (!country) {
     return { error: { message: 'Country not supported' } };
+  }
+  // Service timezone snapshot: persisted on the order so all renders use it
+  // regardless of the viewer's TZ. Fallback covers seed gaps defensively.
+  const orderTimezone = country.timezone || FALLBACK_TIMEZONE;
+  if (!country.timezone) {
+    console.warn(
+      `[submit-service-hire] country ${state.address.country_code} has no timezone; falling back to ${FALLBACK_TIMEZONE}`,
+    );
   }
   let serviceCityId: string | null = null;
   if (state.address.city_name) {
@@ -69,10 +80,15 @@ export async function submitServiceHire(formData: FormData): Promise<SubmitResul
     serviceCityId = city?.id ?? null;
   }
 
-  // Compose appointment_date for once schedules.
+  // Compose appointment_date for once schedules. Wall-clock interpreted
+  // in the service timezone (not the runtime TZ), then stored as UTC.
   const appointmentDate =
     state.scheduling.schedule_type === 'once' && state.scheduling.start_date
-      ? new Date(`${state.scheduling.start_date}T${state.scheduling.time_start}:00`).toISOString()
+      ? composeAppointmentUtc(
+          state.scheduling.start_date,
+          state.scheduling.time_start,
+          orderTimezone,
+        )
       : null;
 
   // Get current user profile for contact fields.
@@ -82,8 +98,21 @@ export async function submitServiceHire(formData: FormData): Promise<SubmitResul
     .eq('id', userId)
     .maybeSingle();
 
-  // INSERT order. Files are uploaded after order_id is known so paths are stable.
+  // Ensure a client_profile exists for this user. Service-hire is a client-
+  // facing flow: every successful submit must leave the user with a
+  // client_profile row so they appear in /admin/clients and the order's
+  // client_id has a valid client record. The schema validates
+  // terms_accepted=true, so we persist that on first creation. If the
+  // profile already exists (returning client) we leave it untouched except
+  // for upgrading terms_accepted to true if it was false (re-acceptance is
+  // safe and tracks the latest agreement).
   const adminClient = createAdminClient();
+  const clientProfileError = await ensureClientProfile(adminClient, userId, state.terms_accepted);
+  if (clientProfileError) {
+    return { error: { message: `Client profile creation failed: ${clientProfileError}` } };
+  }
+
+  // INSERT order. Files are uploaded after order_id is known so paths are stable.
   const { data: order, error: orderError } = await adminClient
     .from('orders')
     .insert({
@@ -95,6 +124,7 @@ export async function submitServiceHire(formData: FormData): Promise<SubmitResul
       service_postal_code: state.address.postal_code || null,
       schedule_type: state.scheduling.schedule_type,
       appointment_date: appointmentDate,
+      timezone: orderTimezone,
       contact_name: profile?.full_name ?? authData.user.email ?? 'Guest',
       contact_email: profile?.email ?? authData.user.email ?? '',
       contact_phone: profile?.phone ?? '',
@@ -166,7 +196,7 @@ export async function submitServiceHire(formData: FormData): Promise<SubmitResul
       end_date: s.end_date ?? null,
       time_start: s.time_start,
       time_end: s.time_end ?? null,
-      timezone: 'Europe/Madrid',
+      timezone: orderTimezone,
       weekdays: s.frequency === 'weekly' ? s.weekdays ?? null : null,
       day_of_month: s.frequency === 'monthly' ? s.day_of_month ?? null : null,
       generation_paused: false,
@@ -175,4 +205,40 @@ export async function submitServiceHire(formData: FormData): Promise<SubmitResul
 
   revalidatePath('/[locale]/dashboard', 'layout');
   return { data: { orderId } };
+}
+
+/**
+ * Get-or-create the client_profile for the given user. `client_profiles.user_id`
+ * is UNIQUE so we can rely on a single SELECT to decide. Returns null on
+ * success, or an error message string. Defaults at the column level handle
+ * is_business=false / status='active' — we only set user_id and terms_accepted.
+ */
+async function ensureClientProfile(
+  adminClient: ReturnType<typeof createAdminClient>,
+  userId: string,
+  termsAccepted: boolean,
+): Promise<string | null> {
+  const { data: existing, error: selectErr } = await adminClient
+    .from('client_profiles')
+    .select('id, terms_accepted')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (selectErr) return selectErr.message;
+
+  if (!existing) {
+    const { error: insertErr } = await adminClient
+      .from('client_profiles')
+      .insert({ user_id: userId, terms_accepted: termsAccepted });
+    return insertErr?.message ?? null;
+  }
+
+  if (termsAccepted && !existing.terms_accepted) {
+    const { error: updateErr } = await adminClient
+      .from('client_profiles')
+      .update({ terms_accepted: true })
+      .eq('id', existing.id);
+    return updateErr?.message ?? null;
+  }
+
+  return null;
 }

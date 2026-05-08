@@ -50,9 +50,11 @@ export type OrderDetail = {
   appointment_date: string | null;
   schedule_type: OrderScheduleType;
   schedule_summary: string;       // human-readable summary, computed Phase 1 mock
+  /** IANA timezone of the service (snapshotted from country at creation). */
+  timezone: string;
   estimated_duration_minutes: number | null;
-  start_time: string | null;      // HH:mm
-  end_time: string | null;        // HH:mm
+  start_time: string | null;      // HH:mm in `timezone`
+  end_time: string | null;        // HH:mm in `timezone`
   price_total: number;
   price_subtotal: number;
   price_tax: number;

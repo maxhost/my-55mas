@@ -103,6 +103,7 @@ export function TestServiceHirePage({ services, locale }: Props) {
                 weekdays: tg('weekdays'),
                 dayOfMonth: tg('dayOfMonth'),
                 endDate: tg('endDate'),
+                localTimeNote: tg('localTimeNote'),
               },
               auth: {
                 title: tg('authTitle'),

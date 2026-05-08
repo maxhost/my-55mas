@@ -61,6 +61,8 @@ export type OrderListItem = {
   service_name: string | null;
   client_name: string | null;
   appointment_date: string | null;
+  /** IANA service timezone snapshotted at order creation. */
+  timezone: string;
   schedule_type: 'once' | 'weekly';
   staff_member_name: string | null;
   talent_name: string | null;

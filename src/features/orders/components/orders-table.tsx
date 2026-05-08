@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { formatDateInTz } from '@/shared/lib/datetime';
 import type { OrderListItem, OrderStatus } from '../types';
 
 type Props = {
@@ -33,11 +34,13 @@ const statusVariant: Record<OrderStatus, 'default' | 'secondary' | 'outline' | '
   cancelado: 'destructive',
 };
 
-function formatDate(iso: string | null, locale: string): string {
+function formatDate(iso: string | null, locale: string, timezone: string): string {
   if (!iso) return '—';
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '—';
-  return d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
+  try {
+    return formatDateInTz(iso, timezone, locale);
+  } catch {
+    return '—';
+  }
 }
 
 export function OrdersTable({ orders, linkBasePath }: Props) {
@@ -81,7 +84,7 @@ export function OrdersTable({ orders, linkBasePath }: Props) {
             <TableCell>{order.service_name ?? '—'}</TableCell>
             <TableCell className="font-medium">{order.client_name ?? '—'}</TableCell>
             <TableCell className="text-muted-foreground">
-              {formatDate(order.appointment_date, 'es')}
+              {formatDate(order.appointment_date, 'es', order.timezone)}
             </TableCell>
             <TableCell>{t(order.schedule_type)}</TableCell>
             <TableCell className="text-muted-foreground">

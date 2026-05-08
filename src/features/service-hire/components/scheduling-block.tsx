@@ -18,6 +18,8 @@ type Props = {
   value: SchedulingValue;
   onChange: (v: SchedulingValue) => void;
   errors?: SchedulingErrors;
+  /** Resolved IANA TZ for the chosen address (null until user picks one). */
+  timezone: string | null;
   hints: {
     title: string;
     scheduleType: string;
@@ -32,10 +34,12 @@ type Props = {
     weekdays: string;
     dayOfMonth: string;
     endDate: string;
+    /** Shown after the user picks an address: "Hora local del servicio: <tz>". */
+    localTimeNote: string;
   };
 };
 
-export function SchedulingBlock({ value, onChange, errors, hints }: Props) {
+export function SchedulingBlock({ value, onChange, errors, timezone, hints }: Props) {
   const isRecurring = value.schedule_type === 'recurring';
 
   const toggleWeekday = (idx: number, checked: boolean) => {
@@ -49,6 +53,12 @@ export function SchedulingBlock({ value, onChange, errors, hints }: Props) {
   return (
     <fieldset className="space-y-3 rounded-md border p-4">
       <legend className="text-sm font-medium">{hints.title}</legend>
+
+      {timezone && (
+        <p className="text-muted-foreground text-xs">
+          {hints.localTimeNote}: <strong>{timezone}</strong>
+        </p>
+      )}
 
       <div className="space-y-1.5">
         <Label>{hints.scheduleType}</Label>

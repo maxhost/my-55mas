@@ -127,6 +127,11 @@ export function ServiceHireForm({ service, locale, hints }: Props) {
         onChange={(v) => setState((s) => ({ ...s, scheduling: v }))}
         errors={errors?.scheduling}
         hints={hints.scheduling}
+        timezone={
+          state.address.country_code
+            ? service.countryTimezones[state.address.country_code.toLowerCase()] ?? null
+            : null
+        }
       />
 
       <ServiceQuestionsRenderer

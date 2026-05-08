@@ -1036,6 +1036,7 @@ export type Database = {
           talent_amount: number | null
           talent_id: string | null
           talents_needed: number
+          timezone: string
           unit_price: number | null
           updated_at: string | null
         }
@@ -1077,6 +1078,7 @@ export type Database = {
           talent_amount?: number | null
           talent_id?: string | null
           talents_needed?: number
+          timezone?: string
           unit_price?: number | null
           updated_at?: string | null
         }
@@ -1118,6 +1120,7 @@ export type Database = {
           talent_amount?: number | null
           talent_id?: string | null
           talents_needed?: number
+          timezone?: string
           unit_price?: number | null
           updated_at?: string | null
         }
@@ -2556,3 +2559,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

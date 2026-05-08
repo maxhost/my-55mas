@@ -16,6 +16,12 @@ export type ServiceForHire = {
   assignedGroups: AssignedSubtypeGroup[];
   /** Active countries for this service (where it can be hired). */
   activeCountryCodes: string[];
+  /**
+   * IANA timezone keyed by lowercase country code (e.g. 'es' → 'Europe/Madrid').
+   * Used to display the service-local timezone next to the scheduling fields
+   * once the user picks an address. Mirrors `countries.timezone`.
+   */
+  countryTimezones: Record<string, string>;
 };
 
 type I18nRecord = Record<string, Record<string, unknown>> | null;
@@ -38,16 +44,18 @@ export async function getServiceForHire(
   // Active countries for this service.
   const { data: countryRows } = await supabase
     .from('service_countries')
-    .select('country_id, countries(code, is_active)')
+    .select('country_id, countries(code, is_active, timezone)')
     .eq('service_id', serviceId)
     .eq('is_active', true);
 
-  const activeCountryCodes = (countryRows ?? [])
-    .map((row) => {
-      const c = row.countries as unknown as { code: string; is_active: boolean } | null;
-      return c?.is_active ? c.code : null;
-    })
-    .filter((c): c is string => Boolean(c));
+  const activeCountries = (countryRows ?? [])
+    .map((row) => row.countries as unknown as { code: string; is_active: boolean; timezone: string } | null)
+    .filter((c): c is { code: string; is_active: boolean; timezone: string } => !!c && c.is_active);
+
+  const activeCountryCodes = activeCountries.map((c) => c.code);
+  const countryTimezones: Record<string, string> = Object.fromEntries(
+    activeCountries.map((c) => [c.code.toLowerCase(), c.timezone]),
+  );
 
   // Assigned subtype groups (with items) — needed for renderer to resolve options.
   const { data: groupAssignments } = await supabase
@@ -103,6 +111,7 @@ export async function getServiceForHire(
     questions: ((service.questions as unknown) as Question[]) ?? [],
     assignedGroups,
     activeCountryCodes,
+    countryTimezones,
   };
 }
 

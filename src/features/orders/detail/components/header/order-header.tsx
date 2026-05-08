@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { formatDateInTz } from '@/shared/lib/datetime';
 import type {
   HeaderHints,
   OrderDetail,
@@ -47,10 +48,11 @@ function formatDate(iso: string | null, locale: string): string | null {
 function formatTimeRange(
   start: string | null,
   end: string | null,
+  timezone: string,
 ): string | null {
   if (!start && !end) return null;
-  if (start && end) return `${start} – ${end}`;
-  return start ?? end;
+  const range = start && end ? `${start} – ${end}` : (start ?? end);
+  return `${range} (${timezone})`;
 }
 
 function formatCurrency(
@@ -94,8 +96,13 @@ export function OrderHeader({
   const [cancelOpen, setCancelOpen] = useState(false);
 
   const duration = formatDuration(order.estimated_duration_minutes);
-  const appointmentDate = formatDate(order.appointment_date, locale);
-  const timeRange = formatTimeRange(order.start_time, order.end_time);
+  // appointment_date renders in the service TZ (cross-midnight cases would
+  // otherwise show the wrong date). created_at is an admin-action timestamp
+  // and stays in the viewer's local TZ.
+  const appointmentDate = order.appointment_date
+    ? formatDateInTz(order.appointment_date, order.timezone, locale)
+    : null;
+  const timeRange = formatTimeRange(order.start_time, order.end_time, order.timezone);
   const createdAt = formatDate(order.created_at, locale);
   const totalText = formatCurrency(order.price_total, order.currency, locale);
 

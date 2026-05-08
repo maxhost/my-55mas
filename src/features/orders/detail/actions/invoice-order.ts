@@ -36,13 +36,15 @@ export async function invoiceOrder(input: unknown): Promise<Result> {
 
   const { data: order, error: orderErr } = await supabase
     .from('orders')
-    .select('id, currency, client_id, appointment_date')
+    .select('id, currency, client_id, appointment_date, timezone')
     .eq('id', orderId)
     .maybeSingle();
   if (orderErr) return { error: { message: orderErr.message } };
   if (!order) return { error: { message: 'Order not found' } };
 
-  const period = (order.appointment_date ?? new Date().toISOString()).substring(0, 7) + '-01';
+  // Billing period is the YYYY-MM of the appointment as seen in the service
+  // timezone (so an order at 23:30 on 31 May Madrid stays in May, not June).
+  const period = computePeriod(order.appointment_date, order.timezone);
   const { data: auth } = await supabase.auth.getUser();
   const createdBy = auth.user?.id ?? null;
 
@@ -186,4 +188,16 @@ async function invoiceTalent(args: {
 
 function round(n: number): number {
   return Math.round(n * 100) / 100;
+}
+
+function computePeriod(isoUtc: string | null, timezone: string): string {
+  const date = isoUtc ? new Date(isoUtc) : new Date();
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+  }).formatToParts(date);
+  const year = parts.find((p) => p.type === 'year')?.value;
+  const month = parts.find((p) => p.type === 'month')?.value;
+  return `${year}-${month}-01`;
 }

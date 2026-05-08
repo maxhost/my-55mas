@@ -42,6 +42,8 @@ export type ClientOrderRow = {
   id: string;
   order_number: number;
   appointment_date: string | null;
+  /** IANA timezone of the service (used to render appointment_date). */
+  timezone: string;
   service_name: string | null;
   talent_name: string | null;
   status: string;
@@ -82,6 +84,8 @@ export type ClientPaymentItem = {
   order_id: string;
   order_number: number;
   appointment_date: string | null;
+  /** IANA timezone of the service (used to render appointment_date). */
+  timezone: string;
   service_name: string | null;
   total: number;
   notes: string | null;

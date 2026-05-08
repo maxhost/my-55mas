@@ -17,6 +17,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { getPaymentDetail } from '@/features/talents/detail/actions/get-payment-detail';
+import { formatDateInTz } from '@/shared/lib/datetime';
 import type {
   PaymentsTabHints,
   TalentPaymentDetail,
@@ -140,7 +141,11 @@ export function PaymentDetailSheet({
                             #{item.order_number}
                           </Link>
                         </TableCell>
-                        <TableCell>{formatDate(item.appointment_date)}</TableCell>
+                        <TableCell>
+                          {item.appointment_date
+                            ? formatDateInTz(item.appointment_date, item.timezone, 'es')
+                            : '—'}
+                        </TableCell>
                         <TableCell>{item.service_name ?? '—'}</TableCell>
                         <TableCell className="text-right">{item.hours ?? '—'}</TableCell>
                         <TableCell className="text-right">

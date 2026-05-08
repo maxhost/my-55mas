@@ -27,6 +27,7 @@ type OrderRow = {
   status: string;
   schedule_type: string;
   appointment_date: string | null;
+  timezone: string;
 };
 
 const PAGE_SIZE = 1000;
@@ -44,7 +45,7 @@ export async function listOrders({
     let query = supabase
       .from('orders')
       .select(
-        'id, order_number, client_id, talent_id, staff_member_id, service_id, country_id, service_city_id, status, schedule_type, appointment_date',
+        'id, order_number, client_id, talent_id, staff_member_id, service_id, country_id, service_city_id, status, schedule_type, appointment_date, timezone',
       )
       .order('order_number', { ascending: false })
       .range(from, from + PAGE_SIZE - 1);
@@ -104,6 +105,7 @@ export async function listOrders({
     service_name: o.service_id ? serviceMap.get(o.service_id) ?? null : null,
     client_name: clientMap.get(o.client_id) ?? null,
     appointment_date: o.appointment_date,
+    timezone: o.timezone,
     schedule_type: o.schedule_type as 'once' | 'weekly',
     staff_member_name: o.staff_member_id ? staffMap.get(o.staff_member_id) ?? null : null,
     talent_name: o.talent_id ? talentMap.get(o.talent_id) ?? null : null,
