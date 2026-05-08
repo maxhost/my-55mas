@@ -9,6 +9,7 @@ export type {
 } from './types';
 export {
   ARCHIVE_STATUSES,
+  INITIAL_ORDER_STATUS,
   ORDER_SCHEDULE_TYPES,
   ORDER_STATUSES,
   isArchiveStatus,

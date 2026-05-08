@@ -15,6 +15,14 @@ export const ORDER_STATUSES = [
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
 
 /**
+ * Status of a freshly-created order. Re-exports the canonical default
+ * from `shared/lib/domain-defaults` typed as `OrderStatus` so feature
+ * consumers get type narrowing.
+ */
+import { INITIAL_ORDER_STATUS as INITIAL_ORDER_STATUS_RAW } from '@/shared/lib/domain-defaults';
+export const INITIAL_ORDER_STATUS: OrderStatus = INITIAL_ORDER_STATUS_RAW as OrderStatus;
+
+/**
  * Statuses considered "archived". The `/admin/archive` listing scopes
  * results to this set, and the archive detail renders read-only while the
  * order is in any of these.

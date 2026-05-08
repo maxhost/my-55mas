@@ -10,6 +10,13 @@ export const TALENT_STATUSES = [
 ] as const;
 export type TalentStatus = (typeof TALENT_STATUSES)[number];
 
+/**
+ * Status of a freshly-registered talent. Re-exports the canonical default
+ * from `shared/lib/domain-defaults` typed as `TalentStatus`.
+ */
+import { INITIAL_TALENT_STATUS as INITIAL_TALENT_STATUS_RAW } from '@/shared/lib/domain-defaults';
+export const INITIAL_TALENT_STATUS: TalentStatus = INITIAL_TALENT_STATUS_RAW as TalentStatus;
+
 // ── Service Chip (for talent list) ──────────────────
 
 export type TalentServiceChip = {

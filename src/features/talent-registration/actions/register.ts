@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
 import type { Database, Json } from '@/lib/supabase/database.types';
+import { INITIAL_TALENT_STATUS } from '@/shared/lib/domain-defaults';
 import { TalentRegistrationSchema, type TalentRegistrationSchemaOutput } from '../schemas';
 
 type RegisterError = { error: Record<string, string[]> };
@@ -97,7 +98,7 @@ async function createTalentProfile(
     .from('talent_profiles')
     .insert({
       user_id: userId,
-      status: 'pending',
+      status: INITIAL_TALENT_STATUS,
       country_id: data.country_id,
       city_id: data.city_id,
       fiscal_id_type_id: data.fiscal_id_type_id,

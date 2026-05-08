@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { Json } from '@/lib/supabase/database.types';
+import { INITIAL_ORDER_STATUS } from '@/shared/lib/domain-defaults';
 import type { Question } from '@/shared/lib/questions';
 import { submitServiceHireSchema } from '../schemas';
 
@@ -98,7 +99,7 @@ export async function submitServiceHire(formData: FormData): Promise<SubmitResul
       contact_email: profile?.email ?? authData.user.email ?? '',
       contact_phone: profile?.phone ?? '',
       notes: state.notes || null,
-      status: 'pending',
+      status: INITIAL_ORDER_STATUS,
       payment_status: 'pending',
       price_subtotal: 0,
       price_tax_rate: 0,
