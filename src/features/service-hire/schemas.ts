@@ -65,11 +65,25 @@ export const submitServiceHireSchema = z.object({
   email: z.string().email().optional(),
 });
 
+// Guest contact: captured after anonymous sign-in so the resulting order has
+// real contact + fiscal data instead of "Guest" placeholders. The data also
+// updates profiles + client_profiles for the anonymous user so subsequent
+// orders in the same session reuse it.
+export const guestContactSchema = z.object({
+  full_name: z.string().trim().min(1).max(200),
+  email: z.string().email().max(200),
+  phone: z.string().trim().min(1).max(40),
+  fiscal_id_type_id: z.string().uuid(),
+  fiscal_id: z.string().trim().min(1).max(64),
+});
+
 export const signupCredentialsSchema = z.object({
-  full_name: z.string().min(1),
-  email: z.string().email(),
+  full_name: z.string().trim().min(1).max(200),
+  email: z.string().email().max(200),
   password: z.string().min(8),
-  phone: z.string().min(1),
+  phone: z.string().trim().min(1).max(40),
+  fiscal_id_type_id: z.string().uuid(),
+  fiscal_id: z.string().trim().min(1).max(64),
 });
 
 export const loginCredentialsSchema = z.object({
@@ -78,6 +92,7 @@ export const loginCredentialsSchema = z.object({
 });
 
 export type SubmitServiceHireInput = z.infer<typeof submitServiceHireSchema>;
+export type GuestContactInput = z.infer<typeof guestContactSchema>;
 export type SignupCredentials = z.infer<typeof signupCredentialsSchema>;
 export type LoginCredentials = z.infer<typeof loginCredentialsSchema>;
 
