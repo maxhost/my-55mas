@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { locales } from '@/lib/i18n/config';
+import { billingChoiceSchema } from '@/shared/fiscal/schemas';
 
 const localeKey = z.enum(locales as unknown as [string, ...string[]]);
 
@@ -63,6 +64,19 @@ export const submitServiceHireSchema = z.object({
   }),
   /** signed-up email (only for signup choice) — optional context */
   email: z.string().email().optional(),
+  /**
+   * Fiscal data of the contact. Optional during transitional state: when
+   * absent, submit falls back to client_profiles.fiscal_* of the registered
+   * user. Sessions 4-5 ensure the UI always sends these fields.
+   */
+  contact_fiscal_id_type_id: z.string().uuid().optional(),
+  contact_fiscal_id: z.string().trim().min(1).max(64).optional(),
+  /**
+   * Invoice override. `{ mode: 'same' }` (or absent) = invoice with contact.
+   * `{ mode: 'custom', data }` = invoice with the embedded party (stored in
+   * orders.billing_override jsonb).
+   */
+  billing: billingChoiceSchema.optional(),
 });
 
 // Guest contact: captured after anonymous sign-in so the resulting order has

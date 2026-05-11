@@ -2436,6 +2436,7 @@ export type Database = {
         }[]
       }
       delete_service: { Args: { p_service_id: string }; Returns: undefined }
+      is_email_registered: { Args: { p_email: string }; Returns: boolean }
       save_service_config: {
         Args: {
           p_allows_recurrence?: boolean
