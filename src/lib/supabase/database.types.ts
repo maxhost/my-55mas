@@ -169,6 +169,7 @@ export type Database = {
           company_tax_id: string | null
           created_at: string | null
           deleted_at: string | null
+          fiscal_id: string | null
           fiscal_id_type_id: string | null
           id: string
           is_business: boolean
@@ -186,6 +187,7 @@ export type Database = {
           company_tax_id?: string | null
           created_at?: string | null
           deleted_at?: string | null
+          fiscal_id?: string | null
           fiscal_id_type_id?: string | null
           id?: string
           is_business?: boolean
@@ -203,6 +205,7 @@ export type Database = {
           company_tax_id?: string | null
           created_at?: string | null
           deleted_at?: string | null
+          fiscal_id?: string | null
           fiscal_id_type_id?: string | null
           id?: string
           is_business?: boolean
@@ -1000,9 +1003,12 @@ export type Database = {
       orders: {
         Row: {
           appointment_date: string | null
+          billing_override: Json | null
           client_id: string
           contact_address: string | null
           contact_email: string
+          contact_fiscal_id: string | null
+          contact_fiscal_id_type_id: string | null
           contact_name: string
           contact_phone: string
           country_id: string
@@ -1042,9 +1048,12 @@ export type Database = {
         }
         Insert: {
           appointment_date?: string | null
+          billing_override?: Json | null
           client_id: string
           contact_address?: string | null
           contact_email: string
+          contact_fiscal_id?: string | null
+          contact_fiscal_id_type_id?: string | null
           contact_name: string
           contact_phone: string
           country_id: string
@@ -1084,9 +1093,12 @@ export type Database = {
         }
         Update: {
           appointment_date?: string | null
+          billing_override?: Json | null
           client_id?: string
           contact_address?: string | null
           contact_email?: string
+          contact_fiscal_id?: string | null
+          contact_fiscal_id_type_id?: string | null
           contact_name?: string
           contact_phone?: string
           country_id?: string
@@ -1130,6 +1142,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_contact_fiscal_id_type_id_fkey"
+            columns: ["contact_fiscal_id_type_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_id_types"
             referencedColumns: ["id"]
           },
           {
