@@ -1,0 +1,4 @@
+# Recon artifacts — large binaries used only for reference, not part of the mockup.
+_rendered.html
+_raw.html
+_screenshot-*.png
