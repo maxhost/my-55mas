@@ -1124,7 +1124,19 @@
     "noArchive": "No archived orders.",
     "backToList": "Back to archive"
   },
-  "home": {},
+  "home": {
+    "hero": {
+      "titleBefore": "Join the",
+      "titleAccent": "55+",
+      "titleAfter": "revolution and discover that talent has no age",
+      "lead": "Hire services from people over 55 to help you with your daily tasks. If you are 55+, stay active and add value to wellbeing — sign up and earn extra income.",
+      "ctaClientsLabel": "For Clients:",
+      "ctaClientsButton": "Hire a service",
+      "ctaTalentsLabel": "For people over 55:",
+      "ctaTalentsButton": "Offer a service",
+      "videoTitle": "55+ — Introduction video"
+    }
+  },
   "nav": {
     "homeAria": "55+ home",
     "mainAria": "Main navigation",

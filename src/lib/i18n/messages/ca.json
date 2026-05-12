@@ -1124,7 +1124,19 @@
     "noArchive": "No hi ha comandes a l'arxiu.",
     "backToList": "Tornar a l'arxiu"
   },
-  "home": {},
+  "home": {
+    "hero": {
+      "titleBefore": "Uneix-te a la revolució",
+      "titleAccent": "55+",
+      "titleAfter": "i descobreix que el talent no té edat",
+      "lead": "Contracta els serveis de persones de més de 55 anys per ajudar-te en les teves tasques diàries. Si tens més de 55 anys, mantén-te actiu i aporta valor al benestar — registra’t i aconsegueix un ingrés extra.",
+      "ctaClientsLabel": "Per a Clients:",
+      "ctaClientsButton": "Contracta un servei",
+      "ctaTalentsLabel": "Per a persones de més de 55:",
+      "ctaTalentsButton": "Ofereix un servei",
+      "videoTitle": "55+ — Vídeo de presentació"
+    }
+  },
   "nav": {
     "homeAria": "55+ inici",
     "mainAria": "Navegació principal",

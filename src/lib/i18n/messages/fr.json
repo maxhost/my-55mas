@@ -1124,7 +1124,19 @@
     "noArchive": "Aucune commande aux archives.",
     "backToList": "Retour aux archives"
   },
-  "home": {},
+  "home": {
+    "hero": {
+      "titleBefore": "Rejoignez la révolution",
+      "titleAccent": "55+",
+      "titleAfter": "et découvrez que le talent n’a pas d’âge",
+      "lead": "Engagez les services de personnes de plus de 55 ans pour vos tâches quotidiennes. Si vous avez plus de 55 ans, restez actif·ve et apportez du bien-être — inscrivez-vous et obtenez un revenu complémentaire.",
+      "ctaClientsLabel": "Pour les Clients :",
+      "ctaClientsButton": "Engager un service",
+      "ctaTalentsLabel": "Pour les plus de 55 ans :",
+      "ctaTalentsButton": "Offrir un service",
+      "videoTitle": "55+ — Vidéo de présentation"
+    }
+  },
   "nav": {
     "homeAria": "55+ accueil",
     "mainAria": "Navigation principale",

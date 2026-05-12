@@ -1124,7 +1124,19 @@
     "noArchive": "Sem pedidos no arquivo.",
     "backToList": "Voltar ao arquivo"
   },
-  "home": {},
+  "home": {
+    "hero": {
+      "titleBefore": "Junte-se à revolução",
+      "titleAccent": "55+",
+      "titleAfter": "e descubra que o talento não tem idade",
+      "lead": "Contrate os serviços de pessoas com mais de 55 anos para te ajudar nas tuas tarefas do dia a dia. Se tens mais de 55 anos, mantém-te ativo e gera bem-estar — inscreve-te e consegue um rendimento extra.",
+      "ctaClientsLabel": "Para Clientes:",
+      "ctaClientsButton": "Contratar um serviço",
+      "ctaTalentsLabel": "Para pessoas com mais de 55:",
+      "ctaTalentsButton": "Oferecer um serviço",
+      "videoTitle": "55+ — Vídeo de apresentação"
+    }
+  },
   "nav": {
     "homeAria": "55+ início",
     "mainAria": "Navegação principal",
