@@ -380,34 +380,48 @@
 <!-- ── 11. Footer ──────────────────────────────────────────────── -->
 <footer class="footer">
   <div class="footer__inner">
-    <div class="footer__col">
-      <span class="footer__logo">55<span class="footer__logo-plus">+</span></span>
-      <p class="footer__address">Gran Vía, 33, Centro, 28013 Madrid, Spain</p>
-      <p class="footer__contact">
-        <a href="tel:+34930491450">T. 930 49 14 50</a><br>
-        <a href="mailto:info@55mas.es">info@55mas.es</a>
-      </p>
+    <div class="footer__top">
+      <a href="/" class="footer__brand" aria-label="55+ inicio">
+        <img src="../../public/brand/logo-light.svg" alt="55+ quem sabe, faz bem." class="footer__brand-img">
+      </a>
+      <button class="footer__lang" aria-haspopup="listbox">
+        <span aria-hidden="true">🌐</span>
+        Español
+      </button>
     </div>
-    <div class="footer__col">
-      <h4 class="footer__heading">Compañía</h4>
-      <ul class="footer__links">
-        <li><a href="#">Sobre 55+</a></li>
+
+    <div class="footer__cols">
+      <div class="footer__col footer__col--contact">
+        <p class="footer__contact">
+          <a href="tel:+34930491450">T.930 49 14 50</a><br>
+          <a href="mailto:info@55mas.es">info@55mas.es</a>
+        </p>
+        <p class="footer__office">
+          <strong>Barcelona</strong><br>
+          Travessera de Gràcia, 88, Sarrià-Sant Gervasi, 08006 Barcelona, Spain
+        </p>
+        <p class="footer__office">
+          <strong>Madrid</strong><br>
+          Gran Vía, 33, Centro, 28013 Madrid, Spain
+        </p>
+      </div>
+      <ul class="footer__col footer__links">
+        <li><a href="#">Inicio</a></li>
         <li><a href="#">Nuestros servicios</a></li>
-        <li><a href="#">Preguntas Frecuentes</a></li>
-        <li><a href="#">Contacta con el 55+</a></li>
+        <li><a href="#">Sobre 55+</a></li>
+        <li><a href="#">Ofrece un servicio</a></li>
       </ul>
-    </div>
-    <div class="footer__col">
-      <h4 class="footer__heading">Legal</h4>
-      <ul class="footer__links">
+      <ul class="footer__col footer__links">
+        <li><a href="#">Preguntas Frecuentes</a></li>
+        <li><a href="#">Condiciones de uso del sitio web</a></li>
         <li><a href="#">Política de privacidad</a></li>
         <li><a href="#">Términos de Uso del Servicio</a></li>
-        <li><a href="#">Condiciones de uso del sitio web</a></li>
-        <li><a href="#">Configuración de cookies</a></li>
+        <li><a href="#">Transparencia</a></li>
       </ul>
     </div>
-    <div class="footer__col">
-      <h4 class="footer__heading">Síguenos</h4>
+
+    <div class="footer__bottom">
+      <div class="footer__copy">© Copyright 2026. 55+</div>
       <nav class="footer__socials" aria-label="Redes sociales">
         <a href="#" aria-label="Facebook"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740505777996x653095662094077800/Facebook.svg" alt=""></a>
         <a href="#" aria-label="LinkedIn"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740505819550x249029465297400320/Linkedin.svg" alt=""></a>
@@ -417,7 +431,20 @@
       </nav>
     </div>
   </div>
-  <div class="footer__copy">© Copyright 2026. 55+</div>
+
+  <!-- 2-row × 3-column colored stripe at the very bottom -->
+  <div class="footer__stripe" aria-hidden="true">
+    <div class="footer__stripe-row">
+      <span class="footer__stripe-cell" style="background:#E0E8C0"></span>
+      <span class="footer__stripe-cell" style="background:#5CB5E6"></span>
+      <span class="footer__stripe-cell" style="background:#171F46"></span>
+    </div>
+    <div class="footer__stripe-row">
+      <span class="footer__stripe-cell" style="background:#FEC35A"></span>
+      <span class="footer__stripe-cell" style="background:#F0513A"></span>
+      <span class="footer__stripe-cell" style="background:#DB1E3B"></span>
+    </div>
+  </div>
 </footer>
 
 <!-- ── 12. Floating WhatsApp ───────────────────────────────────── -->
