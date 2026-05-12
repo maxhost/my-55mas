@@ -603,21 +603,84 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 
 /* ── 8. Testimonials ──────────────────────────────────────── */
 
-.testimonials { background: var(--color-bg-cream); padding: 56px 0; }
+/* Testimonials — horizontal carousel of "review" cards. Cards have a
+   stable visual shape (centered Cliente label + star row + auto-
+   growing quote + author). Min-height ensures short quotes still
+   look balanced next to long ones. */
+.testimonials { background: var(--color-white); padding: 72px 0; }
 .testimonials__inner { max-width: var(--container); margin: 0 auto; padding: 0 16px; }
-.testimonials__list { display: grid; gap: 16px; margin-bottom: 24px; }
-@media (min-width: 768px) {
-  .testimonials__list { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.testimonials__title {
+  font-size: 2rem; font-weight: 700;
+  text-align: center; margin: 0 0 6px;
+  color: var(--color-text);
 }
+.testimonials__subtitle {
+  font-size: 1rem; font-weight: 600;
+  text-align: center; margin: 0 0 36px;
+  color: var(--color-text);
+}
+.testimonials__list {
+  display: flex; gap: 24px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 4px 4px 16px;
+  margin: 0 -4px;
+  scrollbar-width: none;
+}
+.testimonials__list::-webkit-scrollbar { display: none; }
+
 .testimonial {
-  background: white;
-  border-radius: var(--radius-md);
-  padding: 22px 22px 18px;
+  flex: 0 0 86vw;
+  scroll-snap-align: start;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  padding: 28px 28px 24px;
+  display: flex; flex-direction: column;
+  text-align: center;
+  min-height: 280px;
   box-shadow: var(--shadow-card);
 }
-.testimonial__quote { font-size: 0.95rem; margin: 0 0 12px; color: var(--color-text); }
-.testimonial__author { font-size: 0.85rem; color: var(--color-text-soft); font-weight: 600; }
-.testimonials__cta { text-align: center; }
+@media (min-width: 640px) { .testimonial { flex: 0 0 calc(50% - 12px); } }
+@media (min-width: 1024px) { .testimonial { flex: 0 0 calc((100% - 48px) / 3); } }
+
+.testimonial__role {
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 10px;
+}
+.testimonial__stars {
+  font-size: 1.4rem;
+  color: var(--color-accent-blue);
+  letter-spacing: 2px;
+  margin-bottom: 22px;
+  filter: brightness(0.85);
+}
+.testimonial__quote {
+  font-size: 0.95rem; font-style: italic;
+  color: var(--color-text);
+  line-height: 1.55;
+  margin: 0 0 24px;
+  text-align: left;
+  flex: 1;
+}
+.testimonial__author {
+  display: flex; align-items: center; justify-content: flex-start;
+  gap: 12px;
+}
+.testimonial__avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--color-accent-blue);
+  color: var(--color-text);
+  font-size: 0.95rem; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: 0 0 auto;
+}
+.testimonial__name {
+  font-size: 0.95rem; font-weight: 700;
+  color: var(--color-text);
+}
 
 /* ── 9. Collaborators ─────────────────────────────────────── */
 
