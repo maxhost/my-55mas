@@ -101,8 +101,9 @@ export function HowItWorks({
               className={`
                 inline-flex items-center justify-center
                 rounded-full px-7 py-3.5
-                text-base font-semibold whitespace-nowrap
+                text-base font-semibold
                 transition-colors
+                w-full md:w-auto md:whitespace-nowrap
                 ${CTA_VARIANTS[cta.variant]}
               `}
             >

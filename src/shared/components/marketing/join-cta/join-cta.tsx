@@ -53,7 +53,7 @@ export function JoinCta({ title, buttons }: JoinCtaProps) {
         <h2 className="m-0 mb-9 text-[1.8rem] font-bold leading-[1.35] text-brand-text md:text-[2.2rem]">
           {title}
         </h2>
-        <div className="flex flex-wrap justify-center gap-4">
+        <div className="flex flex-col items-stretch gap-4 md:flex-row md:flex-wrap md:items-center md:justify-center">
           {buttons.map((btn, i) => (
             <Link
               key={i}
@@ -61,8 +61,9 @@ export function JoinCta({ title, buttons }: JoinCtaProps) {
               className={`
                 inline-flex items-center justify-center
                 rounded-full px-7 py-3.5
-                text-base font-semibold whitespace-nowrap
+                text-base font-semibold
                 transition-colors
+                w-full md:w-auto md:whitespace-nowrap
                 ${VARIANTS[btn.variant]}
               `}
             >

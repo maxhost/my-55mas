@@ -65,6 +65,7 @@ export function ProjectSection({
               rounded-full bg-brand-mustard px-7 py-3.5
               text-base font-semibold text-brand-text
               hover:bg-brand-mustard-deep transition-colors
+              w-full md:w-auto
             "
           >
             {cta.label}
