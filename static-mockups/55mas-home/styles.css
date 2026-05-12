@@ -93,43 +93,10 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   .section-title { font-size: 2rem; margin-bottom: 2rem; }
 }
 
-/* ── 1. Top bar ───────────────────────────────────────────── */
-
-.topbar {
-  background: var(--color-top-bar);
-  color: var(--color-white);
-  font-size: 0.85rem;
-}
-.topbar__inner {
-  max-width: var(--container);
-  margin: 0 auto;
-  padding: 6px 16px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
-  align-items: center;
-  justify-content: space-between;
-}
-.topbar__location { display: inline-flex; align-items: center; gap: 6px; }
-.topbar__location-select {
-  background: transparent;
-  color: var(--color-white);
-  border: 1px solid rgba(255,255,255,0.4);
-  border-radius: var(--radius-sm);
-  padding: 2px 6px;
-  font: inherit;
-}
-.topbar__location-select option { color: #000; }
-.topbar__right { display: flex; align-items: center; gap: 16px; }
-.topbar__socials { display: inline-flex; align-items: center; gap: 10px; }
-.topbar__socials img { width: 16px; height: 16px; filter: brightness(0) invert(1); }
-.topbar__lang { color: var(--color-white); }
-
-/* ── 2. Header ────────────────────────────────────────────── */
+/* ── 1. Header (white) ────────────────────────────────────── */
 
 .header {
   background: var(--color-white);
-  border-bottom: 1px solid var(--color-border);
   position: sticky; top: 0; z-index: 50;
 }
 .header__inner {
@@ -138,29 +105,113 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   padding: 14px 16px;
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
+}
+
+/* Logo: text "55+" with decorative blocks behind */
+.header__logo {
+  position: relative;
+  display: inline-flex; align-items: center;
+  flex: 0 0 auto;
+  padding: 8px 12px 8px 18px;
+}
+.header__logo-block {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 3px;
+}
+.header__logo-block--yellow {
+  top: 0; left: 0;
+  width: 18px; height: 14px;
+  background: var(--color-secondary);
+}
+.header__logo-block--coral {
+  bottom: 0; left: 6px;
+  width: 22px; height: 18px;
+  background: var(--color-primary);
+  border-radius: 14px 14px 3px 3px;
+}
+.header__logo-block--navy {
+  top: 6px; left: 22px;
+  width: 14px; height: 22px;
+  background: var(--color-text);
+  border-radius: 3px 14px 3px 3px;
 }
 .header__logo-text {
-  font-size: 1.5rem; font-weight: 700;
+  position: relative; z-index: 1;
+  font-size: 1.5rem; font-weight: 800;
   color: var(--color-text);
+  letter-spacing: -0.02em;
 }
 .header__logo-plus { color: var(--color-primary); }
-.header__nav {
+
+/* Locator widget (label + dropdown + Busca button) */
+.header__locator {
   display: none;
-  gap: 22px;
+  align-items: center;
+  gap: 8px;
   flex: 1;
 }
-.header__nav-link {
-  font-size: 0.92rem;
+.header__locator-label {
+  font-size: 0.92rem; font-weight: 500;
   color: var(--color-text);
-  padding: 6px 0;
-  border-bottom: 2px solid transparent;
+  white-space: nowrap;
 }
-.header__nav-link.is-active,
-.header__nav-link:hover {
-  border-bottom-color: var(--color-primary);
+.header__locator-group {
+  display: inline-flex; align-items: center;
+  background: var(--color-bg-cream);
+  border-radius: var(--radius-pill);
+  padding: 4px 4px 4px 14px;
+  gap: 8px;
+  min-width: 280px;
 }
-.header__auth { display: none; gap: 8px; margin-left: auto; }
+.header__locator-select {
+  background: transparent;
+  border: none;
+  padding: 6px 4px;
+  font: inherit; font-size: 0.95rem;
+  color: var(--color-text);
+  flex: 1;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23171F46' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+  padding-right: 20px;
+}
+.header__locator-cta {
+  padding: 10px 22px;
+  font-weight: 700;
+}
+
+/* Right block (socials + lang + signin) */
+.header__right {
+  display: none;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+.header__socials { display: inline-flex; align-items: center; gap: 12px; }
+/* Bubble's source SVGs are white-fill (designed for the red top bar).
+   Apply brightness(0) to render them as solid dark on the white header. */
+.header__socials img {
+  width: 18px; height: 18px;
+  filter: brightness(0);
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+.header__socials a:hover img { opacity: 1; }
+.header__lang {
+  display: inline-flex; align-items: center; gap: 4px;
+  color: var(--color-text);
+  font-size: 0.92rem;
+}
+.header__lang-globe { font-size: 0.95rem; }
+.header__signin {
+  padding: 10px 22px;
+  font-weight: 700;
+}
+
+/* Mobile burger */
 .header__burger {
   margin-left: auto;
   width: 28px; height: 24px;
@@ -172,9 +223,42 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 
 @media (min-width: 1024px) {
-  .header__nav, .header__auth { display: flex; }
+  .header__inner { padding: 18px 24px; gap: 24px; }
+  .header__locator, .header__right { display: flex; }
   .header__burger { display: none; }
 }
+
+/* ── 2. Navbar (red strip) ────────────────────────────────── */
+
+.navbar {
+  background: var(--color-top-bar);
+  color: var(--color-white);
+}
+.navbar__inner {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 14px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 36px;
+}
+.navbar__link {
+  color: var(--color-white);
+  font-size: 0.98rem;
+  font-weight: 600;
+  padding: 4px 2px;
+  position: relative;
+}
+.navbar__link.is-active::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -2px;
+  height: 2px;
+  background: var(--color-white);
+  border-radius: 1px;
+}
+.navbar__link:hover { opacity: 0.85; }
 
 /* ── 3. Hero ──────────────────────────────────────────────── */
 

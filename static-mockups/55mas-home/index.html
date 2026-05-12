@@ -14,51 +14,57 @@
 </head>
 <body>
 
-<!-- ── 1. Top bar ──────────────────────────────────────────────── -->
-<div class="topbar" role="region" aria-label="Barra superior">
-  <div class="topbar__inner">
-    <label class="topbar__location" aria-label="Elige tu ubicación">
-      <span class="topbar__location-label">Elige tu ubicación:</span>
-      <select class="topbar__location-select">
-        <option>Barcelona</option>
-        <option>Madrid</option>
-      </select>
-    </label>
-    <div class="topbar__right">
-      <nav class="topbar__socials" aria-label="Redes sociales">
+<!-- ── 1. Header (white, tall) ─────────────────────────────────── -->
+<header class="header" role="banner">
+  <div class="header__inner">
+    <a href="/" class="header__logo" aria-label="55+ inicio">
+      <span class="header__logo-block header__logo-block--yellow" aria-hidden="true"></span>
+      <span class="header__logo-block header__logo-block--coral" aria-hidden="true"></span>
+      <span class="header__logo-block header__logo-block--navy" aria-hidden="true"></span>
+      <span class="header__logo-text">55<span class="header__logo-plus">+</span></span>
+    </a>
+
+    <form class="header__locator" onsubmit="event.preventDefault()" role="search" aria-label="Buscar servicios">
+      <label for="loc-select" class="header__locator-label">Elige tu ubicación:</label>
+      <div class="header__locator-group">
+        <select id="loc-select" class="header__locator-select">
+          <option>Barcelona</option>
+          <option>Madrid</option>
+        </select>
+        <button class="btn btn--secondary header__locator-cta" type="submit">Busca</button>
+      </div>
+    </form>
+
+    <div class="header__right">
+      <nav class="header__socials" aria-label="Redes sociales">
         <a href="#" aria-label="Facebook"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740505777996x653095662094077800/Facebook.svg" alt=""></a>
         <a href="#" aria-label="LinkedIn"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740505819550x249029465297400320/Linkedin.svg" alt=""></a>
         <a href="#" aria-label="Instagram"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740505845959x443288848793656400/Instagram.svg" alt=""></a>
         <a href="#" aria-label="WhatsApp"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740505857146x243708717962930900/Whatsapp.svg" alt=""></a>
         <a href="#" aria-label="YouTube"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740506270603x377200050752617860/Youtube.svg" alt=""></a>
       </nav>
-      <button class="topbar__lang" aria-haspopup="listbox">Español ▾</button>
+      <button class="header__lang" aria-haspopup="listbox">
+        <span class="header__lang-globe" aria-hidden="true">🌐</span>
+        Español
+      </button>
+      <a href="#" class="btn btn--secondary header__signin">Iniciar sesión</a>
     </div>
-  </div>
-</div>
 
-<!-- ── 2. Header ───────────────────────────────────────────────── -->
-<header class="header">
-  <div class="header__inner">
-    <a href="/" class="header__logo" aria-label="55+ inicio">
-      <span class="header__logo-text">55<span class="header__logo-plus">+</span></span>
-    </a>
-    <nav class="header__nav" aria-label="Principal">
-      <a href="#" class="header__nav-link is-active">Inicio</a>
-      <a href="#">Sobre 55+</a>
-      <a href="#">Nuestros servicios</a>
-      <a href="#">Preguntas Frecuentes</a>
-      <a href="#">Contacta con el 55+</a>
-    </nav>
-    <div class="header__auth">
-      <a href="#" class="btn btn--ghost">Iniciar sesión</a>
-      <a href="#" class="btn btn--primary">Registrarse</a>
-    </div>
     <button class="header__burger" aria-label="Abrir menú" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </div>
 </header>
+
+<!-- ── 2. Nav bar (red, slim) ──────────────────────────────────── -->
+<nav class="navbar" aria-label="Principal">
+  <div class="navbar__inner">
+    <a href="#" class="navbar__link is-active">Inicio</a>
+    <a href="#" class="navbar__link">Nuestros servicios</a>
+    <a href="#" class="navbar__link">Ofrece un servicio</a>
+    <a href="#" class="navbar__link">Sobre 55+</a>
+  </div>
+</nav>
 
 <!-- ── 3. Hero ─────────────────────────────────────────────────── -->
 <section class="hero">
