@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>55+ | Inicio</title>
+  <meta name="description" content="Marketplace donde personas mayores de 55 años ofrecen servicios profesionales. Contrata talento o registrá tu servicio.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700&display=swap">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ── 1. Top bar ──────────────────────────────────────────────── -->
+<div class="topbar" role="region" aria-label="Barra superior">
+  <div class="topbar__inner">
+    <label class="topbar__location" aria-label="Elige tu ubicación">
+      <span class="topbar__location-label">Elige tu ubicación:</span>
+      <select class="topbar__location-select">
+        <option>Barcelona</option>
+        <option>Madrid</option>
+      </select>
+    </label>
+    <div class="topbar__right">
+      <nav class="topbar__socials" aria-label="Redes sociales">
+        <a href="#" aria-label="Facebook"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740505777996x653095662094077800/Facebook.svg" alt=""></a>
+        <a href="#" aria-label="LinkedIn"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740505819550x249029465297400320/Linkedin.svg" alt=""></a>
+        <a href="#" aria-label="Instagram"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740505845959x443288848793656400/Instagram.svg" alt=""></a>
+        <a href="#" aria-label="WhatsApp"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740505857146x243708717962930900/Whatsapp.svg" alt=""></a>
+        <a href="#" aria-label="YouTube"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740506270603x377200050752617860/Youtube.svg" alt=""></a>
+      </nav>
+      <button class="topbar__lang" aria-haspopup="listbox">Español ▾</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 2. Header ───────────────────────────────────────────────── -->
+<header class="header">
+  <div class="header__inner">
+    <a href="/" class="header__logo" aria-label="55+ inicio">
+      <span class="header__logo-text">55<span class="header__logo-plus">+</span></span>
+    </a>
+    <nav class="header__nav" aria-label="Principal">
+      <a href="#" class="header__nav-link is-active">Inicio</a>
+      <a href="#">Sobre 55+</a>
+      <a href="#">Nuestros servicios</a>
+      <a href="#">Preguntas Frecuentes</a>
+      <a href="#">Contacta con el 55+</a>
+    </nav>
+    <div class="header__auth">
+      <a href="#" class="btn btn--ghost">Iniciar sesión</a>
+      <a href="#" class="btn btn--primary">Registrarse</a>
+    </div>
+    <button class="header__burger" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ── 3. Hero ─────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero__decor hero__decor--dot" aria-hidden="true"></div>
+  <div class="hero__decor hero__decor--blue" aria-hidden="true"></div>
+  <div class="hero__decor hero__decor--red" aria-hidden="true"></div>
+  <div class="hero__inner">
+    <div class="hero__content">
+      <h1 class="hero__title">Únete a la revolución <span class="hero__title-accent">55+</span> y descubre que el talento no tiene edad</h1>
+      <p class="hero__lead">
+        Contrata los servicios de personas de más de 55 años para ayudarte
+        en tus tareas cotidianas. Si eres una persona de más de 55 años,
+        únete activo y aporta valor en bienestar, regístrate y consigue
+        un ingreso extra.
+      </p>
+      <div class="hero__ctas">
+        <div class="hero__cta">
+          <span class="hero__cta-label">Para Clientes:</span>
+          <a href="#" class="btn btn--secondary btn--lg">Contrata un servicio</a>
+        </div>
+        <div class="hero__cta">
+          <span class="hero__cta-label">Para personas de más de 55:</span>
+          <a href="#" class="btn btn--ghost btn--lg">Ofrece un servicio</a>
+        </div>
+      </div>
+    </div>
+    <figure class="hero__media">
+      <img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/cdn-cgi/image/w=768,h=543,f=auto,dpr=1,fit=contain/f1745528846068x685064865993180800/image.png"
+           alt="Persona mayor sonriendo, talento 55+">
+      <button class="hero__play" aria-label="Reproducir video">▶</button>
+    </figure>
+  </div>
+</section>
+
+<!-- ── 4. Services grid ────────────────────────────────────────── -->
+<section class="services">
+  <div class="services__inner">
+    <h2 class="section-title">El servicio que necesitas, cerca de ti</h2>
+    <div class="services__locator">
+      <span class="services__locator-icon" aria-hidden="true">📍</span>
+      <span class="services__locator-label">Elige tu ubicación</span>
+      <select class="services__locator-select">
+        <option>Barcelona</option>
+        <option>Madrid</option>
+      </select>
+    </div>
+    <div class="services__tabs" role="tablist">
+      <button class="services__tab is-active" role="tab" aria-selected="true">Todos</button>
+      <button class="services__tab" role="tab">Acompañamiento</button>
+      <button class="services__tab" role="tab">Clases</button>
+      <button class="services__tab" role="tab">Reparaciones</button>
+      <button class="services__tab" role="tab">Casa</button>
+    </div>
+    <div class="services__grid">
+      <!-- Card 1 -->
+      <article class="card">
+        <img class="card__img" src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=60&auto=format" alt="">
+        <div class="card__body">
+          <span class="card__badge">Acompañamiento</span>
+          <h3 class="card__title">Experiencia Gastronómica</h3>
+          <ul class="card__bullets">
+            <li>Comida casera en tu casa Barcelona</li>
+            <li>Menús personalizados de chefs apasionados</li>
+            <li>Servicio en toda Barcelona</li>
+          </ul>
+        </div>
+      </article>
+      <!-- Card 2 -->
+      <article class="card">
+        <img class="card__img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=60&auto=format" alt="">
+        <div class="card__body">
+          <span class="card__badge">Casa</span>
+          <h3 class="card__title">Chef en Casa</h3>
+          <ul class="card__bullets">
+            <li>Menús personalizados y cocina de calidad</li>
+            <li>Servicio en toda Barcelona</li>
+          </ul>
+        </div>
+      </article>
+      <!-- Card 3 -->
+      <article class="card">
+        <img class="card__img" src="https://images.unsplash.com/photo-1581579438747-104c53e7b521?w=600&q=60&auto=format" alt="">
+        <div class="card__body">
+          <span class="card__badge card__badge--alt">Acompañamiento</span>
+          <h3 class="card__title">Apoyo a mayores</h3>
+          <ul class="card__bullets">
+            <li>Atención y acompañamiento profesional</li>
+            <li>Servicio en toda Barcelona</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+    <div class="services__cta">
+      <a href="#" class="btn btn--secondary btn--lg">Ver todos los servicios</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── 5. How it works (talents) ───────────────────────────────── -->
+<section class="howto howto--talents">
+  <div class="howto__inner">
+    <h2 class="section-title">Ganas tú. Ganan ellos. Ganamos todos <span class="section-title__accent">¿Cómo funciona?</span></h2>
+    <div class="howto__row">
+      <figure class="howto__media">
+        <img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/cdn-cgi/image/w=384,h=384,f=auto,dpr=1,fit=contain/f1751921282638x339734082079698370/Group%2042.png" alt="">
+      </figure>
+      <div class="howto__content">
+        <h3 class="howto__heading">Haz lo que mejor se te da y ayuda a los demás con tu talento</h3>
+        <ol class="howto__steps">
+          <li><span class="howto__step-num">1</span>Regístrate en 55+ y crea tu perfil</li>
+          <li><span class="howto__step-num">2</span>Recibe solicitudes de tu servicio</li>
+          <li><span class="howto__step-num">3</span>Trabaja y recibe tu pago con flexibilidad</li>
+        </ol>
+        <a href="#" class="btn btn--primary">Ofrece un servicio</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 6. How it works (clients) ───────────────────────────────── -->
+<section class="howto howto--clients">
+  <div class="howto__inner">
+    <div class="howto__row howto__row--reversed">
+      <div class="howto__content">
+        <h3 class="howto__heading">Contribuye a mejorar la vida de los 55+, mientras encuentras soluciones para tu día a día</h3>
+        <ol class="howto__steps">
+          <li><span class="howto__step-num">1</span>Descubre todos los servicios disponibles cerca de ti</li>
+          <li><span class="howto__step-num">2</span>Disfruta un servicio con confianza y calidad</li>
+          <li><span class="howto__step-num">3</span>Conócelos a todos</li>
+        </ol>
+        <a href="#" class="btn btn--secondary">Contrata un servicio</a>
+      </div>
+      <figure class="howto__media">
+        <img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/cdn-cgi/image/w=384,h=384,f=auto,dpr=1,fit=contain/f1751922226545x391336236503567740/Group%2041.png" alt="">
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ── 7. Project ──────────────────────────────────────────────── -->
+<section class="project">
+  <div class="project__inner">
+    <figure class="project__media">
+      <img src="https://images.unsplash.com/photo-1581579438747-104c53e7b521?w=900&q=60&auto=format" alt="">
+    </figure>
+    <div class="project__content">
+      <h2 class="section-title">Nuestro proyecto 55+</h2>
+      <p class="project__lead">
+        Conocé los 55+, la comunidad que transforma la experiencia
+        y el talento en valor para personas que necesitan apoyo
+        en su día a día. Una iniciativa social con propósito.
+      </p>
+      <a href="#" class="btn btn--secondary">Descubre la asociación</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── 8. Testimonials ─────────────────────────────────────────── -->
+<section class="testimonials">
+  <div class="testimonials__inner">
+    <h2 class="section-title">Ellos ya forman parte de 55+. <span class="section-title__accent">Esto es lo que cuentan.</span></h2>
+    <div class="testimonials__list">
+      <article class="testimonial">
+        <p class="testimonial__quote">«Encontré una vocación nueva después de los 60. Ofrecer mis clases de cocina cambió mi día a día.»</p>
+        <footer class="testimonial__author">— Andrea, Barcelona</footer>
+      </article>
+      <article class="testimonial">
+        <p class="testimonial__quote">«Contratamos a una persona 55+ para acompañar a mi madre y todo cambió en casa.»</p>
+        <footer class="testimonial__author">— Luis, Madrid</footer>
+      </article>
+      <article class="testimonial">
+        <p class="testimonial__quote">«La plataforma me dio confianza. Recibo solicitudes y trabajo con flexibilidad.»</p>
+        <footer class="testimonial__author">— Carmen, Barcelona</footer>
+      </article>
+    </div>
+    <div class="testimonials__cta">
+      <a href="#" class="btn btn--ghost">Descubre testimonios inspiradores</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── 9. Collaborators ────────────────────────────────────────── -->
+<section class="collaborators">
+  <div class="collaborators__inner">
+    <h2 class="section-title section-title--sm">Colaboradores</h2>
+    <ul class="collaborators__grid">
+      <li><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/cdn-cgi/image/w=96,h=96,f=auto,dpr=1,fit=contain/f1763487252937x483543950116803700/Fundacio%CC%81n%20Juan%20Entrecanales.png" alt="Fundación Juan Entrecanales"></li>
+      <li><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/cdn-cgi/image/w=96,h=96,f=auto,dpr=1,fit=contain/f1763487286284x568551872526792400/logo%20fundacio%CC%81n%20SAbadell.png" alt="Fundación Sabadell"></li>
+      <li><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/cdn-cgi/image/w=96,h=96,f=auto,dpr=1,fit=contain/f1763487308325x596328463103136500/Ship2bfoundation.png" alt="Ship2b Foundation"></li>
+      <li><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/cdn-cgi/image/w=96,h=96,f=auto,dpr=1,fit=contain/f1763487327924x915078301813935900/B-VALUE.png" alt="B-Value"></li>
+      <li><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/cdn-cgi/image/w=96,h=96,f=auto,dpr=1,fit=contain/f1763487365360x886625720547902700/logo%20Barcelona%20Activa.png" alt="Barcelona Activa"></li>
+      <li><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/cdn-cgi/image/w=96,h=96,f=auto,dpr=1,fit=contain/f1763487687995x640282683772514400/SBD_Seg%20Grales_Pensiones_Vida_pos_col_cas.jpg" alt="SBD Seguros"></li>
+      <li><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/cdn-cgi/image/w=96,h=96,f=auto,dpr=1,fit=contain/f1763487861224x557073284378615700/DIP%20MALAGA.jpg" alt="Diputación de Málaga"></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ── 10. Newsletter ──────────────────────────────────────────── -->
+<section class="newsletter">
+  <div class="newsletter__inner">
+    <h2 class="newsletter__title">Recibe nuestra newsletter</h2>
+    <p class="newsletter__lead">Entérate de las últimas novedades, logros y eventos de 55+. En tu correo, una vez al mes.</p>
+    <form class="newsletter__form" onsubmit="event.preventDefault()">
+      <label class="visually-hidden" for="newsletter-email">Email</label>
+      <input id="newsletter-email" class="newsletter__input" type="email" placeholder="Tu correo electrónico" required>
+      <button class="btn btn--secondary newsletter__submit" type="submit">Subscríbete</button>
+    </form>
+  </div>
+</section>
+
+<!-- ── 11. Footer ──────────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__col">
+      <span class="footer__logo">55<span class="footer__logo-plus">+</span></span>
+      <p class="footer__address">Gran Vía, 33, Centro, 28013 Madrid, Spain</p>
+      <p class="footer__contact">
+        <a href="tel:+34930491450">T. 930 49 14 50</a><br>
+        <a href="mailto:info@55mas.es">info@55mas.es</a>
+      </p>
+    </div>
+    <div class="footer__col">
+      <h4 class="footer__heading">Compañía</h4>
+      <ul class="footer__links">
+        <li><a href="#">Sobre 55+</a></li>
+        <li><a href="#">Nuestros servicios</a></li>
+        <li><a href="#">Preguntas Frecuentes</a></li>
+        <li><a href="#">Contacta con el 55+</a></li>
+      </ul>
+    </div>
+    <div class="footer__col">
+      <h4 class="footer__heading">Legal</h4>
+      <ul class="footer__links">
+        <li><a href="#">Política de privacidad</a></li>
+        <li><a href="#">Términos de Uso del Servicio</a></li>
+        <li><a href="#">Condiciones de uso del sitio web</a></li>
+        <li><a href="#">Configuración de cookies</a></li>
+      </ul>
+    </div>
+    <div class="footer__col">
+      <h4 class="footer__heading">Síguenos</h4>
+      <nav class="footer__socials" aria-label="Redes sociales">
+        <a href="#" aria-label="Facebook"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740505777996x653095662094077800/Facebook.svg" alt=""></a>
+        <a href="#" aria-label="LinkedIn"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740505819550x249029465297400320/Linkedin.svg" alt=""></a>
+        <a href="#" aria-label="Instagram"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740505845959x443288848793656400/Instagram.svg" alt=""></a>
+        <a href="#" aria-label="WhatsApp"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740505857146x243708717962930900/Whatsapp.svg" alt=""></a>
+        <a href="#" aria-label="YouTube"><img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740506270603x377200050752617860/Youtube.svg" alt=""></a>
+      </nav>
+    </div>
+  </div>
+  <div class="footer__copy">© Copyright 2026. 55+</div>
+</footer>
+
+<!-- ── 12. Floating WhatsApp ───────────────────────────────────── -->
+<a href="#" class="whatsapp-fab" aria-label="Contactar por WhatsApp">
+  <img src="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io/f1740505857146x243708717962930900/Whatsapp.svg" alt="" width="28" height="28">
+</a>
+
+</body>
+</html>
