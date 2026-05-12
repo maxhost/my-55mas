@@ -124,6 +124,12 @@ export function TestServiceHirePage({ services, locale, fiscalIdTypes }: Props) 
                 authenticatedAs: tg('authAuthenticatedAs'),
                 asGuest: tg('authAsGuest'),
                 error: tg('authError'),
+                emailAlreadyRegistered: tg('emailAlreadyRegistered'),
+                fiscalType: tg('fiscalType'),
+                fiscalTypePlaceholder: tg('fiscalTypePlaceholder'),
+                fiscalNumber: tg('fiscalNumber'),
+                fiscalNumberPlaceholder: tg('fiscalNumberPlaceholder'),
+                fiscalFormatError: tg('fiscalFormatError'),
                 guestData: {
                   title: tg('guestDataTitle'),
                   name: tg('guestDataName'),

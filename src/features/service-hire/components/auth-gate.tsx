@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { signinAsGuest, signupClient, loginClient } from '../actions/auth-actions';
+import { checkEmailStatus } from '../actions/check-email-status';
 import type { FiscalIdTypeOption } from '../actions/list-fiscal-id-types';
 import { GuestContactFields } from './guest-contact-fields';
+import { FiscalIdInput } from './fiscal-id-input';
 
 export type AuthState =
   | { status: 'idle' }
@@ -34,9 +36,17 @@ type Props = {
     authenticatedAs: string;
     asGuest: string;
     error: string;
+    emailAlreadyRegistered: string;
+    fiscalType: string;
+    fiscalTypePlaceholder: string;
+    fiscalNumber: string;
+    fiscalNumberPlaceholder: string;
+    fiscalFormatError: string;
     guestData: React.ComponentProps<typeof GuestContactFields>['hints'];
   };
 };
+
+const EMAIL_DEBOUNCE_MS = 400;
 
 export function AuthGate({ authState, onAuthenticated, fiscalIdTypes, hints }: Props) {
   const [choice, setChoice] = useState<Choice>(null);
@@ -44,11 +54,40 @@ export function AuthGate({ authState, onAuthenticated, fiscalIdTypes, hints }: P
   const [error, setError] = useState<string | null>(null);
   const [pendingGuestUserId, setPendingGuestUserId] = useState<string | null>(null);
 
-  // Signup state
+  // Signup state (5 fields + fiscal pair)
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
+  const [signupFiscalTypeId, setSignupFiscalTypeId] = useState('');
+  const [signupFiscalId, setSignupFiscalId] = useState('');
+  const [signupEmailBlocked, setSignupEmailBlocked] = useState(false);
+  const [signupEmailChecking, setSignupEmailChecking] = useState(false);
+  const emailDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Signup email pre-check: when in signup mode, debounce-check whether the
+  // email already belongs to a registered account. Blocking before submit
+  // saves the user from filling the rest just to fail on auth.signUp.
+  useEffect(() => {
+    if (choice !== 'signup') {
+      setSignupEmailBlocked(false);
+      return;
+    }
+    if (emailDebounceRef.current) clearTimeout(emailDebounceRef.current);
+    setSignupEmailBlocked(false);
+    if (!email.includes('@') || email.length < 5) return;
+    const emailToCheck = email;
+    setSignupEmailChecking(true);
+    emailDebounceRef.current = setTimeout(async () => {
+      const r = await checkEmailStatus({ email: emailToCheck });
+      setSignupEmailChecking(false);
+      if (emailToCheck !== email) return;
+      if ('data' in r && r.data.hasAccount) setSignupEmailBlocked(true);
+    }, EMAIL_DEBOUNCE_MS);
+    return () => {
+      if (emailDebounceRef.current) clearTimeout(emailDebounceRef.current);
+    };
+  }, [email, choice]);
 
   if (authState.status === 'authenticated') {
     return (
@@ -84,19 +123,32 @@ export function AuthGate({ authState, onAuthenticated, fiscalIdTypes, hints }: P
         setError(r.error.message);
         return;
       }
-      // Two-phase: anonymous session created, now collect guest data before
-      // marking the parent form authenticated.
       setPendingGuestUserId(r.data.userId);
     });
   };
 
+  const canSubmitSignup =
+    !isPending &&
+    !signupEmailBlocked &&
+    !signupEmailChecking &&
+    name.trim().length > 0 &&
+    email.includes('@') &&
+    password.length >= 8 &&
+    phone.trim().length > 0 &&
+    signupFiscalTypeId.length > 0 &&
+    signupFiscalId.trim().length > 0;
+
   const handleSignup = () => {
     setError(null);
     startTransition(async () => {
-      // Sessions 4-5: signup also captures fiscal data. Signup-with-fiscal UI
-      // lands in Session 5; for now signup falls back to legacy (no fiscal)
-      // and signupClient will reject — the user should pick guest or login.
-      const r = await signupClient({ full_name: name, email, password, phone });
+      const r = await signupClient({
+        full_name: name,
+        email,
+        password,
+        phone,
+        fiscal_id_type_id: signupFiscalTypeId,
+        fiscal_id: signupFiscalId,
+      });
       if ('error' in r) {
         setError(r.error.message);
         return;
@@ -159,7 +211,19 @@ export function AuthGate({ authState, onAuthenticated, fiscalIdTypes, hints }: P
           </div>
           <div>
             <Label htmlFor="signup-email">{hints.signupEmail}</Label>
-            <Input id="signup-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input
+              id="signup-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              aria-invalid={signupEmailBlocked || undefined}
+              aria-describedby={signupEmailBlocked ? 'signup-email-error' : undefined}
+            />
+            {signupEmailBlocked && (
+              <p id="signup-email-error" className="text-destructive text-xs">
+                {hints.emailAlreadyRegistered}
+              </p>
+            )}
           </div>
           <div>
             <Label htmlFor="signup-password">{hints.signupPassword}</Label>
@@ -169,7 +233,22 @@ export function AuthGate({ authState, onAuthenticated, fiscalIdTypes, hints }: P
             <Label htmlFor="signup-phone">{hints.signupPhone}</Label>
             <Input id="signup-phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
-          <Button type="button" disabled={isPending} onClick={handleSignup}>
+          <FiscalIdInput
+            idPrefix="signup"
+            options={fiscalIdTypes}
+            typeId={signupFiscalTypeId}
+            number={signupFiscalId}
+            onTypeChange={setSignupFiscalTypeId}
+            onNumberChange={setSignupFiscalId}
+            hints={{
+              typeLabel: hints.fiscalType,
+              typePlaceholder: hints.fiscalTypePlaceholder,
+              numberLabel: hints.fiscalNumber,
+              numberPlaceholder: hints.fiscalNumberPlaceholder,
+              formatError: hints.fiscalFormatError,
+            }}
+          />
+          <Button type="button" disabled={!canSubmitSignup} onClick={handleSignup}>
             {isPending ? '…' : hints.signupConfirm}
           </Button>
         </div>
