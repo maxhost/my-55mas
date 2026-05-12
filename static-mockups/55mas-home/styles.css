@@ -160,6 +160,15 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   background-repeat: no-repeat;
   background-position: right center;
   padding-right: 24px;
+  outline: none;
+}
+/* Suppress mouse-click focus ring on the locator dropdown; keep
+   keyboard focus visible for a11y via :focus-visible. */
+.header__locator-select:focus { outline: none; box-shadow: none; }
+.header__locator-select:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 /* Busca CTA — separate yellow pill */
 .header__locator-cta {
