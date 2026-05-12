@@ -287,10 +287,12 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   color: var(--color-text);
 }
 .hero__cta .btn { align-self: flex-start; }
-/* The second CTA uses btn--ghost but with a YELLOW border (matches the
-   original's outlined-yellow style for "Ofrece un servicio"). */
+/* The second CTA matches the join-cta "Ofrece un servicio" style:
+   white fill, yellow border, navy text, hover flips to yellow fill. */
 .hero__cta .btn--ghost {
+  background: var(--color-white);
   border-color: var(--color-secondary);
+  color: var(--color-text);
 }
 .hero__cta .btn--ghost:hover {
   background: var(--color-secondary);
