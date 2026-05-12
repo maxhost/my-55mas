@@ -1233,5 +1233,18 @@
   },
   "whatsapp": {
     "label": "Contactar per WhatsApp"
+  },
+  "errors": {
+    "boundary": {
+      "title": "Alguna cosa ha anat malament",
+      "lead": "Hem tingut un problema carregant aquesta secció. Pots tornar-ho a provar o tornar a l’inici.",
+      "retry": "Tornar a provar",
+      "home": "Anar a l’inici"
+    },
+    "notFound": {
+      "title": "Pàgina no trobada",
+      "lead": "La pàgina que cerques no existeix o s’ha mogut.",
+      "home": "Tornar a l’inici"
+    }
   }
 }

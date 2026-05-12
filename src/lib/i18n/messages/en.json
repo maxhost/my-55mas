@@ -1233,5 +1233,18 @@
   },
   "whatsapp": {
     "label": "Contact by WhatsApp"
+  },
+  "errors": {
+    "boundary": {
+      "title": "Something went wrong",
+      "lead": "We had a problem loading this section. You can retry or go back home.",
+      "retry": "Try again",
+      "home": "Go home"
+    },
+    "notFound": {
+      "title": "Page not found",
+      "lead": "The page you are looking for doesn’t exist or has moved.",
+      "home": "Back home"
+    }
   }
 }

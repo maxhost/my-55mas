@@ -1233,5 +1233,18 @@
   },
   "whatsapp": {
     "label": "Contacter par WhatsApp"
+  },
+  "errors": {
+    "boundary": {
+      "title": "Une erreur s’est produite",
+      "lead": "Nous avons eu un problème pour charger cette section. Vous pouvez réessayer ou revenir à l’accueil.",
+      "retry": "Réessayer",
+      "home": "Revenir à l’accueil"
+    },
+    "notFound": {
+      "title": "Page introuvable",
+      "lead": "La page que vous cherchez n’existe pas ou a été déplacée.",
+      "home": "Retour à l’accueil"
+    }
   }
 }

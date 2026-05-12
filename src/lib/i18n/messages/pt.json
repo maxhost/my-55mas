@@ -1233,5 +1233,18 @@
   },
   "whatsapp": {
     "label": "Contactar via WhatsApp"
+  },
+  "errors": {
+    "boundary": {
+      "title": "Algo correu mal",
+      "lead": "Tivemos um problema a carregar esta secção. Podes tentar novamente ou voltar ao início.",
+      "retry": "Tentar novamente",
+      "home": "Ir para o início"
+    },
+    "notFound": {
+      "title": "Página não encontrada",
+      "lead": "A página que procuras não existe ou foi movida.",
+      "home": "Voltar ao início"
+    }
   }
 }
