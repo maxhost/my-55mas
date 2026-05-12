@@ -278,13 +278,23 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   margin: 0 0 24px;
   max-width: 50ch;
 }
-.hero__ctas { display: grid; gap: 16px; }
-.hero__cta { display: flex; flex-direction: column; gap: 6px; }
+/* Stacked CTAs (vertical column on all viewports). */
+.hero__ctas { display: flex; flex-direction: column; gap: 22px; }
+.hero__cta { display: flex; flex-direction: column; gap: 10px; }
 .hero__cta-label {
-  font-size: 0.82rem; font-weight: 600;
-  color: var(--color-text-soft);
+  font-size: 0.95rem; font-weight: 700;
+  color: var(--color-text);
 }
 .hero__cta .btn { align-self: flex-start; }
+/* The second CTA uses btn--ghost but with a YELLOW border (matches the
+   original's outlined-yellow style for "Ofrece un servicio"). */
+.hero__cta .btn--ghost {
+  border-color: var(--color-secondary);
+}
+.hero__cta .btn--ghost:hover {
+  background: var(--color-secondary);
+  color: var(--color-text);
+}
 
 .hero__media {
   margin: 0;
@@ -368,7 +378,6 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 @media (min-width: 768px) {
   .hero__inner { grid-template-columns: 1.1fr 1fr; padding: 56px 24px 72px; }
   .hero__title { font-size: 2.6rem; }
-  .hero__ctas { grid-template-columns: 1fr 1fr; gap: 28px; }
 }
 @media (min-width: 1024px) {
   .hero__title { font-size: 3rem; }
