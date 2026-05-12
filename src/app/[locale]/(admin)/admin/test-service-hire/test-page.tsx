@@ -13,14 +13,16 @@ import { Label } from '@/components/ui/label';
 import { getServiceForHire } from '@/features/service-hire/actions/get-service-for-hire';
 import type { PublishedServiceOption } from '@/features/service-hire/actions/list-published-services';
 import type { ServiceForHire } from '@/features/service-hire/actions/get-service-for-hire';
+import type { FiscalIdTypeOption } from '@/features/service-hire/actions/list-fiscal-id-types';
 import { ServiceHireForm } from '@/features/service-hire/components/service-hire-form';
 
 type Props = {
   services: PublishedServiceOption[];
   locale: string;
+  fiscalIdTypes: FiscalIdTypeOption[];
 };
 
-export function TestServiceHirePage({ services, locale }: Props) {
+export function TestServiceHirePage({ services, locale, fiscalIdTypes }: Props) {
   const t = useTranslations('AdminTestServiceHire');
   const tg = useTranslations('ServiceHire');
   const [serviceId, setServiceId] = useState<string>('');
@@ -80,6 +82,7 @@ export function TestServiceHirePage({ services, locale }: Props) {
           <ServiceHireForm
             service={service}
             locale={locale}
+            fiscalIdTypes={fiscalIdTypes}
             hints={{
               addressLabel: tg('addressLabel'),
               addressPlaceholder: tg('addressPlaceholder'),
@@ -121,6 +124,32 @@ export function TestServiceHirePage({ services, locale }: Props) {
                 authenticatedAs: tg('authAuthenticatedAs'),
                 asGuest: tg('authAsGuest'),
                 error: tg('authError'),
+                guestData: {
+                  title: tg('guestDataTitle'),
+                  name: tg('guestDataName'),
+                  email: tg('guestDataEmail'),
+                  phone: tg('guestDataPhone'),
+                  fiscalType: tg('fiscalType'),
+                  fiscalTypePlaceholder: tg('fiscalTypePlaceholder'),
+                  fiscalNumber: tg('fiscalNumber'),
+                  fiscalNumberPlaceholder: tg('fiscalNumberPlaceholder'),
+                  formatError: tg('fiscalFormatError'),
+                  emailRegistered: tg('emailAlreadyRegistered'),
+                  submit: tg('guestDataSubmit'),
+                  error: tg('authError'),
+                },
+              },
+              billing: {
+                legend: tg('billingLegend'),
+                same: tg('billingSame'),
+                custom: tg('billingCustom'),
+                name: tg('billingName'),
+                phone: tg('billingPhone'),
+                fiscalType: tg('fiscalType'),
+                fiscalTypePlaceholder: tg('fiscalTypePlaceholder'),
+                fiscalNumber: tg('fiscalNumber'),
+                fiscalNumberPlaceholder: tg('fiscalNumberPlaceholder'),
+                formatError: tg('fiscalFormatError'),
               },
               questions: {
                 yes: tg('yes'),
@@ -139,6 +168,7 @@ export function TestServiceHirePage({ services, locale }: Props) {
                 termsRequired: tg('validationTermsRequired'),
                 authRequired: tg('validationAuthRequired'),
                 fieldRequired: tg('validationFieldRequired'),
+                billingCustomIncomplete: tg('validationBillingCustomIncomplete'),
               },
             }}
           />

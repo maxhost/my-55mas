@@ -13,12 +13,24 @@ export type SchedulingValue = {
   end_date?: string;         // ISO YYYY-MM-DD
 };
 
+export type BillingPartyValue = {
+  name: string;
+  phone: string;
+  fiscal_id_type_id: string;
+  fiscal_id: string;
+};
+
+export type BillingChoiceValue =
+  | { mode: 'same' }
+  | { mode: 'custom'; data: BillingPartyValue };
+
 export type ServiceHireFormState = {
   address: AddressValue;
   scheduling: SchedulingValue;
   answers: AnswersMap;
   notes: string;
   terms_accepted: boolean;
+  billing: BillingChoiceValue;
 };
 
 export const emptyScheduling: SchedulingValue = {
@@ -26,3 +38,5 @@ export const emptyScheduling: SchedulingValue = {
   start_date: '',
   time_start: '',
 };
+
+export const emptyBilling: BillingChoiceValue = { mode: 'same' };

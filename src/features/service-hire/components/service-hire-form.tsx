@@ -6,16 +6,19 @@ import { Label } from '@/components/ui/label';
 import { AddressAutocomplete, emptyAddress } from '@/shared/components/address-autocomplete';
 import { ServiceQuestionsRenderer } from '@/shared/components/question-renderers';
 import type { ServiceForHire } from '../actions/get-service-for-hire';
+import type { FiscalIdTypeOption } from '../actions/list-fiscal-id-types';
 import { submitServiceHire } from '../actions/submit-service-hire';
 import type { ServiceHireFormState } from '../types';
-import { emptyScheduling } from '../types';
+import { emptyScheduling, emptyBilling } from '../types';
 import { SchedulingBlock } from './scheduling-block';
 import { AuthGate, type AuthState } from './auth-gate';
+import { BillingChoiceFields } from './billing-choice-fields';
 import { validateServiceHire, type ServiceHireErrors, type ValidationMessages } from '../lib/validate';
 
 type Props = {
   service: ServiceForHire;
   locale: string;
+  fiscalIdTypes: FiscalIdTypeOption[];
   hints: {
     addressLabel: string;
     addressPlaceholder: string;
@@ -28,6 +31,7 @@ type Props = {
     addressError: string;
     scheduling: React.ComponentProps<typeof SchedulingBlock>['hints'];
     auth: React.ComponentProps<typeof AuthGate>['hints'];
+    billing: React.ComponentProps<typeof BillingChoiceFields>['hints'];
     questions: { yes: string; no: string; fileTooLarge: string; fileWrongType: string };
     validation: ValidationMessages;
   };
@@ -36,13 +40,14 @@ type Props = {
 const TEXTAREA_CLASS =
   'flex min-h-[80px] w-full rounded-lg border border-input bg-transparent px-2.5 py-1.5 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30';
 
-export function ServiceHireForm({ service, locale, hints }: Props) {
+export function ServiceHireForm({ service, locale, fiscalIdTypes, hints }: Props) {
   const [state, setState] = useState<ServiceHireFormState>({
     address: emptyAddress,
     scheduling: emptyScheduling,
     answers: {},
     notes: '',
     terms_accepted: false,
+    billing: emptyBilling,
   });
   const [authState, setAuthState] = useState<AuthState>({ status: 'idle' });
   const [errors, setErrors] = useState<ServiceHireErrors | null>(null);
@@ -82,7 +87,12 @@ export function ServiceHireForm({ service, locale, hints }: Props) {
     }
     fd.append(
       'state',
-      JSON.stringify({ ...state, serviceId: service.id, answers: cleanAnswers }),
+      JSON.stringify({
+        ...state,
+        serviceId: service.id,
+        answers: cleanAnswers,
+        billing: state.billing,
+      }),
     );
 
     startTransition(async () => {
@@ -169,8 +179,20 @@ export function ServiceHireForm({ service, locale, hints }: Props) {
         {errors?.terms && <p className="text-destructive text-xs">{errors.terms}</p>}
       </div>
 
-      <AuthGate authState={authState} onAuthenticated={setAuthState} hints={hints.auth} />
+      <AuthGate
+        authState={authState}
+        onAuthenticated={setAuthState}
+        fiscalIdTypes={fiscalIdTypes}
+        hints={hints.auth}
+      />
       {errors?.auth && <p className="text-destructive text-xs">{errors.auth}</p>}
+
+      <BillingChoiceFields
+        value={state.billing}
+        onChange={(v) => setState((s) => ({ ...s, billing: v }))}
+        fiscalIdTypes={fiscalIdTypes}
+        hints={hints.billing}
+      />
 
       {submitError && <p className="text-destructive text-sm">{submitError}</p>}
 

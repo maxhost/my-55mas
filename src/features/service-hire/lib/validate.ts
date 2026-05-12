@@ -15,6 +15,7 @@ export type ServiceHireErrors = {
   answers?: Record<string, string>;
   terms?: string;
   auth?: string;
+  billing?: string;
 };
 
 export type ValidationMessages = {
@@ -27,6 +28,7 @@ export type ValidationMessages = {
   termsRequired: string;
   authRequired: string;
   fieldRequired: string;
+  billingCustomIncomplete: string;
 };
 
 export type ValidationContext = {
@@ -80,6 +82,16 @@ export function validateServiceHire(ctx: ValidationContext): ServiceHireErrors |
 
   // Auth
   if (!isAuthenticated) errors.auth = m.authRequired;
+
+  // Billing: when invoicing to a different party, all four custom fields must
+  // be filled. The fiscal_id format check happens client-side in FiscalIdInput
+  // and again server-side; here we only catch the "all empty" case.
+  if (state.billing.mode === 'custom') {
+    const b = state.billing.data;
+    if (!b.name.trim() || !b.phone.trim() || !b.fiscal_id_type_id || !b.fiscal_id.trim()) {
+      errors.billing = m.billingCustomIncomplete;
+    }
+  }
 
   return Object.keys(errors).length > 0 ? errors : null;
 }

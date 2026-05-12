@@ -14,6 +14,7 @@ const m: ValidationMessages = {
   termsRequired: 'terms',
   authRequired: 'auth',
   fieldRequired: 'field',
+  billingCustomIncomplete: 'billing',
 };
 
 const baseState = (): ServiceHireFormState => ({
@@ -32,6 +33,7 @@ const baseState = (): ServiceHireFormState => ({
   answers: {},
   notes: '',
   terms_accepted: true,
+  billing: { mode: 'same' },
 });
 
 describe('validateServiceHire', () => {

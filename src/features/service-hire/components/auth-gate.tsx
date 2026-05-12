@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { signinAsGuest, signupClient, loginClient } from '../actions/auth-actions';
+import type { FiscalIdTypeOption } from '../actions/list-fiscal-id-types';
+import { GuestContactFields } from './guest-contact-fields';
 
 export type AuthState =
   | { status: 'idle' }
@@ -15,6 +17,7 @@ type Choice = 'guest' | 'signup' | 'login' | null;
 type Props = {
   authState: AuthState;
   onAuthenticated: (s: Extract<AuthState, { status: 'authenticated' }>) => void;
+  fiscalIdTypes: FiscalIdTypeOption[];
   hints: {
     title: string;
     guest: string;
@@ -31,13 +34,15 @@ type Props = {
     authenticatedAs: string;
     asGuest: string;
     error: string;
+    guestData: React.ComponentProps<typeof GuestContactFields>['hints'];
   };
 };
 
-export function AuthGate({ authState, onAuthenticated, hints }: Props) {
+export function AuthGate({ authState, onAuthenticated, fiscalIdTypes, hints }: Props) {
   const [choice, setChoice] = useState<Choice>(null);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [pendingGuestUserId, setPendingGuestUserId] = useState<string | null>(null);
 
   // Signup state
   const [name, setName] = useState('');
@@ -56,6 +61,21 @@ export function AuthGate({ authState, onAuthenticated, hints }: Props) {
     );
   }
 
+  if (pendingGuestUserId) {
+    return (
+      <fieldset className="space-y-3 rounded-md border p-4">
+        <legend className="text-sm font-medium">{hints.title}</legend>
+        <GuestContactFields
+          fiscalIdTypes={fiscalIdTypes}
+          onSaved={(userId) =>
+            onAuthenticated({ status: 'authenticated', userId, choice: 'guest' })
+          }
+          hints={hints.guestData}
+        />
+      </fieldset>
+    );
+  }
+
   const handleGuest = () => {
     setError(null);
     startTransition(async () => {
@@ -64,13 +84,18 @@ export function AuthGate({ authState, onAuthenticated, hints }: Props) {
         setError(r.error.message);
         return;
       }
-      onAuthenticated({ status: 'authenticated', userId: r.data.userId, choice: 'guest' });
+      // Two-phase: anonymous session created, now collect guest data before
+      // marking the parent form authenticated.
+      setPendingGuestUserId(r.data.userId);
     });
   };
 
   const handleSignup = () => {
     setError(null);
     startTransition(async () => {
+      // Sessions 4-5: signup also captures fiscal data. Signup-with-fiscal UI
+      // lands in Session 5; for now signup falls back to legacy (no fiscal)
+      // and signupClient will reject — the user should pick guest or login.
       const r = await signupClient({ full_name: name, email, password, phone });
       if ('error' in r) {
         setError(r.error.message);
