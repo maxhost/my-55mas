@@ -8,19 +8,20 @@
 export function HeroDecorations() {
   return (
     <>
-      {/* Salmon outline ring — upper left, bleeds off */}
+      {/* Salmon outline ring — hidden on mobile per design request,
+          visible only from md+. */}
       <span
         aria-hidden="true"
         className="
           pointer-events-none absolute z-0
-          top-[4%] -left-[120px]
-          h-[220px] w-[220px] rounded-full
-          border-[32px] border-brand-salmon
+          hidden md:block
           md:top-[6%] md:-left-[150px]
-          md:h-[220px] md:w-[220px] md:border-[32px]
+          md:h-[220px] md:w-[220px] md:rounded-full
+          md:border-[32px] md:border-brand-salmon
         "
       />
-      {/* Salmon solid disc — below the ring, smaller, bleeds off */}
+      {/* Salmon solid disc — kept on mobile and desktop; small enough
+          to not collide with the headline. */}
       <span
         aria-hidden="true"
         className="
@@ -32,15 +33,14 @@ export function HeroDecorations() {
           md:h-[70px] md:w-[70px]
         "
       />
-      {/* Yellow dot — top, between text and media */}
+      {/* Yellow dot — hidden on mobile per design request, visible md+. */}
       <span
         aria-hidden="true"
         className="
           pointer-events-none absolute z-0
-          top-[10%] right-[8%]
-          h-[26px] w-[26px] rounded-full
-          bg-brand-mustard
-          md:top-[8%] md:right-[48%] md:h-9 md:w-9
+          hidden md:block
+          md:top-[8%] md:right-[48%] md:h-9 md:w-9 md:rounded-full
+          md:bg-brand-mustard
         "
       />
       {/* Yellow vertical strip — right edge (desktop only) */}

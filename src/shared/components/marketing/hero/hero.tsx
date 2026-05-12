@@ -61,17 +61,20 @@ export function Hero({ titleBefore, titleAccent, titleAfter, lead, ctas, media }
           </p>
           <div className="flex flex-col gap-6">
             {ctas.map((cta) => (
-              <div key={cta.id} className="flex flex-col items-start gap-2.5">
+              <div key={cta.id} className="flex flex-col gap-2.5 items-stretch md:items-start">
                 {cta.prefix && (
-                  <span className="text-[0.95rem] font-bold text-brand-text">{cta.prefix}</span>
+                  <span className="text-[0.95rem] font-bold text-brand-text text-center md:text-left">
+                    {cta.prefix}
+                  </span>
                 )}
                 <Link
                   href={cta.href}
                   className={`
                     inline-flex items-center justify-center
                     rounded-full px-7 py-3.5
-                    text-base font-semibold whitespace-nowrap
+                    text-base font-semibold
                     transition-colors
+                    w-full md:w-auto md:whitespace-nowrap
                     ${CTA_BUTTON_VARIANTS[cta.variant]}
                   `}
                 >
