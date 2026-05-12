@@ -210,17 +210,17 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .navbar__inner {
   max-width: var(--container);
   margin: 0 auto;
-  padding: 14px 16px;
+  padding: 6px 16px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 6px 36px;
+  gap: 4px 36px;
 }
 .navbar__link {
   color: var(--color-white);
-  font-size: 0.98rem;
+  font-size: 0.92rem;
   font-weight: 600;
-  padding: 4px 2px;
+  padding: 2px 2px;
   position: relative;
 }
 .navbar__link.is-active::after {
@@ -239,6 +239,10 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   background: var(--color-bg-cream);
   position: relative;
   overflow: hidden;
+  /* Fill viewport minus header (~73px) and navbar (~46px) */
+  min-height: calc(100vh - 119px);
+  display: flex;
+  align-items: center;
 }
 .hero__inner {
   max-width: var(--container);
@@ -247,6 +251,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   display: grid;
   gap: 28px;
   align-items: center;
+  width: 100%;
 }
 .hero__title {
   font-size: 1.9rem;
@@ -288,11 +293,23 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 
 /* Decorative shapes */
 .hero__decor { position: absolute; pointer-events: none; z-index: 1; }
+/* Big red half-circle bleeding off the left edge */
+.hero__decor--circle {
+  top: 35%;
+  left: -80px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
 .hero__decor--dot {
   top: 12%; right: 8%;
   width: 26px; height: 26px;
   border-radius: 50%;
   background: var(--color-secondary);
+}
+/* Yellow accent rectangle near the video on the right */
+.hero__decor--yellow-rect {
+  display: none;
 }
 .hero__decor--blue {
   bottom: 8%; left: 0;
@@ -305,9 +322,20 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   background: var(--color-primary);
 }
 @media (min-width: 768px) {
-  .hero__decor--dot { top: 8%; right: 48%; width: 32px; height: 32px; }
-  .hero__decor--blue { bottom: 18%; left: 1%; width: 90px; height: 28px; }
-  .hero__decor--red { top: 60%; right: 0; width: 22px; height: 70px; }
+  .hero__decor--circle {
+    top: 38%;
+    left: -110px;
+    width: 220px; height: 220px;
+  }
+  .hero__decor--dot { top: 10%; right: 48%; width: 36px; height: 36px; }
+  .hero__decor--yellow-rect {
+    display: block;
+    top: 16%; right: 1%;
+    width: 24px; height: 80px;
+    background: var(--color-secondary);
+  }
+  .hero__decor--blue { bottom: 14%; left: 1%; width: 90px; height: 28px; }
+  .hero__decor--red { top: 65%; right: 0; width: 22px; height: 70px; }
 }
 
 @media (min-width: 768px) {
