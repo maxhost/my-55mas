@@ -108,42 +108,15 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   gap: 16px;
 }
 
-/* Logo: text "55+" with decorative blocks behind */
+/* Logo: real brand SVG (downloaded to public/brand/logo.svg) */
 .header__logo {
-  position: relative;
   display: inline-flex; align-items: center;
   flex: 0 0 auto;
-  padding: 8px 12px 8px 18px;
 }
-.header__logo-block {
-  position: absolute;
-  pointer-events: none;
-  border-radius: 3px;
+.header__logo-img {
+  height: 40px; width: auto;
+  display: block;
 }
-.header__logo-block--yellow {
-  top: 0; left: 0;
-  width: 18px; height: 14px;
-  background: var(--color-secondary);
-}
-.header__logo-block--coral {
-  bottom: 0; left: 6px;
-  width: 22px; height: 18px;
-  background: var(--color-primary);
-  border-radius: 14px 14px 3px 3px;
-}
-.header__logo-block--navy {
-  top: 6px; left: 22px;
-  width: 14px; height: 22px;
-  background: var(--color-text);
-  border-radius: 3px 14px 3px 3px;
-}
-.header__logo-text {
-  position: relative; z-index: 1;
-  font-size: 1.5rem; font-weight: 800;
-  color: var(--color-text);
-  letter-spacing: -0.02em;
-}
-.header__logo-plus { color: var(--color-primary); }
 
 /* Locator widget (label + dropdown + Busca button) */
 .header__locator {
