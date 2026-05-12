@@ -12,6 +12,7 @@
   --color-text-mute: #6b7280;
   --color-top-bar: #DB1E3B;
   --color-accent-blue: #C5E8F2;
+  --color-accent-blue-deep: #5CB5E6;
   --color-accent-salmon: #EE684F;
   --color-border: #e5e7eb;
   --color-white: #ffffff;
@@ -680,6 +681,88 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .testimonial__name {
   font-size: 0.95rem; font-weight: 700;
   color: var(--color-text);
+}
+
+/* ── 8b. Join CTA banner ──────────────────────────────────── */
+
+.join-cta {
+  background: var(--color-bg-cream);
+  position: relative;
+  overflow: hidden;
+  padding: 96px 16px;
+}
+.join-cta__inner {
+  max-width: 880px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+.join-cta__title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0 0 36px;
+  color: var(--color-text);
+}
+.join-cta__actions {
+  display: flex; gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.join-cta__ghost {
+  background: var(--color-white);
+  border-color: var(--color-secondary);
+  color: var(--color-text);
+}
+.join-cta__ghost:hover {
+  background: var(--color-secondary);
+}
+
+/* Decorative shapes — same family as hero/howto. z-index 0 so they
+   stay behind the heading and buttons (which are z-index 2). */
+.join-cta__decor { position: absolute; pointer-events: none; z-index: 0; }
+.join-cta__decor--red-rect {
+  top: 20px; left: 22%;
+  width: 30px; height: 64px;
+  background: var(--color-primary);
+}
+.join-cta__decor--blue-rect {
+  top: 30px; right: 8%;
+  width: 80px; height: 32px;
+  background: var(--color-accent-blue);
+}
+.join-cta__decor--blue-ring {
+  top: 50%; left: -90px;
+  transform: translateY(-50%);
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  border: 36px solid var(--color-accent-blue-deep);
+  background: transparent;
+}
+.join-cta__decor--coral-ring {
+  bottom: -90px; right: -80px;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  border: 40px solid var(--color-primary);
+  background: transparent;
+}
+
+@media (min-width: 768px) {
+  .join-cta { padding: 130px 24px; }
+  .join-cta__title { font-size: 2.2rem; }
+  .join-cta__decor--red-rect { top: 60px; left: 24%; }
+  .join-cta__decor--blue-rect { top: 70px; right: 6%; }
+  .join-cta__decor--blue-ring {
+    left: -120px;
+    width: 240px; height: 240px;
+    border-width: 48px;
+  }
+  .join-cta__decor--coral-ring {
+    bottom: -120px; right: -100px;
+    width: 260px; height: 260px;
+    border-width: 52px;
+  }
 }
 
 /* ── 9. Collaborators ─────────────────────────────────────── */
