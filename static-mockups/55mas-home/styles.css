@@ -538,6 +538,26 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   background: var(--color-secondary);
   border-radius: 0 80px 80px 0;
 }
+
+/* Howto--clients shapes: blue rect top-right, coral ring bottom-left. */
+.howto__shape--blue-tr {
+  top: -16px;
+  right: 36px;
+  width: 78px;
+  height: 26px;
+  background: var(--color-accent-blue);
+}
+.howto__shape--coral-arc {
+  /* A thick coral ring positioned mostly behind the image; only the
+     bottom-right quadrant peeks out from under-left of the image. */
+  bottom: -56px;
+  left: -56px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 24px solid var(--color-primary);
+  background: transparent;
+}
 .howto__heading {
   font-size: 1.35rem;
   font-weight: 700;
