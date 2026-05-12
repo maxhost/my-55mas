@@ -23,11 +23,13 @@
 
     <form class="header__locator" onsubmit="event.preventDefault()" role="search" aria-label="Buscar servicios">
       <label for="loc-select" class="header__locator-label">Elige tu ubicación:</label>
-      <div class="header__locator-group">
-        <select id="loc-select" class="header__locator-select">
-          <option>Barcelona</option>
-          <option>Madrid</option>
-        </select>
+      <div class="header__locator-row">
+        <div class="header__locator-pill">
+          <select id="loc-select" class="header__locator-select">
+            <option>Barcelona</option>
+            <option>Madrid</option>
+          </select>
+        </div>
         <button class="btn btn--secondary header__locator-cta" type="submit">Busca</button>
       </div>
     </form>
