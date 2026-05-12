@@ -29,7 +29,7 @@ export function ServiceCard({ href, imageSrc, imageAlt, category, title, bullets
         border border-black/10 shadow-[0_2px_8px_rgba(23,31,70,0.06)]
         transition-[transform,box-shadow] duration-200
         hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(23,31,70,0.12)]
-        md:h-[535px] md:w-[327px]
+        shrink-0 w-[84vw] sm:w-[calc(50%-12px)] md:w-[327px] md:h-[535px]
       "
     >
       <div className="relative h-60 w-full flex-shrink-0 md:h-[280px]">
