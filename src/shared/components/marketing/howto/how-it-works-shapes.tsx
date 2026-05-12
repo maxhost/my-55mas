@@ -26,18 +26,18 @@ export function HowItWorksShapes({ variant }: Props) {
       </>
     );
   }
-  // clients
+  // clients — both shapes hidden on mobile per design feedback.
   return (
     <>
       {/* light-blue horizontal rect peeking from top-right corner */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute z-[1] -top-4 right-9 h-[26px] w-[78px] bg-brand-blue"
+        className="pointer-events-none absolute z-[1] hidden md:block -top-4 right-9 h-[26px] w-[78px] bg-brand-blue"
       />
       {/* coral ring bottom-left: 150x150 with 24px border, peeks from under-left */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute z-[1] -bottom-14 -left-14 h-[150px] w-[150px] rounded-full border-[24px] border-brand-coral"
+        className="pointer-events-none absolute z-[1] hidden md:block -bottom-14 -left-14 h-[150px] w-[150px] rounded-full border-[24px] border-brand-coral"
       />
     </>
   );
