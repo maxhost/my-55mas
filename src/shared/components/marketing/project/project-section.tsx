@@ -37,7 +37,7 @@ export function ProjectSection({
   );
 
   return (
-    <section className="bg-white px-4 py-12 md:px-6 md:py-20">
+    <section className="relative overflow-hidden bg-white px-4 py-12 md:px-6 md:py-20">
       <div className="mx-auto grid max-w-[1200px] items-center gap-7 md:grid-cols-[1.1fr_1fr] md:gap-14">
         <figure className="m-0">
           {imageHref ? (

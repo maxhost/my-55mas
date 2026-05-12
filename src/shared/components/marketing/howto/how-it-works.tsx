@@ -47,7 +47,9 @@ export function HowItWorks({
   withCreamBg = false,
 }: HowItWorksProps) {
   return (
-    <section className={`px-4 py-12 md:px-6 md:py-20 ${withCreamBg ? 'bg-brand-cream' : 'bg-white'}`}>
+    <section
+      className={`relative overflow-hidden px-4 py-12 md:px-6 md:py-20 ${withCreamBg ? 'bg-brand-cream' : 'bg-white'}`}
+    >
       <div className="mx-auto max-w-[1200px]">
         {sectionTitle && (
           <h2 className="mb-7 text-center text-2xl font-bold text-brand-text md:text-[2rem]">

@@ -21,7 +21,7 @@ export default function PublicLayout({ children, params: { locale } }: Props) {
   const currentCity = getSelectedCity();
 
   return (
-    <div className="font-mulish text-brand-text">
+    <div className="overflow-x-hidden font-mulish text-brand-text">
       <JsonLdScript id="ld-org" data={organizationJsonLd()} />
       <PublicHeader currentCity={currentCity} />
       <PublicNavbar />

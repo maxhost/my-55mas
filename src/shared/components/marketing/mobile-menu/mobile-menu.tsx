@@ -39,17 +39,23 @@ export function MobileMenu({
   // Portal target only exists after mount; SSR safety.
   useEffect(() => setMounted(true), []);
 
-  // ESC closes + body scroll lock while open.
+  // ESC closes + scroll lock while open. Locking BOTH <html> and <body>
+  // because iOS Safari ignores body-only overflow:hidden in some cases.
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false);
     };
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtml = html.style.overflow;
+    const prevBody = body.style.overflow;
+    html.style.overflow = 'hidden';
+    body.style.overflow = 'hidden';
     window.addEventListener('keydown', onKey);
     return () => {
-      document.body.style.overflow = prevOverflow;
+      html.style.overflow = prevHtml;
+      body.style.overflow = prevBody;
       window.removeEventListener('keydown', onKey);
     };
   }, [open]);
