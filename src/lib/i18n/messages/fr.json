@@ -1123,5 +1123,8 @@
     "description": "Commandes archivées, clôturées, annulées ou rejetées.",
     "noArchive": "Aucune commande aux archives.",
     "backToList": "Retour aux archives"
-  }
+  },
+  "home": {},
+  "nav": {},
+  "footer": {}
 }

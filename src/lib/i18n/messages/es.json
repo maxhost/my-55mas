@@ -1123,5 +1123,8 @@
     "description": "Pedidos archivados, terminados, cancelados o rechazados.",
     "noArchive": "No hay pedidos en el archivo.",
     "backToList": "Volver al archivo"
-  }
+  },
+  "home": {},
+  "nav": {},
+  "footer": {}
 }

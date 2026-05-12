@@ -37,6 +37,25 @@
   --radius-sm: calc(var(--radius) - 4px);
   --font-sans: var(--font-sans);
   --font-heading: var(--font-heading);
+
+  /* Brand tokens — public site. Map mockup CSS vars to Tailwind utilities.
+     Usage: bg-brand-coral, text-brand-text, border-brand-mustard, etc.
+     These live alongside the existing shadcn neutrals and do NOT replace
+     them, so admin UI stays untouched. */
+  --color-brand-coral: var(--brand-coral);
+  --color-brand-coral-deep: var(--brand-coral-deep);
+  --color-brand-salmon: var(--brand-salmon);
+  --color-brand-mustard: var(--brand-mustard);
+  --color-brand-mustard-deep: var(--brand-mustard-deep);
+  --color-brand-cream: var(--brand-cream);
+  --color-brand-cream-deep: var(--brand-cream-deep);
+  --color-brand-text: var(--brand-text);
+  --color-brand-text-soft: var(--brand-text-soft);
+  --color-brand-red: var(--brand-red);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-blue-deep: var(--brand-blue-deep);
+
+  --font-mulish: var(--font-mulish);
 }
 
 @layer base {
@@ -69,6 +88,21 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+
+    /* Brand palette — from static-mockups/55mas-home recon.
+       Mapping to the public-home spec tokens (docs/features/public-home.md). */
+    --brand-coral: #F0513A;          /* primary CTA + accents */
+    --brand-coral-deep: #d9442f;     /* hover for coral */
+    --brand-salmon: #EE684F;         /* lighter coral variant */
+    --brand-mustard: #FEC35A;        /* secondary CTA fill */
+    --brand-mustard-deep: #FAB515;   /* hover for mustard */
+    --brand-cream: #F3E9E1;          /* hero/howto-clients background */
+    --brand-cream-deep: #ead9c8;
+    --brand-text: #171F46;           /* navy — body text + headings */
+    --brand-text-soft: #4a5275;
+    --brand-red: #DB1E3B;            /* navbar red */
+    --brand-blue: #C5E8F2;           /* light accent blue */
+    --brand-blue-deep: #5CB5E6;      /* saturated sky blue */
   }
 
   .dark {

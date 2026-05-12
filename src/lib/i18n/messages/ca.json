@@ -1123,5 +1123,8 @@
     "description": "Comandes arxivades, tancades, cancel·lades o rebutjades.",
     "noArchive": "No hi ha comandes a l'arxiu.",
     "backToList": "Tornar a l'arxiu"
-  }
+  },
+  "home": {},
+  "nav": {},
+  "footer": {}
 }

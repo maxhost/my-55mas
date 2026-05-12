@@ -1123,5 +1123,8 @@
     "description": "Orders archived, closed, cancelled, or rejected.",
     "noArchive": "No archived orders.",
     "backToList": "Back to archive"
-  }
+  },
+  "home": {},
+  "nav": {},
+  "footer": {}
 }
