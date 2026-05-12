@@ -354,15 +354,15 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 
 @media (min-width: 768px) {
   .hero__decor--ring {
-    top: 2%;
-    left: -160px;
-    width: 360px; height: 360px;
-    border-width: 48px;
+    top: 6%;
+    left: -150px;
+    width: 220px; height: 220px;
+    border-width: 32px;
   }
   .hero__decor--disc {
-    top: 62%;
-    left: -40px;
-    width: 90px; height: 90px;
+    top: 58%;
+    left: -36px;
+    width: 70px; height: 70px;
   }
   .hero__decor--dot { top: 8%; right: 48%; width: 36px; height: 36px; }
   .hero__decor--yellow-rect {
