@@ -295,23 +295,23 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .hero__decor { position: absolute; pointer-events: none; z-index: 0; }
 .hero__content, .hero__media { position: relative; z-index: 2; }
 
-/* Composite "donut" on the upper-left: an outline ring + a smaller
-   solid disc beside it, both bleeding off the left edge. Stays above
-   the paragraph so it never overlaps the body copy. */
+/* Composite donut on the upper-left: a large outline ring + a small
+   solid disc below it (with a visible gap), both bleeding off the
+   left edge. Color matches the salmon variant seen on the original. */
 .hero__decor--ring {
-  top: 8%;
-  left: -70px;
-  width: 130px; height: 130px;
+  top: 4%;
+  left: -120px;
+  width: 240px; height: 240px;
   border-radius: 50%;
   background: transparent;
-  border: 10px solid var(--color-primary);
+  border: 32px solid var(--color-accent-salmon);
 }
 .hero__decor--disc {
-  top: 24%;
-  left: -28px;
-  width: 56px; height: 56px;
+  top: 56%;
+  left: -30px;
+  width: 64px; height: 64px;
   border-radius: 50%;
-  background: var(--color-primary);
+  background: var(--color-accent-salmon);
 }
 .hero__decor--dot {
   top: 10%; right: 8%;
@@ -333,15 +333,15 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 
 @media (min-width: 768px) {
   .hero__decor--ring {
-    top: 6%;
-    left: -90px;
-    width: 180px; height: 180px;
-    border-width: 14px;
+    top: 2%;
+    left: -160px;
+    width: 360px; height: 360px;
+    border-width: 48px;
   }
   .hero__decor--disc {
-    top: 28%;
-    left: -36px;
-    width: 80px; height: 80px;
+    top: 62%;
+    left: -40px;
+    width: 90px; height: 90px;
   }
   .hero__decor--dot { top: 8%; right: 48%; width: 36px; height: 36px; }
   .hero__decor--yellow-rect {
