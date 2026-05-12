@@ -1149,6 +1149,34 @@
       "viewAll": "Voir tous les services",
       "tabsAria": "Filtres de services",
       "carouselAria": "Services disponibles"
+    },
+    "howtoTalents": {
+      "sectionTitle": "Vous gagnez. Ils gagnent. Nous gagnons tous.",
+      "sectionTitleAccent": "Comment ça marche ?",
+      "imageAlt": "Talent 55+ en cuisine",
+      "heading": "Faites ce que vous faites de mieux et aidez les autres avec votre talent",
+      "steps": {
+        "s1": "Inscrivez-vous sur 55+ et créez votre profil",
+        "s2": "Recevez des demandes pour votre service",
+        "s3": "Travaillez et recevez votre paiement avec flexibilité"
+      },
+      "cta": "Offrir un service"
+    },
+    "howtoClients": {
+      "imageAlt": "Communauté 55+",
+      "heading": "Contribuez à améliorer la vie des plus de 55 ans, tout en trouvant des solutions pour votre quotidien",
+      "steps": {
+        "s1": "Découvrez tous les services disponibles près de chez vous",
+        "s2": "Contactez 55+",
+        "s3": "Profitez d’un service avec confiance et qualité"
+      },
+      "cta": "Engager un service"
+    },
+    "project": {
+      "imageAlt": "Reportage sur 55+ sur RTVE",
+      "title": "Notre projet 55+",
+      "lead": "Nous sommes 55+, la communauté qui transforme l’expérience et le talent en lien, sens et activité pour lutter contre la solitude et l’isolement des plus de 55 ans.",
+      "cta": "Découvrir l’association"
     }
   },
   "nav": {

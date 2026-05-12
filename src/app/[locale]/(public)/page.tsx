@@ -2,6 +2,9 @@ import { unstable_setRequestLocale } from 'next-intl/server';
 import { getSelectedCity } from '@/shared/lib/country/cookie-server';
 import { HomeHero } from '@/features/public-home/components/home-hero';
 import { HomeServicesSection } from '@/features/public-home/components/home-services-section';
+import { HomeHowtoTalents } from '@/features/public-home/components/home-howto-talents';
+import { HomeHowtoClients } from '@/features/public-home/components/home-howto-clients';
+import { HomeProject } from '@/features/public-home/components/home-project';
 
 type Category = 'all' | 'accompaniment' | 'classes' | 'repairs' | 'home';
 
@@ -25,8 +28,10 @@ export default async function PublicHomePage({ params: { locale }, searchParams 
     <>
       <HomeHero />
       <HomeServicesSection activeCategory={activeCategory} cityLabel={city.label} />
-      {/* fase 2.3: how-it-works (talents + clients) + project
-          fase 2.4: testimonials + join-cta + collaborators */}
+      <HomeHowtoTalents />
+      <HomeHowtoClients />
+      <HomeProject />
+      {/* fase 2.4: testimonials + join-cta + collaborators */}
     </>
   );
 }

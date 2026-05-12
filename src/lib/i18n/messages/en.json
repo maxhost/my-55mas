@@ -1149,6 +1149,34 @@
       "viewAll": "View all services",
       "tabsAria": "Service filters",
       "carouselAria": "Available services"
+    },
+    "howtoTalents": {
+      "sectionTitle": "You win. They win. We all win.",
+      "sectionTitleAccent": "How does it work?",
+      "imageAlt": "55+ talent at work in a kitchen",
+      "heading": "Do what you do best and help others with your talent",
+      "steps": {
+        "s1": "Sign up on 55+ and create your profile",
+        "s2": "Receive service requests",
+        "s3": "Work and get paid with flexibility"
+      },
+      "cta": "Offer a service"
+    },
+    "howtoClients": {
+      "imageAlt": "55+ community",
+      "heading": "Help improve the lives of 55+, while you find solutions for your day-to-day",
+      "steps": {
+        "s1": "Discover all services available near you",
+        "s2": "Contact 55+",
+        "s3": "Enjoy a service with confidence and quality"
+      },
+      "cta": "Hire a service"
+    },
+    "project": {
+      "imageAlt": "55+ report on RTVE",
+      "title": "Our 55+ project",
+      "lead": "We are 55+, a community that turns experience and talent into connection, purpose and activity to fight loneliness and isolation among people over 55.",
+      "cta": "Discover the association"
     }
   },
   "nav": {

@@ -1149,6 +1149,34 @@
       "viewAll": "Veure tots els serveis",
       "tabsAria": "Filtres de serveis",
       "carouselAria": "Serveis disponibles"
+    },
+    "howtoTalents": {
+      "sectionTitle": "Guanyes tu. Guanyen ells. Guanyem tots.",
+      "sectionTitleAccent": "Com funciona?",
+      "imageAlt": "Talent 55+ treballant a la cuina",
+      "heading": "Fes el que millor se t’hi dóna i ajuda els altres amb el teu talent",
+      "steps": {
+        "s1": "Registra’t a 55+ i crea el teu perfil",
+        "s2": "Rep sol·licituds del teu servei",
+        "s3": "Treballa i rep el teu pagament amb flexibilitat"
+      },
+      "cta": "Ofereix un servei"
+    },
+    "howtoClients": {
+      "imageAlt": "Comunitat 55+",
+      "heading": "Contribueix a millorar la vida dels 55+, mentre trobes solucions per al teu dia a dia",
+      "steps": {
+        "s1": "Descobreix tots els serveis disponibles a prop teu",
+        "s2": "Contacta amb 55+",
+        "s3": "Gaudeix d’un servei amb confiança i qualitat"
+      },
+      "cta": "Contracta un servei"
+    },
+    "project": {
+      "imageAlt": "Reportatge sobre 55+ a RTVE",
+      "title": "El nostre projecte 55+",
+      "lead": "Som 55+, la comunitat que transforma l’experiència i el talent en connexió, propòsit i activitat per combatre la solitud i l’aïllament dels més grans de 55 anys.",
+      "cta": "Descobreix l’associació"
     }
   },
   "nav": {
