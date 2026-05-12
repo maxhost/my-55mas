@@ -400,32 +400,28 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   border-radius: var(--radius-sm); padding: 4px 8px; font: inherit;
 }
 
-/* Filter pills — sized for older-user reachability. */
+/* Filter chips — rounded-rect buttons left-aligned, matching original. */
 .services__tabs {
-  display: flex; gap: 12px; flex-wrap: wrap;
-  justify-content: center;
-  margin: 24px 0 32px;
+  display: flex; gap: 10px; flex-wrap: wrap;
+  justify-content: flex-start;
+  margin: 20px 0 28px;
 }
 .services__tab {
-  padding: 12px 28px;
-  font-size: 1rem; font-weight: 600;
+  padding: 10px 20px;
+  font-size: 0.95rem; font-weight: 600;
   color: var(--color-text);
   background: var(--color-white);
   border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-pill);
+  border-radius: 10px;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 .services__tab:hover {
   border-color: var(--color-primary);
-  color: var(--color-primary);
 }
 .services__tab.is-active {
   background: var(--color-primary);
   color: var(--color-white);
   border-color: var(--color-primary);
-}
-@media (min-width: 768px) {
-  .services__tab { padding: 14px 32px; font-size: 1.05rem; }
 }
 
 .services__grid {
