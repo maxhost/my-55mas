@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { LOCATOR_CITIES, type LocatorCity } from '@/shared/lib/country';
 import { MobileMenu } from '../mobile-menu';
+import { LangSwitcher } from '../lang-switcher';
 import { SocialsRow } from './socials-row';
 import { LocatorSelect } from './locator-select';
 
@@ -45,14 +46,7 @@ export async function PublicHeader({ currentCity }: Props) {
 
         <div className="hidden lg:flex items-center gap-4 ml-auto">
           <SocialsRow tone="dark" ariaLabel={t('socialsAria')} />
-          <button
-            type="button"
-            className="inline-flex items-center gap-1 text-sm text-brand-text"
-            aria-haspopup="listbox"
-          >
-            <span aria-hidden="true">🌐</span>
-            {t('lang')}
-          </button>
+          <LangSwitcher tone="dark" align="right" />
           <Link
             href="/login"
             className="
@@ -75,7 +69,6 @@ export async function PublicHeader({ currentCity }: Props) {
           socialsAriaLabel={t('socialsAria')}
           signInLabel={t('signIn')}
           signInHref="/login"
-          langLabel={t('lang')}
           links={[
             { key: 'home', href: '/', label: t('home') },
             { key: 'services', href: '/servicios', label: t('services') },

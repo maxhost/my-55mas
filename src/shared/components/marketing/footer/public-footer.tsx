@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { SITE_CONFIG } from '@/shared/lib/site-config';
 import { SocialsRow } from '../header/socials-row';
+import { LangSwitcher } from '../lang-switcher';
 import { FooterColorStripe } from './footer-color-stripe';
 
 type FooterLink = { key: string; href: string; label: string };
@@ -41,14 +42,7 @@ export async function PublicFooter() {
               className="h-13 w-auto block"
             />
           </Link>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 text-sm text-white"
-            aria-haspopup="listbox"
-          >
-            <span aria-hidden="true">🌐</span>
-            {tNav('lang')}
-          </button>
+          <LangSwitcher tone="light" align="right" />
         </div>
 
         {/* 3-column grid */}

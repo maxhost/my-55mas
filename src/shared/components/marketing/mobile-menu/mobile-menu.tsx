@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
 import { SocialsRow } from '../header/socials-row';
+import { LangSwitcher } from '../lang-switcher';
 
 export type MobileMenuLink = { key: string; href: string; label: string };
 
@@ -15,7 +16,6 @@ type Props = {
   socialsAriaLabel: string;
   signInLabel: string;
   signInHref: string;
-  langLabel: string;
   brandAlt: string;
 };
 
@@ -30,7 +30,6 @@ export function MobileMenu({
   socialsAriaLabel,
   signInLabel,
   signInHref,
-  langLabel,
   brandAlt,
 }: Props) {
   const [open, setOpen] = useState(false);
@@ -135,14 +134,7 @@ export function MobileMenu({
 
       <div className="flex items-center justify-between gap-4 border-t border-black/5 px-5 py-3">
         <SocialsRow tone="dark" size={20} ariaLabel={socialsAriaLabel} />
-        <button
-          type="button"
-          className="inline-flex items-center gap-1.5 text-sm text-brand-text"
-          aria-haspopup="listbox"
-        >
-          <span aria-hidden="true">🌐</span>
-          {langLabel}
-        </button>
+        <LangSwitcher tone="dark" align="right" />
       </div>
     </div>
   );
