@@ -1211,7 +1211,8 @@
     "home": "Início",
     "services": "Nossos serviços",
     "offer": "Oferecer um serviço",
-    "about": "Sobre 55+"
+    "about": "Sobre 55+",
+    "menuCloseAria": "Fechar menu"
   },
   "footer": {
     "legal": {

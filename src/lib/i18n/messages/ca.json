@@ -1211,7 +1211,8 @@
     "home": "Inici",
     "services": "Els nostres serveis",
     "offer": "Ofereix un servei",
-    "about": "Sobre 55+"
+    "about": "Sobre 55+",
+    "menuCloseAria": "Tancar menú"
   },
   "footer": {
     "legal": {

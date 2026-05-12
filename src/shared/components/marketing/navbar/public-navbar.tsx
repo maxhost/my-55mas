@@ -20,7 +20,7 @@ export async function PublicNavbar({ activeKey = 'home' }: Props) {
   const t = await getTranslations('nav');
 
   return (
-    <nav aria-label={t('mainAria')} className="bg-brand-red text-white">
+    <nav aria-label={t('mainAria')} className="hidden bg-brand-red text-white lg:block">
       <div className="mx-auto max-w-[1200px] flex flex-wrap justify-center gap-x-9 gap-y-1 px-4 py-1.5">
         {ITEMS.map((item) => {
           const isActive = item.key === activeKey;

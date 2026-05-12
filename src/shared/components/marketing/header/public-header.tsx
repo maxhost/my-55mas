@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { LOCATOR_CITIES, type LocatorCity } from '@/shared/lib/country';
+import { MobileMenu } from '../mobile-menu';
 import { SocialsRow } from './socials-row';
 import { LocatorSelect } from './locator-select';
 
@@ -67,17 +68,21 @@ export async function PublicHeader({ currentCity }: Props) {
           </Link>
         </div>
 
-        {/* Mobile burger placeholder — real drawer ships in fase 1.1.1 */}
-        <button
-          type="button"
-          aria-label={t('menuAria')}
-          aria-expanded="false"
-          className="lg:hidden ml-auto flex flex-col gap-1 w-7 h-6 justify-between"
-        >
-          <span className="block h-0.5 w-full bg-brand-text rounded-sm" />
-          <span className="block h-0.5 w-full bg-brand-text rounded-sm" />
-          <span className="block h-0.5 w-full bg-brand-text rounded-sm" />
-        </button>
+        <MobileMenu
+          ariaLabelOpen={t('menuAria')}
+          ariaLabelClose={t('menuCloseAria')}
+          brandAlt={t('homeAria')}
+          socialsAriaLabel={t('socialsAria')}
+          signInLabel={t('signIn')}
+          signInHref="/login"
+          langLabel={t('lang')}
+          links={[
+            { key: 'home', href: '/', label: t('home') },
+            { key: 'services', href: '/servicios', label: t('services') },
+            { key: 'offer', href: '/ofrece', label: t('offer') },
+            { key: 'about', href: '/sobre-55', label: t('about') },
+          ]}
+        />
       </div>
     </header>
   );
