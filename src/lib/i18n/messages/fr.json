@@ -1140,5 +1140,25 @@
     "offer": "Offrir un service",
     "about": "À propos de 55+"
   },
-  "footer": {}
+  "footer": {
+    "legal": {
+      "faq": "Questions Fréquentes",
+      "siteTerms": "Conditions d’utilisation du site",
+      "privacy": "Politique de confidentialité",
+      "serviceTerms": "Conditions d’utilisation du service",
+      "transparency": "Transparence"
+    },
+    "socialsAria": "Réseaux sociaux"
+  },
+  "newsletter": {
+    "title": "Recevez notre newsletter",
+    "lead": "Découvrez les dernières nouvelles, réussites et événements de 55+. Dans votre boîte mail, une fois par mois.",
+    "placeholder": "Votre adresse email",
+    "emailLabel": "Email",
+    "submit": "S’abonner",
+    "formAria": "Inscription à la newsletter"
+  },
+  "whatsapp": {
+    "label": "Contacter par WhatsApp"
+  }
 }

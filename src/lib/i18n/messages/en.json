@@ -1140,5 +1140,25 @@
     "offer": "Offer a service",
     "about": "About 55+"
   },
-  "footer": {}
+  "footer": {
+    "legal": {
+      "faq": "FAQ",
+      "siteTerms": "Site terms of use",
+      "privacy": "Privacy policy",
+      "serviceTerms": "Service terms",
+      "transparency": "Transparency"
+    },
+    "socialsAria": "Social media"
+  },
+  "newsletter": {
+    "title": "Receive our newsletter",
+    "lead": "Get the latest news, milestones and events of 55+. In your inbox, once a month.",
+    "placeholder": "Your email address",
+    "emailLabel": "Email",
+    "submit": "Subscribe",
+    "formAria": "Newsletter signup"
+  },
+  "whatsapp": {
+    "label": "Contact by WhatsApp"
+  }
 }
