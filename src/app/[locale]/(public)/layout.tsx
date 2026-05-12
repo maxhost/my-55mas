@@ -6,6 +6,7 @@ import { PublicNavbar } from '@/shared/components/marketing/navbar';
 import { NewsletterForm } from '@/shared/components/marketing/newsletter';
 import { PublicFooter } from '@/shared/components/marketing/footer';
 import { WhatsappFab } from '@/shared/components/marketing/whatsapp-fab';
+import { JsonLdScript, organizationJsonLd } from '@/shared/lib/seo';
 
 type Props = {
   children: ReactNode;
@@ -21,6 +22,7 @@ export default function PublicLayout({ children, params: { locale } }: Props) {
 
   return (
     <div className="font-mulish text-brand-text">
+      <JsonLdScript id="ld-org" data={organizationJsonLd()} />
       <PublicHeader currentCity={currentCity} />
       <PublicNavbar />
       <main>{children}</main>
