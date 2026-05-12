@@ -38,6 +38,14 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <html lang={locale} className={mulish.variable}>
+      <head>
+        {/* Preconnect to known third-party origins so the browser opens
+            TCP+TLS in parallel with HTML parsing. Cuts LCP for the
+            Vimeo hero embed + Bubble CDN legacy images. */}
+        <link rel="preconnect" href="https://player.vimeo.com" />
+        <link rel="dns-prefetch" href="https://725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io" />
+        <link rel="dns-prefetch" href="https://i.vimeocdn.com" />
+      </head>
       <body className="font-sans antialiased">
         <NextIntlClientProvider messages={messages}>
           {children}
