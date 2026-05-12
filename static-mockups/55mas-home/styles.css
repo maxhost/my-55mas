@@ -767,24 +767,52 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 
 /* ── 9. Collaborators ─────────────────────────────────────── */
 
-.collaborators { background: white; padding: 48px 0; }
-.collaborators__inner { max-width: var(--container); margin: 0 auto; padding: 0 16px; }
-.collaborators__grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-  align-items: center;
-  justify-items: center;
-  margin-top: 8px;
+/* Collaborators — infinite horizontal marquee. */
+.collaborators { background: white; padding: 56px 0 64px; }
+.collaborators__inner {
+  max-width: var(--container);
+  margin: 0 auto; padding: 0 16px;
+  text-align: center;
 }
-.collaborators__grid img {
-  max-height: 56px; max-width: 100%; object-fit: contain;
-  filter: grayscale(1) opacity(0.75);
-  transition: filter 0.2s;
+.collaborators__title {
+  font-size: 1.4rem; font-weight: 700;
+  margin: 0 0 32px;
+  color: var(--color-text);
 }
-.collaborators__grid img:hover { filter: none; }
-@media (min-width: 640px) { .collaborators__grid { grid-template-columns: repeat(4, 1fr); } }
-@media (min-width: 1024px) { .collaborators__grid { grid-template-columns: repeat(7, 1fr); } }
+.collaborators__marquee {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  gap: 56px;
+  /* Soft fade on both edges so logos don't pop in/out abruptly */
+  mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+}
+.collaborators__track {
+  flex: 0 0 auto;
+  display: flex; align-items: center;
+  gap: 56px;
+  padding-right: 56px;
+  animation: marquee 32s linear infinite;
+}
+.collaborators__track li {
+  flex: 0 0 auto;
+  display: flex; align-items: center; justify-content: center;
+  height: 64px;
+}
+.collaborators__track img {
+  max-height: 64px; max-width: 160px;
+  object-fit: contain;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+.collaborators__marquee:hover .collaborators__track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .collaborators__track { animation: none; }
+}
+.collaborators__cta { margin-top: 32px; }
 
 /* ── 10. Newsletter ───────────────────────────────────────── */
 
