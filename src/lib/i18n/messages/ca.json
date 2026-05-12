@@ -1177,6 +1177,21 @@
       "title": "El nostre projecte 55+",
       "lead": "Som 55+, la comunitat que transforma l’experiència i el talent en connexió, propòsit i activitat per combatre la solitud i l’aïllament dels més grans de 55 anys.",
       "cta": "Descobreix l’associació"
+    },
+    "testimonials": {
+      "title": "Descobreix testimonis inspiradors",
+      "subtitle": "Ja formen part de 55+. Això és el que expliquen.",
+      "roleLabel": "Client",
+      "carouselAria": "Carrusel de testimonis"
+    },
+    "joinCta": {
+      "title": "Uneix-te a la nostra comunitat i descobreix connexions que transformen vides.",
+      "ctaPrimary": "Contracta un servei",
+      "ctaSecondary": "Ofereix un servei"
+    },
+    "collaborators": {
+      "title": "Col·laboradors",
+      "cta": "Coneix-los tots"
     }
   },
   "nav": {

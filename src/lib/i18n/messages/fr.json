@@ -1177,6 +1177,21 @@
       "title": "Notre projet 55+",
       "lead": "Nous sommes 55+, la communauté qui transforme l’expérience et le talent en lien, sens et activité pour lutter contre la solitude et l’isolement des plus de 55 ans.",
       "cta": "Découvrir l’association"
+    },
+    "testimonials": {
+      "title": "Découvrez des témoignages inspirants",
+      "subtitle": "Ils font déjà partie de 55+. Voici ce qu’ils racontent.",
+      "roleLabel": "Client",
+      "carouselAria": "Carrousel de témoignages"
+    },
+    "joinCta": {
+      "title": "Rejoignez notre communauté et découvrez des connexions qui transforment des vies.",
+      "ctaPrimary": "Engager un service",
+      "ctaSecondary": "Offrir un service"
+    },
+    "collaborators": {
+      "title": "Collaborateurs",
+      "cta": "Découvrez-les tous"
     }
   },
   "nav": {

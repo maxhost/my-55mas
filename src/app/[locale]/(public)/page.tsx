@@ -5,6 +5,9 @@ import { HomeServicesSection } from '@/features/public-home/components/home-serv
 import { HomeHowtoTalents } from '@/features/public-home/components/home-howto-talents';
 import { HomeHowtoClients } from '@/features/public-home/components/home-howto-clients';
 import { HomeProject } from '@/features/public-home/components/home-project';
+import { HomeTestimonials } from '@/features/public-home/components/home-testimonials';
+import { HomeJoinCta } from '@/features/public-home/components/home-join-cta';
+import { HomeCollaborators } from '@/features/public-home/components/home-collaborators';
 
 type Category = 'all' | 'accompaniment' | 'classes' | 'repairs' | 'home';
 
@@ -31,7 +34,9 @@ export default async function PublicHomePage({ params: { locale }, searchParams 
       <HomeHowtoTalents />
       <HomeHowtoClients />
       <HomeProject />
-      {/* fase 2.4: testimonials + join-cta + collaborators */}
+      <HomeTestimonials />
+      <HomeJoinCta />
+      <HomeCollaborators />
     </>
   );
 }
