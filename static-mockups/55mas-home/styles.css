@@ -139,36 +139,26 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   gap: 10px;
   width: 100%;
 }
-/* Dropdown pill (cream) */
-.header__locator-pill {
-  flex: 1;
-  display: flex; align-items: center;
-  background: var(--color-bg-cream);
-  border-radius: var(--radius-pill);
-  padding: 4px 18px;
-  min-width: 240px;
-}
+/* Dropdown styled as a cream pill (no wrapping container). */
 .header__locator-select {
-  background: transparent;
-  border: none;
-  padding: 10px 0;
-  font: inherit; font-size: 1rem; font-weight: 500;
-  color: var(--color-text);
-  width: 100%;
-  appearance: none;
+  flex: 1;
+  min-width: 240px;
+  background-color: var(--color-bg-cream);
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23171F46' stroke-width='2.5' stroke-linecap='round'><path d='M6 9l6 6 6-6'/></svg>");
   background-repeat: no-repeat;
-  background-position: right center;
-  padding-right: 24px;
+  background-position: right 16px center;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 14px 38px 14px 18px;
+  font: inherit; font-size: 1rem; font-weight: 500;
+  color: var(--color-text);
+  appearance: none;
   outline: none;
 }
-/* Suppress mouse-click focus ring on the locator dropdown; keep
-   keyboard focus visible for a11y via :focus-visible. */
 .header__locator-select:focus { outline: none; box-shadow: none; }
 .header__locator-select:focus-visible {
   outline: 2px solid var(--color-text);
-  outline-offset: 3px;
-  border-radius: 4px;
+  outline-offset: 2px;
 }
 /* Busca CTA — separate yellow pill */
 .header__locator-cta {
