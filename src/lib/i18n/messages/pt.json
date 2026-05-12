@@ -1125,6 +1125,20 @@
     "backToList": "Voltar ao arquivo"
   },
   "home": {},
-  "nav": {},
+  "nav": {
+    "homeAria": "55+ início",
+    "mainAria": "Navegação principal",
+    "menuAria": "Abrir menu",
+    "socialsAria": "Redes sociais",
+    "searchAria": "Escolher localização",
+    "chooseLocation": "Escolha sua localização:",
+    "search": "Buscar",
+    "signIn": "Entrar",
+    "lang": "Português",
+    "home": "Início",
+    "services": "Nossos serviços",
+    "offer": "Oferecer um serviço",
+    "about": "Sobre 55+"
+  },
   "footer": {}
 }

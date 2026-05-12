@@ -1125,6 +1125,20 @@
     "backToList": "Tornar a l'arxiu"
   },
   "home": {},
-  "nav": {},
+  "nav": {
+    "homeAria": "55+ inici",
+    "mainAria": "Navegació principal",
+    "menuAria": "Obrir menú",
+    "socialsAria": "Xarxes socials",
+    "searchAria": "Triar ubicació",
+    "chooseLocation": "Tria la teva ubicació:",
+    "search": "Cerca",
+    "signIn": "Iniciar sessió",
+    "lang": "Català",
+    "home": "Inici",
+    "services": "Els nostres serveis",
+    "offer": "Ofereix un servei",
+    "about": "Sobre 55+"
+  },
   "footer": {}
 }

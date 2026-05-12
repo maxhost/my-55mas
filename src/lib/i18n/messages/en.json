@@ -1125,6 +1125,20 @@
     "backToList": "Back to archive"
   },
   "home": {},
-  "nav": {},
+  "nav": {
+    "homeAria": "55+ home",
+    "mainAria": "Main navigation",
+    "menuAria": "Open menu",
+    "socialsAria": "Social media",
+    "searchAria": "Choose location",
+    "chooseLocation": "Choose your location:",
+    "search": "Search",
+    "signIn": "Sign in",
+    "lang": "English",
+    "home": "Home",
+    "services": "Our services",
+    "offer": "Offer a service",
+    "about": "About 55+"
+  },
   "footer": {}
 }
