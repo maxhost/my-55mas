@@ -1135,6 +1135,20 @@
       "ctaTalentsLabel": "Per a persones de més de 55:",
       "ctaTalentsButton": "Ofereix un servei",
       "videoTitle": "55+ — Vídeo de presentació"
+    },
+    "services": {
+      "sectionTitle": "El servei que necessites, prop teu",
+      "locatorLabel": "Tria la teva ubicació",
+      "tabs": {
+        "all": "Tots",
+        "accompaniment": "Acompanyament",
+        "classes": "Classes",
+        "repairs": "Reparacions",
+        "home": "Casa"
+      },
+      "viewAll": "Veure tots els serveis",
+      "tabsAria": "Filtres de serveis",
+      "carouselAria": "Serveis disponibles"
     }
   },
   "nav": {

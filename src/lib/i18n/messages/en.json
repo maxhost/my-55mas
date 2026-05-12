@@ -1135,6 +1135,20 @@
       "ctaTalentsLabel": "For people over 55:",
       "ctaTalentsButton": "Offer a service",
       "videoTitle": "55+ — Introduction video"
+    },
+    "services": {
+      "sectionTitle": "The service you need, near you",
+      "locatorLabel": "Choose your location",
+      "tabs": {
+        "all": "All",
+        "accompaniment": "Companionship",
+        "classes": "Classes",
+        "repairs": "Repairs",
+        "home": "Home"
+      },
+      "viewAll": "View all services",
+      "tabsAria": "Service filters",
+      "carouselAria": "Available services"
     }
   },
   "nav": {
