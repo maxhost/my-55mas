@@ -291,26 +291,35 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   display: block;
 }
 
-/* Decorative shapes */
-.hero__decor { position: absolute; pointer-events: none; z-index: 1; }
-/* Big red half-circle bleeding off the left edge */
-.hero__decor--circle {
-  top: 35%;
-  left: -80px;
-  width: 160px; height: 160px;
+/* Decorative shapes — always BEHIND text. */
+.hero__decor { position: absolute; pointer-events: none; z-index: 0; }
+.hero__content, .hero__media { position: relative; z-index: 2; }
+
+/* Composite "donut" on the upper-left: an outline ring + a smaller
+   solid disc beside it, both bleeding off the left edge. Stays above
+   the paragraph so it never overlaps the body copy. */
+.hero__decor--ring {
+  top: 8%;
+  left: -70px;
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  background: transparent;
+  border: 10px solid var(--color-primary);
+}
+.hero__decor--disc {
+  top: 24%;
+  left: -28px;
+  width: 56px; height: 56px;
   border-radius: 50%;
   background: var(--color-primary);
 }
 .hero__decor--dot {
-  top: 12%; right: 8%;
+  top: 10%; right: 8%;
   width: 26px; height: 26px;
   border-radius: 50%;
   background: var(--color-secondary);
 }
-/* Yellow accent rectangle near the video on the right */
-.hero__decor--yellow-rect {
-  display: none;
-}
+.hero__decor--yellow-rect { display: none; }
 .hero__decor--blue {
   bottom: 8%; left: 0;
   width: 60px; height: 22px;
@@ -321,21 +330,28 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   width: 18px; height: 50px;
   background: var(--color-primary);
 }
+
 @media (min-width: 768px) {
-  .hero__decor--circle {
-    top: 38%;
-    left: -110px;
-    width: 220px; height: 220px;
+  .hero__decor--ring {
+    top: 6%;
+    left: -90px;
+    width: 180px; height: 180px;
+    border-width: 14px;
   }
-  .hero__decor--dot { top: 10%; right: 48%; width: 36px; height: 36px; }
+  .hero__decor--disc {
+    top: 28%;
+    left: -36px;
+    width: 80px; height: 80px;
+  }
+  .hero__decor--dot { top: 8%; right: 48%; width: 36px; height: 36px; }
   .hero__decor--yellow-rect {
     display: block;
-    top: 16%; right: 1%;
+    top: 14%; right: 1%;
     width: 24px; height: 80px;
     background: var(--color-secondary);
   }
-  .hero__decor--blue { bottom: 14%; left: 1%; width: 90px; height: 28px; }
-  .hero__decor--red { top: 65%; right: 0; width: 22px; height: 70px; }
+  .hero__decor--blue { bottom: 12%; left: 1%; width: 90px; height: 28px; }
+  .hero__decor--red { top: 66%; right: 0; width: 22px; height: 70px; }
 }
 
 @media (min-width: 768px) {
