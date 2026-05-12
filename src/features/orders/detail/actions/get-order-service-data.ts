@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { localizedField } from '@/shared/lib/i18n/localize';
 import type { I18nRecord } from '@/shared/lib/json';
-import type { Question } from '@/shared/lib/questions/types';
+import type { AssignedSubtypeGroup, Question } from '@/shared/lib/questions/types';
 import type { OrderScheduleType } from '../../types';
 import type { ServiceTabContext, ServiceTabData } from '../types';
 
@@ -27,7 +27,14 @@ export async function getOrderServiceData(
     .maybeSingle();
   if (!order) return null;
 
-  const [serviceRes, langsRes, countriesRes, citiesRes, recurrenceRes] = await Promise.all([
+  const [
+    serviceRes,
+    langsRes,
+    countriesRes,
+    citiesRes,
+    recurrenceRes,
+    groupAssignmentsRes,
+  ] = await Promise.all([
     order.service_id
       ? supabase
           .from('services')
@@ -47,6 +54,18 @@ export async function getOrderServiceData(
       .select('repeat_every, weekdays, start_date, end_date, time_window_start, time_window_end, hours_per_session')
       .eq('order_id', orderId)
       .maybeSingle(),
+    order.service_id
+      ? supabase
+          .from('service_subtype_group_assignments')
+          .select(
+            `group_id,
+             service_subtype_groups (
+               id, slug, i18n,
+               service_subtypes ( id, slug, i18n, is_active, sort_order )
+             )`,
+          )
+          .eq('service_id', order.service_id)
+      : Promise.resolve({ data: [] as Array<Record<string, unknown>> }),
   ]);
 
   const service = serviceRes.data;
@@ -88,6 +107,39 @@ export async function getOrderServiceData(
     },
   };
 
+  const assignedGroups: AssignedSubtypeGroup[] = ((groupAssignmentsRes.data ?? []) as unknown as Array<{
+    service_subtype_groups: {
+      id: string;
+      slug: string;
+      i18n: I18nRecord;
+      service_subtypes: Array<{
+        id: string;
+        slug: string;
+        i18n: I18nRecord;
+        is_active: boolean;
+        sort_order: number;
+      }>;
+    } | null;
+  }>)
+    .map((row) => {
+      const g = row.service_subtype_groups;
+      if (!g) return null;
+      return {
+        id: g.id,
+        slug: g.slug,
+        translations: extractTranslations(g.i18n, 'name'),
+        items: (g.service_subtypes ?? [])
+          .filter((it) => it.is_active)
+          .sort((a, b) => a.sort_order - b.sort_order)
+          .map((it) => ({
+            id: it.id,
+            slug: it.slug,
+            translations: extractTranslations(it.i18n, 'name'),
+          })),
+      } satisfies AssignedSubtypeGroup;
+    })
+    .filter((g): g is AssignedSubtypeGroup => g !== null);
+
   const context: ServiceTabContext = {
     spokenLanguages: (langsRes.data ?? []).map((l) => ({
       code: l.code,
@@ -103,7 +155,18 @@ export async function getOrderServiceData(
       country_id: c.country_id,
       name: localizedField(c.i18n as I18nRecord, locale, 'name') ?? '',
     })),
+    assignedGroups,
   };
 
   return { data, context };
+}
+
+function extractTranslations(i18n: I18nRecord, field: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  if (!i18n) return out;
+  for (const [loc, entry] of Object.entries(i18n)) {
+    const v = (entry as Record<string, unknown>)[field];
+    if (typeof v === 'string') out[loc] = v;
+  }
+  return out;
 }

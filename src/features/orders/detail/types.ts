@@ -1,4 +1,4 @@
-import type { Question } from '@/shared/lib/questions/types';
+import type { AssignedSubtypeGroup, Question } from '@/shared/lib/questions/types';
 import type { OrderStatus, OrderScheduleType } from '../types';
 
 // ── Status helpers ──────────────────────────────────────────
@@ -126,6 +126,12 @@ export type ServiceTabContext = {
   spokenLanguages: { code: string; name: string }[];
   countries: CountryRef[];
   cities: CityRef[];
+  /**
+   * Subtype groups assigned to the order's service, with localised item
+   * labels. Used by service-answers-section to resolve subtype-sourced
+   * select answers (otherwise read-mode shows raw UUIDs).
+   */
+  assignedGroups: AssignedSubtypeGroup[];
 };
 
 // ── Tab Especialistas ───────────────────────────────────────

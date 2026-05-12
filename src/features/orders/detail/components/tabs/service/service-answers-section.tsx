@@ -6,7 +6,8 @@ import {
   ServiceQuestionsRenderer,
   type AnswersMap,
 } from '@/shared/components/question-renderers';
-import { resolveQuestionLabels } from '@/shared/lib/questions/resolve-options';
+import { resolveOptions, resolveQuestionLabels } from '@/shared/lib/questions/resolve-options';
+import type { AssignedSubtypeGroup, Question } from '@/shared/lib/questions/types';
 import { saveOrderServiceAnswers } from '../../../actions/save-order-service-answers';
 import type {
   ServiceAnswersValues,
@@ -28,8 +29,31 @@ type Props = {
   readOnly?: boolean;
 };
 
-function formatAnswer(value: unknown): string | null {
+function formatAnswer(
+  question: Question,
+  value: unknown,
+  locale: string,
+  assignedGroups: AssignedSubtypeGroup[],
+): string | null {
   if (value === null || value === undefined) return null;
+
+  // Select-typed questions store option values (uuids for subtype-sourced
+  // questions, opaque strings for manual). Resolve to localised labels so
+  // the read view shows "Montaje de…" instead of "dc0856cc-…".
+  if (question.type === 'singleSelect' || question.type === 'multiSelect') {
+    const options = resolveOptions(question, locale, 'es', assignedGroups);
+    const labelById = new Map(options.map((o) => [o.value, o.label]));
+    if (Array.isArray(value)) {
+      if (value.length === 0) return null;
+      return value
+        .map((v) => (typeof v === 'string' ? labelById.get(v) ?? v : String(v)))
+        .join(', ');
+    }
+    if (typeof value === 'string') {
+      return value ? labelById.get(value) ?? value : null;
+    }
+  }
+
   if (typeof value === 'string') return value || null;
   if (typeof value === 'number') return String(value);
   if (typeof value === 'boolean') return value ? '✓' : '—';
@@ -47,6 +71,7 @@ function formatAnswer(value: unknown): string | null {
 export function ServiceAnswersSection({
   orderId,
   data,
+  context,
   hints,
   locale,
   open,
@@ -112,7 +137,7 @@ export function ServiceAnswersSection({
               <Field
                 key={q.key}
                 label={labels.label}
-                value={formatAnswer(data.answers[q.key])}
+                value={formatAnswer(q, data.answers[q.key], locale, context.assignedGroups)}
                 fallback={hints.notProvided}
               />
             );
@@ -132,7 +157,7 @@ export function ServiceAnswersSection({
         answers={answers}
         onChange={setAnswers}
         locale={locale}
-        assignedGroups={[]}
+        assignedGroups={context.assignedGroups}
         hints={rendererHints}
       />
       {data.questions.length === 0 && (
