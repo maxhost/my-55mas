@@ -18,7 +18,7 @@ export async function PublicHeader({ currentCity }: Props) {
   const t = await getTranslations('nav');
 
   return (
-    <header className="sticky top-0 z-50 bg-white">
+    <header className="bg-white">
       <div className="mx-auto max-w-[1200px] flex items-center gap-4 px-4 py-3.5 lg:gap-6 lg:px-6 lg:py-4">
         <Link href="/" aria-label={t('homeAria')} className="flex-shrink-0">
           <Image

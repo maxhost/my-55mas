@@ -21,10 +21,16 @@ export default function PublicLayout({ children, params: { locale } }: Props) {
   const currentCity = getSelectedCity();
 
   return (
-    <div className="overflow-x-hidden font-mulish text-brand-text">
+    <div className="overflow-x-clip font-mulish text-brand-text">
       <JsonLdScript id="ld-org" data={organizationJsonLd()} />
-      <PublicHeader currentCity={currentCity} />
-      <PublicNavbar />
+      {/* Header + navbar travel together as one sticky block. Wrapping
+          them keeps the red strip pinned with the white bar on scroll;
+          the parent uses overflow-x-clip (not -hidden) so position:
+          sticky still resolves against the viewport. */}
+      <div className="sticky top-0 z-50">
+        <PublicHeader currentCity={currentCity} />
+        <PublicNavbar />
+      </div>
       <main>{children}</main>
       <NewsletterForm />
       <PublicFooter />
