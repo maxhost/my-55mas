@@ -1209,6 +1209,52 @@
       "description": "A marketplace where people over 55 offer professional services. Hire experienced talent near you."
     }
   },
+  "about": {
+    "meta": {
+      "title": "Sobre nosotros — 55+",
+      "description": "55+: la revolución de la experiencia. Conoce el proyecto, sus protagonistas y cómo formar parte del movimiento."
+    },
+    "hero": {
+      "titleBefore": "55+:",
+      "titleAccent": "La Revolución",
+      "titleAfter": "de la experiencia",
+      "lead": "Durante demasiado tiempo, la sociedad ha visto a los mayores de 55 años como una generación que se apaga, cuando en realidad son una fuerza imparable de conocimiento, talento y energía. El sistema nos empuja a la inactividad, al aislamiento y a la pérdida de propósito. Se acabó, es el momento de redefinir las reglas.",
+      "imageAlt": "Personas mayores de 55 con vitalidad y talento"
+    },
+    "protagonists": {
+      "title": "Los protagonistas del cambio",
+      "lead": "55+ nace como una respuesta, como un desafío al modelo que desperdicia el potencial de quienes tienen más que aportar. Trabajar no es solo un medio para vivir, es también un puente para conectar, compartir y dejar huella. Y en un mundo que envejece, contar con el conocimiento y la habilidad de quienes han vivido más no es solo una ventaja, es una necesidad.",
+      "imageAlt": "Mujer 55+ sonriendo, protagonista del cambio"
+    },
+    "movement": {
+      "title": "55+: Más que un proyecto, un movimiento",
+      "lead": "En 2017, Elena Parras tomó una decisión: dejar atrás una exitosa carrera para liderar un cambio necesario. Jienense de origen y lisboeta de corazón, eligió Portugal como el punto de partida de una revolución social. Hoy, junto a su equipo, impulsa un movimiento que va más allá del empleo: una lucha activa contra el edadismo, la exclusión y la invisibilización de quienes aún tienen mucho que aportar. Desde Portugal y ahora también en España, 55+ combate el aislamiento y la precarización de los mayores de 55 años, devolviéndoles voz, oportunidades y un rol clave en la sociedad. Porque en palabras de Elena: la edad no es un límite, sino una ventaja. Y es hora de que el mundo lo entienda.",
+      "videoTitle": "Elena Parras presenta 55+",
+      "cta": "Ser parte del movimiento"
+    },
+    "howtoTalents": {
+      "sectionTitle": "Ganas tú. Ganan ellos. Ganamos todos",
+      "sectionTitleAccent": "¿Cómo funciona?",
+      "imageAlt": "Talento 55+ ofreciendo un servicio",
+      "heading": "Haz lo que mejor se te da y ayuda a los demás con tu talento",
+      "steps": {
+        "s1": "Regístrate en 55+ y crea tu perfil",
+        "s2": "Recibe solicitudes de tu servicio",
+        "s3": "Trabaja y recibe tu pago con flexibilidad"
+      },
+      "cta": "Ofrece un servicio"
+    },
+    "howtoClients": {
+      "imageAlt": "Cliente disfrutando un servicio 55+",
+      "heading": "Contribuye a mejorar la vida de los 55+, mientras encuentras soluciones para tu día a día",
+      "steps": {
+        "s1": "Descubre todos los servicios disponibles cerca de ti",
+        "s2": "Contacta con el 55+",
+        "s3": "Disfruta un servicio con confianza y calidad"
+      },
+      "cta": "Contrata un servicio"
+    }
+  },
   "nav": {
     "homeAria": "55+ home",
     "mainAria": "Main navigation",
