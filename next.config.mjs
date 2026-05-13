@@ -36,10 +36,19 @@ const SECURITY_HEADERS = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // sharp is a native Node module used by our cover-image upload
+  // Server Action. Excluding it from the server bundle keeps the
+  // serverless function size below Vercel's 50 MB limit; sharp is
+  // resolved at runtime from node_modules instead.
+  experimental: {
+    serverComponentsExternalPackages: ['sharp'],
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '725e9d51ad7caf1033da4d1e65348273.cdn.bubble.io' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
+      // Supabase Storage public objects (service covers, future buckets)
+      { protocol: 'https', hostname: 'vkfolbfchkwezrbkxpiv.supabase.co' },
     ],
   },
   async headers() {
