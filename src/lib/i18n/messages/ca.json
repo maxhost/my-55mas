@@ -103,7 +103,18 @@
     "deleteServiceTitle": "Eliminar servei",
     "deleteServiceDescription": "Això eliminarà permanentment \"{name}\" i totes les seves dades: traduccions, configuració de països/ciutats, formularis i documents requerits. Aquesta acció no es pot desfer.",
     "deleteConfirm": "Eliminar permanentment",
-    "deleteError": "Error en eliminar el servei."
+    "deleteError": "Error en eliminar el servei.",
+    "cover": {
+      "title": "Imatge de portada",
+      "help": "Imatge que es mostra a les cards i al detall del servei. Optimitzada automàticament a WebP en 3 mides.",
+      "empty": "Sense imatge carregada",
+      "upload": "Carregar imatge",
+      "replace": "Reemplaçar imatge",
+      "remove": "Treure imatge",
+      "uploading": "Carregant…",
+      "removing": "Treient…",
+      "sizeHint": "Màxim 8 MB. JPG, PNG, WebP o AVIF."
+    }
   },
   "AdminSurveyQuestions": {
     "title": "Preguntes Estadístiques",

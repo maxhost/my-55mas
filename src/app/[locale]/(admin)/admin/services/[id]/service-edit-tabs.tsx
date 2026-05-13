@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ServiceForm } from '@/features/services/components/service-form';
 import { ServiceConfig } from '@/features/services/components/service-config';
+import { CoverImageUpload } from '@/features/services/components/cover-image-upload';
 import { GroupAssignmentEditor } from '@/features/subtypes/components/group-assignment-editor';
 import type { SubtypeGroupWithTranslations } from '@/features/subtypes/types';
 import { QuestionsEditor } from '@/features/service-questions/components/questions-editor';
@@ -63,7 +64,11 @@ export function ServiceEditTabs({
         <TabsTrigger value="talent-questions">{t('tabTalentQuestions')}</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="content" className="pt-6">
+      <TabsContent value="content" className="space-y-6 pt-6">
+        <CoverImageUpload
+          serviceId={service.id}
+          initialCoverBase={service.cover_image_url}
+        />
         <ServiceForm
           serviceId={service.id}
           translations={service.translations}

@@ -103,7 +103,18 @@
     "deleteServiceTitle": "Delete service",
     "deleteServiceDescription": "This will permanently delete \"{name}\" and all its data: translations, country/city configuration, forms, and required documents. This action cannot be undone.",
     "deleteConfirm": "Delete permanently",
-    "deleteError": "Error deleting service."
+    "deleteError": "Error deleting service.",
+    "cover": {
+      "title": "Cover image",
+      "help": "Image shown on service cards and detail page. Optimized to WebP in 3 sizes automatically.",
+      "empty": "No image uploaded",
+      "upload": "Upload image",
+      "replace": "Replace image",
+      "remove": "Remove image",
+      "uploading": "Uploading…",
+      "removing": "Removing…",
+      "sizeHint": "Max 8 MB. JPG, PNG, WebP or AVIF."
+    }
   },
   "AdminSurveyQuestions": {
     "title": "Survey Questions",

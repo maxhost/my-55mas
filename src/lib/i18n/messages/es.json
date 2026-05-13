@@ -103,7 +103,18 @@
     "deleteServiceTitle": "Eliminar servicio",
     "deleteServiceDescription": "Esto eliminará permanentemente \"{name}\" y todos sus datos: traducciones, configuración de países/ciudades, formularios y documentos requeridos. Esta acción no se puede deshacer.",
     "deleteConfirm": "Eliminar permanentemente",
-    "deleteError": "Error al eliminar el servicio."
+    "deleteError": "Error al eliminar el servicio.",
+    "cover": {
+      "title": "Imagen de portada",
+      "help": "Imagen mostrada en cards y detalle del servicio. Se optimiza automáticamente a WebP en 3 tamaños.",
+      "empty": "Sin imagen cargada",
+      "upload": "Subir imagen",
+      "replace": "Reemplazar imagen",
+      "remove": "Quitar imagen",
+      "uploading": "Subiendo…",
+      "removing": "Quitando…",
+      "sizeHint": "Máximo 8 MB. JPG, PNG, WebP o AVIF."
+    }
   },
   "AdminSurveyQuestions": {
     "title": "Preguntas Estadísticas",

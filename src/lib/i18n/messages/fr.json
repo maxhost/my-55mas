@@ -103,7 +103,18 @@
     "deleteServiceTitle": "Supprimer le service",
     "deleteServiceDescription": "Ceci supprimera définitivement \"{name}\" et toutes ses données : traductions, configuration pays/villes, formulaires et documents requis. Cette action est irréversible.",
     "deleteConfirm": "Supprimer définitivement",
-    "deleteError": "Erreur lors de la suppression du service."
+    "deleteError": "Erreur lors de la suppression du service.",
+    "cover": {
+      "title": "Image de couverture",
+      "help": "Image affichée sur les cartes et la page détaillée du service. Optimisée automatiquement en WebP dans 3 tailles.",
+      "empty": "Aucune image chargée",
+      "upload": "Téléverser une image",
+      "replace": "Remplacer l’image",
+      "remove": "Supprimer l’image",
+      "uploading": "Envoi en cours…",
+      "removing": "Suppression…",
+      "sizeHint": "8 Mo max. JPG, PNG, WebP ou AVIF."
+    }
   },
   "AdminSurveyQuestions": {
     "title": "Questions Statistiques",
