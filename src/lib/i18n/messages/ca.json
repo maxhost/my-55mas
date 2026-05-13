@@ -114,7 +114,15 @@
       "uploading": "Carregant…",
       "removing": "Treient…",
       "sizeHint": "Màxim 8 MB. JPG, PNG, WebP o AVIF."
-    }
+    },
+    "aiTranslateButtonLabel": "IA",
+    "aiTranslate": "Traducir con IA",
+    "aiTranslating": "Traduciendo…",
+    "aiTranslateConfirmTitle": "Traducir contenido con IA",
+    "aiTranslateConfirmDescription": "Esto guardará el contenido en español tal como lo tenés ahora y lo traducirá a inglés, portugués, francés y catalán usando IA. Las traducciones existentes en esos 4 idiomas se sobrescribirán. Los campos vacíos en español quedarán vacíos en los otros idiomas.",
+    "aiTranslateSuccess": "Contenido traducido a EN/PT/FR/CA",
+    "aiTranslateError": "No se pudo traducir el contenido",
+    "aiTranslateDisabledHint": "Completá el nombre y al menos uno de descripción / incluye / título hero en español para usar la IA"
   },
   "AdminSurveyQuestions": {
     "title": "Preguntes Estadístiques",

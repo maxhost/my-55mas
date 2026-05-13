@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -13,6 +13,7 @@ import { saveTranslation } from '../actions/update-service';
 import type { ServiceTranslationDetail, FaqItem } from '../types';
 import { ListEditor } from './list-editor';
 import { FaqEditor } from './faq-editor';
+import { ServiceTranslateAiButton } from './service-translate-ai-button';
 
 type Props = {
   serviceId: string;
@@ -56,6 +57,23 @@ function translationToData(t: ServiceTranslationDetail): LocaleData {
   };
 }
 
+function dataToTranslation(
+  d: LocaleData,
+  locale: string,
+): ServiceTranslationDetail {
+  return {
+    locale,
+    name: d.name,
+    description: d.description || null,
+    includes: d.includes || null,
+    hero_title: d.hero_title || null,
+    hero_subtitle: d.hero_subtitle || null,
+    benefits: d.benefits,
+    guarantees: d.guarantees,
+    faqs: d.faqs,
+  };
+}
+
 export function ServiceForm({ serviceId, translations }: Props) {
   const t = useTranslations('AdminServices');
   const tc = useTranslations('Common');
@@ -71,6 +89,18 @@ export function ServiceForm({ serviceId, translations }: Props) {
 
   const [data, setData] = useState(initialData);
   const [activeLocale, setActiveLocale] = useState<string>(locales[0]);
+
+  // Sync local state when the parent receives fresh translations (e.g. after
+  // router.refresh() following the AI translate action). Keeps activeLocale
+  // intact so the admin's tab choice survives the refresh.
+  useEffect(() => {
+    const next: Record<string, LocaleData> = {};
+    for (const locale of locales) {
+      const existing = translations.find((tr) => tr.locale === locale);
+      next[locale] = existing ? translationToData(existing) : emptyLocaleData();
+    }
+    setData(next);
+  }, [translations]);
 
   const updateField = (field: keyof LocaleData, value: LocaleData[keyof LocaleData]) => {
     setData((prev) => ({
@@ -99,13 +129,19 @@ export function ServiceForm({ serviceId, translations }: Props) {
   return (
     <div className="space-y-6">
       <Tabs value={activeLocale} onValueChange={setActiveLocale}>
-        <TabsList>
-          {locales.map((locale) => (
-            <TabsTrigger key={locale} value={locale}>
-              {locale.toUpperCase()}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        <div className="flex items-center justify-between gap-3">
+          <TabsList>
+            {locales.map((locale) => (
+              <TabsTrigger key={locale} value={locale}>
+                {locale.toUpperCase()}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          <ServiceTranslateAiButton
+            serviceId={serviceId}
+            esTranslation={dataToTranslation(data['es'], 'es')}
+          />
+        </div>
 
         {locales.map((locale) => (
           <TabsContent key={locale} value={locale} className="space-y-4 pt-4">
