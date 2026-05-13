@@ -314,22 +314,58 @@ Al final de Fase 2: home pixel-equivalente al mockup, en Next.js, multi-locale c
 - `app/[locale]/(public)/loading.tsx` — skeleton.
 - `app/[locale]/(public)/not-found.tsx` — 404 estilado.
 
-### **Fase 4 — DB-driven sections** (user-paced, una sesión por sección)
+### **Fase 4 — Language switching** (re-scoped 2026-05-12)
 
-Patrón estándar por sesión:
-1. **DB**: RLS policy `for select using (true)` o filtrada por país en la tabla afectada.
-2. **Action**: `getX(locale, countryId, filters)` en `features/public-home/actions/` o feature dedicado si crece (ej: `features/services-catalog/`).
+Originalmente la fase era DB integration. Se reordenó porque el
+cliente quiere primero garantizar que el sitio responde a cambios de
+idioma. DB integration además bloquea sobre un ajuste de schema de
+imágenes pendiente en admin, así que se difiere a **Fase 4b** más
+abajo y arranca cuando aterrice ese schema.
+
+**Sesiones**
+- 4.1 — Tests + explicit localeDetection (commit `2f361e7`):
+  RTL smoke tests del LangSwitcher + `localeDetection: true`
+  explícito en routing.ts (es el default de next-intl, documentado
+  para que la cookie NEXT_LOCALE + Accept-Language fallback queden
+  obvios).
+- 4.2 — Host → country (commit `df0b5ee`): `getDomainCountry()` lee
+  Host header y mapea TLD → country code (`.es → ES`, `.pt → PT`,
+  `.fr → FR`, `.br → BR`, `.com.ar → AR`, fallback ES).
+  `getSelectedCity()` cae al primer city.countryCode matching cuando
+  no hay cookie. Ready para `55mas.pt` en cuanto se sumen ciudades PT.
+- 4.3 — Docs (este commit).
+
+**End-to-end behaviour**
+
+| Usuario | Resultado |
+|---|---|
+| Primera visita a `/` desde navegador en inglés | next-intl redirige a `/en/` (Accept-Language match) |
+| Cambia a "Français" en el switcher | URL → `/fr/...`, cookie `NEXT_LOCALE=fr` escrita por next-intl |
+| Próxima visita a `/` (días después) | Cookie NEXT_LOCALE gana → redirige a `/fr/` |
+| Visita `55mas.pt/...` | `getDomainCountry() === 'PT'`; idioma sigue independiente |
+| Cambia ciudad en el header | Cookie `55mas_location` gana sobre el TLD default |
+
+**Out of scope de Fase 4**
+- Servicios desde DB con i18n (espera schema admin).
+- Testimonios desde DB.
+- Colaboradores desde DB.
+- Cualquier RSC dependiente de DB que necesite localización por fila.
+
+### **Fase 4b — DB-driven sections** (parqueada hasta schema admin)
+
+Patrón estándar por sesión cuando se arranque:
+1. **DB**: RLS policy `for select using (true)` o filtrada por país.
+2. **Action**: `getX(locale, countryId, filters)` con `localizedField`.
 3. **Schema**: Zod schema de respuesta + safeParse defensivo.
 4. **Wire-up**: RSC parent reemplaza data mock por `await getX(...)`.
-5. **Error/loading**: handled por los archivos de Fase 3.2 + revalidation tags.
+5. **Error/loading**: handled por los archivos de Fase 3.2.
 6. **Tests**: smoke + happy path del action.
 7. **Commit + tag**.
 
-Candidatos en orden sugerido (usuario decide):
+Candidatos cuando arranque (usuario decide):
 - Servicios (filtrados por país + categoría).
 - Testimonios.
 - Colaboradores.
-- Project section (si tiene data dinámica).
 
 ### **Fase 5 — Image pipeline + Forms** (cuando hagan falta)
 
