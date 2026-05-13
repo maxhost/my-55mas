@@ -22,9 +22,12 @@ type Props = {
   tone?: 'dark' | 'light';
   /** Where to anchor the dropdown horizontally. */
   align?: 'left' | 'right';
+  /** Open upward when the trigger sits near the bottom of the viewport
+   *  (e.g. the mobile drawer's footer). Defaults to 'down'. */
+  placement?: 'down' | 'up';
 };
 
-export function LangSwitcher({ tone = 'dark', align = 'right' }: Props) {
+export function LangSwitcher({ tone = 'dark', align = 'right', placement = 'down' }: Props) {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
@@ -61,6 +64,8 @@ export function LangSwitcher({ tone = 'dark', align = 'right' }: Props) {
 
   const triggerText = tone === 'light' ? 'text-white' : 'text-brand-text';
   const panelAlign = align === 'right' ? 'right-0' : 'left-0';
+  const panelVertical =
+    placement === 'up' ? 'bottom-full mb-2' : 'top-full mt-2';
 
   return (
     <div ref={ref} className="relative">
@@ -81,7 +86,7 @@ export function LangSwitcher({ tone = 'dark', align = 'right' }: Props) {
           role="listbox"
           aria-label="Cambiar idioma"
           className={`
-            absolute top-full mt-2 z-50 ${panelAlign}
+            absolute z-50 ${panelVertical} ${panelAlign}
             min-w-[160px] rounded-lg border border-black/10
             bg-white py-1 shadow-lg
           `}
