@@ -16,6 +16,9 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // 'server-only' throws at Next build time when imported from a
+      // client bundle. In jsdom tests we just need a no-op.
+      'server-only': path.resolve(__dirname, './src/test/server-only-stub.ts'),
     },
   },
 });

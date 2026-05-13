@@ -5,3 +5,4 @@
 
 export { LOCATOR_CITIES, DEFAULT_CITY_SLUG, findCityBySlug } from './cities';
 export type { LocatorCity } from './cities';
+export type { DomainCountry } from './domain';
