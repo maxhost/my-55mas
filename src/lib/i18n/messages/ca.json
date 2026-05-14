@@ -216,6 +216,18 @@
     "countries": "Països",
     "noCountries": "Sense països actius"
   },
+  "AdminFaqs": {
+    "title": "FAQ",
+    "description": "Preguntas frecuentes que se usan en el sitio público. Cada pregunta tiene una versión por idioma; ES es obligatorio, otros idiomas son opcionales y caen a ES.",
+    "addFaq": "Añadir pregunta",
+    "noFaqs": "Todavía no hay preguntas. Añadí la primera.",
+    "question": "Pregunta",
+    "answer": "Respuesta",
+    "isActive": "Activa (visible en el sitio público)",
+    "remove": "Eliminar",
+    "moveUp": "Subir",
+    "moveDown": "Bajar"
+  },
   "AdminReviews": {
     "title": "Reseñas",
     "description": "Testimonials que aparecen en el sitio público. Cada reseña tiene autor, foto, estrellas (paso 0.5) y texto traducible a los 5 idiomas.",

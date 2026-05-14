@@ -273,6 +273,33 @@ export type Database = {
           },
         ]
       }
+      faqs: {
+        Row: {
+          created_at: string
+          i18n: Json
+          id: string
+          is_active: boolean
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          i18n?: Json
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          i18n?: Json
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       fiscal_id_type_countries: {
         Row: {
           country_id: string
