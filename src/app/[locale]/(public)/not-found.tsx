@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import { getTranslations } from 'next-intl/server';
 
 // Public 404. Triggered when a public route doesn't resolve (e.g. a

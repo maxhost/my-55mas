@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import Image from 'next/image';
 import { SocialsRow } from '../header/socials-row';
 import { LangSwitcher } from '../lang-switcher';

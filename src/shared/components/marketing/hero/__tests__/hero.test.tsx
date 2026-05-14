@@ -1,5 +1,14 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
+
+// Identity mock: render next-intl `Link` as a plain `<a>` so jsdom
+// doesn't need a locale provider and `href` asserts keep working.
+vi.mock('@/lib/i18n/navigation', () => ({
+  Link: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => (
+    <a href={typeof href === 'string' ? href : ''} {...rest}>{children}</a>
+  ),
+}));
+
 import { Hero } from '../hero';
 
 const IMAGE = { type: 'image' as const, src: '/img.jpg', alt: 'pic' };

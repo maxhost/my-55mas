@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import { getTranslations } from 'next-intl/server';
 import { SITE_CONFIG } from '@/shared/lib/site-config';
 import { SocialsRow } from '../header/socials-row';

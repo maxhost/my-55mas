@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import { HowItWorksShapes } from './how-it-works-shapes';
 
 export type HowItWorksStep = { num: number; label: string };

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import { HeroDecorations } from './hero-decorations';
 
 export type HeroCta = {
