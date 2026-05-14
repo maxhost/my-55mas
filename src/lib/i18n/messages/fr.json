@@ -240,7 +240,16 @@
     "noItemsInGroup": "Ce groupe n'a pas de sous-types.",
     "noGroupsAssigned": "Ce service n'a pas de groupes de sous-types assignés. Configure-les dans l'onglet Sous-types d'abord.",
     "allowedFileTypes": "Types de fichier autorisés",
-    "maxSizeMb": "Taille max. (MB)"
+    "maxSizeMb": "Taille max. (MB)",
+    "aiTranslateButtonLabel": "IA",
+    "aiTranslate": "Traducir con IA",
+    "aiTranslating": "Traduciendo…",
+    "aiTranslateConfirmTitle": "Traducir preguntas con IA",
+    "aiTranslateConfirmDescription": "Esto guardará las preguntas en español tal como las tenés ahora y traducirá sus textos (etiquetas, placeholders, ayudas y opciones manuales) a inglés, portugués, francés y catalán usando IA. Las traducciones existentes en esos 4 idiomas se sobrescribirán. Las preguntas sin texto en español quedarán sin tocar.",
+    "aiTranslateSuccess": "Preguntas traducidas a EN/PT/FR/CA",
+    "aiTranslateError": "No se pudo traducir las preguntas",
+    "aiTranslateErrorTooMany": "Demasiadas preguntas para traducir en un solo click (más de 50). Reducí la cantidad o traducí en tandas.",
+    "aiTranslateDisabledHint": "Necesitás al menos una pregunta con etiqueta en español"
   },
   "AdminSpokenLanguages": {
     "title": "Langues parlées",

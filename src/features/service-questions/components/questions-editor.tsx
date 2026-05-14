@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import type {
   QuestionTarget,
 } from '@/shared/lib/questions/types';
 import { QuestionCard } from './question-card';
+import { ServiceTranslateQuestionsAiButton } from './service-translate-questions-ai-button';
 
 type Props = {
   serviceId: string;
@@ -36,6 +37,13 @@ export function QuestionsEditor({ serviceId, target, initialQuestions, assignedG
   const locale = useLocale();
   const [questions, setQuestions] = useState<Question[]>(initialQuestions);
   const [isPending, startTransition] = useTransition();
+
+  // Sync state when parent re-fetches (e.g. after router.refresh() following
+  // the AI translate action). Without this, useState would keep the stale
+  // questions even though props updated.
+  useEffect(() => {
+    setQuestions(initialQuestions);
+  }, [initialQuestions]);
 
   const updateAt = (index: number, q: Question) => {
     setQuestions(questions.map((x, i) => (i === index ? q : x)));
@@ -73,7 +81,14 @@ export function QuestionsEditor({ serviceId, target, initialQuestions, assignedG
 
   return (
     <div className="space-y-3">
-      <p className="text-muted-foreground text-sm">{t('description')}</p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-muted-foreground text-sm">{t('description')}</p>
+        <ServiceTranslateQuestionsAiButton
+          serviceId={serviceId}
+          target={target}
+          questions={questions}
+        />
+      </div>
 
       <div className="space-y-2">
         {questions.length === 0 && (
