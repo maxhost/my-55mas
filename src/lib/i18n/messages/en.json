@@ -1382,6 +1382,54 @@
     "about": "About 55+",
     "menuCloseAria": "Close menu"
   },
+  "legal": {
+    "nav": {
+      "faq": "Frequently Asked Questions",
+      "terms": "Terms and Conditions",
+      "privacy": "Privacy Policy",
+      "termsOfUse": "Service Terms of Use",
+      "transparency": "Transparency"
+    },
+    "navAriaLabel": "Legal navigation",
+    "emptyDocument": "We will share this content soon.",
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "We regularly answer the same questions from our clients and 55+ talents. Here we address the most common ones to help you understand 55+ better.",
+      "empty": "We will share FAQs soon.",
+      "meta": {
+        "title": "Frequently Asked Questions | 55+",
+        "description": "Answers to the most common questions about 55+, our services and how we work."
+      }
+    },
+    "terms": {
+      "title": "Terms and Conditions",
+      "meta": {
+        "title": "Terms and Conditions | 55+",
+        "description": "Terms and conditions of use of the 55+ site."
+      }
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "meta": {
+        "title": "Privacy Policy | 55+",
+        "description": "How we collect, use and protect your personal data at 55+."
+      }
+    },
+    "termsOfUse": {
+      "title": "Service Terms of Use",
+      "meta": {
+        "title": "Service Terms of Use | 55+",
+        "description": "Conditions applicable to the use of services contracted through 55+."
+      }
+    },
+    "transparency": {
+      "title": "Transparency",
+      "meta": {
+        "title": "Transparency | 55+",
+        "description": "Information about 55+'s operations, fees and transparency practices."
+      }
+    }
+  },
   "footer": {
     "legal": {
       "faq": "FAQ",

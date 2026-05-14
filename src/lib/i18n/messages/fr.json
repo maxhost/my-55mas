@@ -1382,6 +1382,54 @@
     "about": "À propos de 55+",
     "menuCloseAria": "Fermer le menu"
   },
+  "legal": {
+    "nav": {
+      "faq": "Questions Fréquentes",
+      "terms": "Conditions générales",
+      "privacy": "Politique de confidentialité",
+      "termsOfUse": "Conditions d’utilisation du service",
+      "transparency": "Transparence"
+    },
+    "navAriaLabel": "Navigation légale",
+    "emptyDocument": "Nous partagerons bientôt ce contenu.",
+    "faq": {
+      "title": "Questions Fréquentes",
+      "subtitle": "Nous répondons régulièrement aux mêmes questions de nos clients et talents 55+. Ici, nous abordons les plus courantes pour vous aider à mieux comprendre 55+.",
+      "empty": "Nous partagerons bientôt des questions fréquentes.",
+      "meta": {
+        "title": "Questions Fréquentes | 55+",
+        "description": "Réponses aux questions les plus fréquentes sur 55+, nos services et notre fonctionnement."
+      }
+    },
+    "terms": {
+      "title": "Conditions générales",
+      "meta": {
+        "title": "Conditions générales | 55+",
+        "description": "Conditions générales d’utilisation du site 55+."
+      }
+    },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "meta": {
+        "title": "Politique de confidentialité | 55+",
+        "description": "Comment nous collectons, utilisons et protégeons vos données personnelles chez 55+."
+      }
+    },
+    "termsOfUse": {
+      "title": "Conditions d’utilisation du service",
+      "meta": {
+        "title": "Conditions d’utilisation du service | 55+",
+        "description": "Conditions applicables à l’utilisation des services contractés via 55+."
+      }
+    },
+    "transparency": {
+      "title": "Transparence",
+      "meta": {
+        "title": "Transparence | 55+",
+        "description": "Informations sur les opérations, commissions et pratiques de transparence de 55+."
+      }
+    }
+  },
   "footer": {
     "legal": {
       "faq": "Questions Fréquentes",

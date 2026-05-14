@@ -1382,6 +1382,54 @@
     "about": "Sobre 55+",
     "menuCloseAria": "Fechar menu"
   },
+  "legal": {
+    "nav": {
+      "faq": "Perguntas Frequentes",
+      "terms": "Termos e Condições",
+      "privacy": "Política de Privacidade",
+      "termsOfUse": "Termos de Uso do Serviço",
+      "transparency": "Transparência"
+    },
+    "navAriaLabel": "Navegação legal",
+    "emptyDocument": "Em breve compartilharemos este conteúdo.",
+    "faq": {
+      "title": "Perguntas Frequentes",
+      "subtitle": "Respondemos regularmente às mesmas perguntas dos nossos clientes e talentos 55+. Aqui abordamos as mais comuns para ajudá-lo a entender melhor a 55+.",
+      "empty": "Em breve compartilharemos perguntas frequentes.",
+      "meta": {
+        "title": "Perguntas Frequentes | 55+",
+        "description": "Respostas às perguntas mais comuns sobre a 55+, nossos serviços e como funcionamos."
+      }
+    },
+    "terms": {
+      "title": "Termos e Condições",
+      "meta": {
+        "title": "Termos e Condições | 55+",
+        "description": "Termos e condições de uso do site 55+."
+      }
+    },
+    "privacy": {
+      "title": "Política de Privacidade",
+      "meta": {
+        "title": "Política de Privacidade | 55+",
+        "description": "Como coletamos, usamos e protegemos seus dados pessoais na 55+."
+      }
+    },
+    "termsOfUse": {
+      "title": "Termos de Uso do Serviço",
+      "meta": {
+        "title": "Termos de Uso do Serviço | 55+",
+        "description": "Condições aplicáveis ao uso dos serviços contratados através da 55+."
+      }
+    },
+    "transparency": {
+      "title": "Transparência",
+      "meta": {
+        "title": "Transparência | 55+",
+        "description": "Informações sobre operações, comissões e práticas de transparência da 55+."
+      }
+    }
+  },
   "footer": {
     "legal": {
       "faq": "Perguntas Frequentes",

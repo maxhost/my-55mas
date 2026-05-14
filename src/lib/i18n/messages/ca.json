@@ -1382,6 +1382,54 @@
     "about": "Sobre 55+",
     "menuCloseAria": "Tancar menú"
   },
+  "legal": {
+    "nav": {
+      "faq": "Preguntes Freqüents",
+      "terms": "Termes i Condicions",
+      "privacy": "Política de Privacitat",
+      "termsOfUse": "Termes d’ús del Servei",
+      "transparency": "Transparència"
+    },
+    "navAriaLabel": "Navegació legal",
+    "emptyDocument": "Aviat compartirem aquest contingut.",
+    "faq": {
+      "title": "Preguntes Freqüents",
+      "subtitle": "Responem regularment a les mateixes preguntes dels nostres clients i talents 55+. Aquí abordem les més comunes per ajudar-te a entendre millor 55+.",
+      "empty": "Aviat compartirem preguntes freqüents.",
+      "meta": {
+        "title": "Preguntes Freqüents | 55+",
+        "description": "Respostes a les preguntes més comunes sobre 55+, els nostres serveis i com funcionem."
+      }
+    },
+    "terms": {
+      "title": "Termes i Condicions",
+      "meta": {
+        "title": "Termes i Condicions | 55+",
+        "description": "Termes i condicions d’ús del lloc 55+."
+      }
+    },
+    "privacy": {
+      "title": "Política de Privacitat",
+      "meta": {
+        "title": "Política de Privacitat | 55+",
+        "description": "Com recollim, fem servir i protegim les teves dades personals a 55+."
+      }
+    },
+    "termsOfUse": {
+      "title": "Termes d’ús del Servei",
+      "meta": {
+        "title": "Termes d’ús del Servei | 55+",
+        "description": "Condicions aplicables a l’ús dels serveis contractats a través de 55+."
+      }
+    },
+    "transparency": {
+      "title": "Transparència",
+      "meta": {
+        "title": "Transparència | 55+",
+        "description": "Informació sobre l’operativa, comissions i pràctiques de transparència de 55+."
+      }
+    }
+  },
   "footer": {
     "legal": {
       "faq": "Preguntes Freqüents",

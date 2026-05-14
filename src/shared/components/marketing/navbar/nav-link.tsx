@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { stripLocale } from '@/shared/lib/i18n/strip-locale';
 
 export type NavKey = 'home' | 'services' | 'offer' | 'about';
 
@@ -10,13 +11,6 @@ type Props = {
   href: string;
   label: string;
 };
-
-// Strips a leading 2-letter locale segment (e.g. '/es/sobre-55' → '/sobre-55').
-function stripLocale(pathname: string): string {
-  const match = pathname.match(/^\/[a-z]{2}(\/.*)?$/);
-  if (!match) return pathname;
-  return match[1] ?? '/';
-}
 
 const ACTIVE_MATCHERS: Record<NavKey, (path: string) => boolean> = {
   home: (p) => p === '/' || p === '',
