@@ -216,6 +216,31 @@
     "countries": "Countries",
     "noCountries": "No active countries"
   },
+  "AdminLegalDocuments": {
+    "description": "Documento legal editado con rich-text. Cada idioma tiene su versión; los cambios se guardan en todos los idiomas con un click.",
+    "placeholder": "Empezá a escribir el documento…",
+    "editorAriaLabel": "Editor de contenido",
+    "savedSuccess": "Documento guardado",
+    "saveError": "No se pudo guardar el documento",
+    "optimisticLockError": "Alguien más guardó este documento mientras editabas. Refrescá la página para ver los cambios.",
+    "invalidInputError": "Hay contenido inválido en el documento",
+    "titleTerms": "Términos y Condiciones",
+    "titlePrivacy": "Política de Privacidad",
+    "titleTermsOfUse": "Términos de Uso del Servicio",
+    "titleTransparency": "Transparencia",
+    "toolbar": {
+      "bold": "Negrita",
+      "italic": "Cursiva",
+      "underline": "Subrayado",
+      "paragraph": "Párrafo",
+      "h2": "Título nivel 2",
+      "h3": "Título nivel 3",
+      "bulletList": "Lista con viñetas",
+      "numberedList": "Lista numerada",
+      "link": "Insertar enlace",
+      "linkPrompt": "URL del enlace (https:// o mailto:)"
+    }
+  },
   "AdminFaqs": {
     "title": "FAQ",
     "description": "Preguntas frecuentes que se usan en el sitio público. Cada pregunta tiene una versión por idioma; ES es obligatorio, otros idiomas son opcionales y caen a ES.",

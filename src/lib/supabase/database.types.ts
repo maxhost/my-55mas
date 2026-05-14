@@ -477,6 +477,30 @@ export type Database = {
         }
         Relationships: []
       }
+      legal_documents: {
+        Row: {
+          created_at: string
+          i18n: Json
+          id: string
+          slug: Database["public"]["Enums"]["legal_document_slug"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          i18n?: Json
+          id?: string
+          slug: Database["public"]["Enums"]["legal_document_slug"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          i18n?: Json
+          id?: string
+          slug?: Database["public"]["Enums"]["legal_document_slug"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_billing_lines: {
         Row: {
           client_payment_id: string | null
@@ -2527,6 +2551,7 @@ export type Database = {
           }
     }
     Enums: {
+      legal_document_slug: "terms" | "privacy" | "terms_of_use" | "transparency"
       service_category: "accompaniment" | "classes" | "repairs" | "home"
     }
     CompositeTypes: {
@@ -2655,6 +2680,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      legal_document_slug: ["terms", "privacy", "terms_of_use", "transparency"],
       service_category: ["accompaniment", "classes", "repairs", "home"],
     },
   },
