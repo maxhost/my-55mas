@@ -251,7 +251,16 @@
     "isActive": "Activa (visible en el sitio público)",
     "remove": "Eliminar",
     "moveUp": "Subir",
-    "moveDown": "Bajar"
+    "moveDown": "Bajar",
+    "aiTranslateButtonLabel": "IA",
+    "aiTranslate": "Traducir con IA",
+    "aiTranslating": "Traduciendo…",
+    "aiTranslateConfirmTitle": "Traducir FAQ con IA",
+    "aiTranslateConfirmDescription": "Esto traducirá pregunta y respuesta de cada FAQ en español a inglés, portugués, francés y catalán usando IA. Las traducciones existentes en esos 4 idiomas se sobrescribirán. Solo se traducen FAQs ya guardadas con pregunta y respuesta en español.",
+    "aiTranslateSuccess": "FAQs traducidas a EN/PT/FR/CA",
+    "aiTranslateError": "No se pudo traducir las FAQs",
+    "aiTranslateErrorTooMany": "Demasiadas FAQs para traducir en un solo click (más de 50). Reducí la cantidad o traducí en tandas.",
+    "aiTranslateDisabledHint": "Guardá al menos una FAQ con pregunta y respuesta en español para usar la IA"
   },
   "AdminReviews": {
     "title": "Reseñas",

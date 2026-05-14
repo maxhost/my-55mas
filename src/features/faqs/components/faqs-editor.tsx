@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Plus } from 'lucide-react';
@@ -16,6 +16,7 @@ import { saveFaq } from '../actions/save-faq';
 import { deleteFaq } from '../actions/delete-faq';
 import type { FaqInput, FaqWithTranslations } from '../types';
 import { FaqRow } from './faq-row';
+import { FaqsTranslateAiButton } from './faqs-translate-ai-button';
 
 type Props = {
   initialFaqs: FaqWithTranslations[];
@@ -36,6 +37,13 @@ export function FaqsEditor({ initialFaqs }: Props) {
   const [isPending, startTransition] = useTransition();
   const [faqs, setFaqs] = useState<FaqInput[]>(initialFaqs.map(toInput));
   const [removedIds, setRemovedIds] = useState<string[]>([]);
+
+  // Sync state when parent re-fetches (e.g. after router.refresh() following
+  // the AI translate action). Without this, useState keeps stale faqs.
+  useEffect(() => {
+    setFaqs(initialFaqs.map(toInput));
+    setRemovedIds([]);
+  }, [initialFaqs]);
 
   const primaryLocale = locales[0];
 
@@ -139,7 +147,7 @@ export function FaqsEditor({ initialFaqs }: Props) {
         ))}
       </Tabs>
 
-      <div className="flex gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <Button type="button" variant="outline" onClick={addFaq}>
           <Plus className="mr-2 size-4" />
           {t('addFaq')}
@@ -147,6 +155,7 @@ export function FaqsEditor({ initialFaqs }: Props) {
         <Button onClick={handleSave} disabled={isPending}>
           {isPending ? tc('saving') : tc('save')}
         </Button>
+        <FaqsTranslateAiButton faqs={faqs} />
       </div>
     </div>
   );
