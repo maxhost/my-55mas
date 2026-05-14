@@ -1,0 +1,3 @@
+# Internal cache the Supabase CLI auto-updates on every run (e.g. the
+# latest available CLI version). Bumps shouldn't pollute git history.
+.temp/
