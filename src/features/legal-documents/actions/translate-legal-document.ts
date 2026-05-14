@@ -52,74 +52,97 @@ type Result =
 export async function translateLegalDocument(
   input: Input,
 ): Promise<Result> {
-  const parsed = inputSchema.safeParse(input);
-  if (!parsed.success) {
-    return { error: 'invalid-input' };
-  }
-  const { slug, expectedUpdatedAt, esTranslation } = parsed.data;
-
-  const esHtml = esTranslation.richHtml.trim();
-  if (!esHtml) {
-    return { error: 'es-empty' };
-  }
-  if (esHtml.length > MAX_HTML_BYTES) {
-    return { error: 'doc-too-large' };
-  }
-
-  const supabase = createClient();
-
-  // Optimistic-lock check.
-  const { data: existing, error: readError } = await supabase
-    .from('legal_documents')
-    .select('updated_at')
-    .eq('slug', slug)
-    .single();
-  if (readError || !existing) return { error: 'not-found' };
-  if (existing.updated_at !== expectedUpdatedAt) {
-    return { error: 'optimistic-lock' };
-  }
-
-  let translatedByLocale: Record<TranslationTarget, string>;
   try {
-    const entries = await Promise.all(
-      TARGET_LOCALES.map(async (locale) => {
-        const html = await translateLegalDocHtml(esHtml, locale);
-        return [locale, html] as const;
-      }),
-    );
-    translatedByLocale = Object.fromEntries(entries) as Record<
-      TranslationTarget,
-      string
-    >;
-  } catch {
-    return { error: 'translate-failed' };
-  }
+    const parsed = inputSchema.safeParse(input);
+    if (!parsed.success) {
+      console.error('[translateLegalDocument] invalid-input', {
+        slug: (input as { slug?: string })?.slug,
+        issues: parsed.error.issues.slice(0, 3),
+      });
+      return { error: 'invalid-input' };
+    }
+    const { slug, expectedUpdatedAt, esTranslation } = parsed.data;
 
-  // Build the new i18n jsonb. ES preserves the form's lexicalState + a
-  // sanitized version of its richHtml. Targets get sanitized translated
-  // HTML and `lexicalState: null` (the editor reconstructs state from
-  // HTML via $generateNodesFromDOM on next open).
-  const nextI18n: Record<string, LegalDocumentTranslation> = {
-    es: {
-      lexicalState: esTranslation.lexicalState,
-      richHtml: sanitizeRichHtml(esTranslation.richHtml),
-    },
-  };
-  for (const locale of TARGET_LOCALES) {
-    nextI18n[locale] = {
-      lexicalState: null,
-      richHtml: sanitizeRichHtml(translatedByLocale[locale]),
+    const esHtml = esTranslation.richHtml.trim();
+    if (!esHtml) {
+      return { error: 'es-empty' };
+    }
+    if (esHtml.length > MAX_HTML_BYTES) {
+      return { error: 'doc-too-large' };
+    }
+
+    const supabase = createClient();
+
+    // Optimistic-lock check.
+    const { data: existing, error: readError } = await supabase
+      .from('legal_documents')
+      .select('updated_at')
+      .eq('slug', slug)
+      .single();
+    if (readError || !existing) return { error: 'not-found' };
+    if (existing.updated_at !== expectedUpdatedAt) {
+      return { error: 'optimistic-lock' };
+    }
+
+    let translatedByLocale: Record<TranslationTarget, string>;
+    try {
+      const entries = await Promise.all(
+        TARGET_LOCALES.map(async (locale) => {
+          const html = await translateLegalDocHtml(esHtml, locale);
+          return [locale, html] as const;
+        }),
+      );
+      translatedByLocale = Object.fromEntries(entries) as Record<
+        TranslationTarget,
+        string
+      >;
+    } catch (err) {
+      console.error('[translateLegalDocument] translate-failed', {
+        slug,
+        message: (err as Error)?.message,
+      });
+      return { error: 'translate-failed' };
+    }
+
+    // Build the new i18n jsonb. ES preserves the form's lexicalState + a
+    // sanitized version of its richHtml. Targets get sanitized translated
+    // HTML and `lexicalState: null` (the editor reconstructs state from
+    // HTML via $generateNodesFromDOM on next open).
+    const nextI18n: Record<string, LegalDocumentTranslation> = {
+      es: {
+        lexicalState: esTranslation.lexicalState,
+        richHtml: sanitizeRichHtml(esTranslation.richHtml),
+      },
     };
+    for (const locale of TARGET_LOCALES) {
+      nextI18n[locale] = {
+        lexicalState: null,
+        richHtml: sanitizeRichHtml(translatedByLocale[locale]),
+      };
+    }
+
+    const { data: updated, error: writeError } = await supabase
+      .from('legal_documents')
+      .update({ i18n: nextI18n as unknown as Json })
+      .eq('slug', slug)
+      .select('updated_at')
+      .single();
+    if (writeError || !updated) {
+      console.error('[translateLegalDocument] db-failed', {
+        slug,
+        message: writeError?.message,
+      });
+      return { error: 'db-failed' };
+    }
+
+    revalidatePath('/[locale]/(admin)/admin', 'layout');
+    return { data: { updated_at: updated.updated_at } };
+  } catch (err) {
+    console.error('[translateLegalDocument] unexpected throw', {
+      message: (err as Error)?.message,
+      name: (err as Error)?.name,
+      stack: (err as Error)?.stack?.slice(0, 500),
+    });
+    return { error: 'db-failed' };
   }
-
-  const { data: updated, error: writeError } = await supabase
-    .from('legal_documents')
-    .update({ i18n: nextI18n as unknown as Json })
-    .eq('slug', slug)
-    .select('updated_at')
-    .single();
-  if (writeError || !updated) return { error: 'db-failed' };
-
-  revalidatePath('/[locale]/(admin)/admin', 'layout');
-  return { data: { updated_at: updated.updated_at } };
 }

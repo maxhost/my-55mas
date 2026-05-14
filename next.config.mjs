@@ -36,12 +36,20 @@ const SECURITY_HEADERS = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // sharp is a native Node module used by our cover-image upload
-  // Server Action. Excluding it from the server bundle keeps the
-  // serverless function size below Vercel's 50 MB limit; sharp is
-  // resolved at runtime from node_modules instead.
+  // Packages excluded from the server bundle, resolved at runtime from
+  // node_modules instead. Required for:
+  //  - sharp: native Node module used by cover-image upload; bundling
+  //    would push the function over Vercel's 50 MB limit.
+  //  - isomorphic-dompurify / jsdom: server-side HTML sanitizer pulls
+  //    jsdom which has native bindings + ESM/CJS interop quirks that
+  //    Next.js's bundler chokes on inside serverless functions. With
+  //    these external, the action loads them at runtime cleanly.
   experimental: {
-    serverComponentsExternalPackages: ['sharp'],
+    serverComponentsExternalPackages: [
+      'sharp',
+      'isomorphic-dompurify',
+      'jsdom',
+    ],
   },
   images: {
     remotePatterns: [
