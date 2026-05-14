@@ -266,7 +266,16 @@
     "savePhotoHint": "Guardá la reseña primero para poder subir foto",
     "remove": "Eliminar",
     "moveUp": "Subir",
-    "moveDown": "Bajar"
+    "moveDown": "Bajar",
+    "aiTranslateButtonLabel": "IA",
+    "aiTranslate": "Traducir con IA",
+    "aiTranslating": "Traduciendo…",
+    "aiTranslateConfirmTitle": "Traducir reseñas con IA",
+    "aiTranslateConfirmDescription": "Esto traducirá el texto de cada reseña en español a inglés, portugués, francés y catalán usando IA. Las traducciones existentes en esos 4 idiomas se sobrescribirán. Solo se traducen reseñas ya guardadas con texto en español.",
+    "aiTranslateSuccess": "Reseñas traducidas a EN/PT/FR/CA",
+    "aiTranslateError": "No se pudo traducir las reseñas",
+    "aiTranslateErrorTooMany": "Demasiadas reseñas para traducir en un solo click (más de 50). Reducí la cantidad o traducí en tandas.",
+    "aiTranslateDisabledHint": "Guardá al menos una reseña con texto en español para usar la IA"
   },
   "AdminTalentTags": {
     "title": "Etiquetas de talento",

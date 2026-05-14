@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Plus } from 'lucide-react';
@@ -16,6 +16,7 @@ import { saveReview } from '../actions/save-review';
 import { deleteReview } from '../actions/delete-review';
 import type { ReviewInput, ReviewWithTranslations } from '../types';
 import { ReviewRow } from './review-row';
+import { ReviewsTranslateAiButton } from './reviews-translate-ai-button';
 
 type Props = {
   initialReviews: ReviewWithTranslations[];
@@ -41,6 +42,14 @@ export function ReviewsEditor({ initialReviews }: Props) {
     initialReviews.map(toInput),
   );
   const [removedIds, setRemovedIds] = useState<string[]>([]);
+
+  // Sync state when parent re-fetches (e.g. after router.refresh() following
+  // the AI translate action). Without this, useState would keep the stale
+  // reviews even though props updated.
+  useEffect(() => {
+    setReviews(initialReviews.map(toInput));
+    setRemovedIds([]);
+  }, [initialReviews]);
 
   const primaryLocale = locales[0];
 
@@ -147,7 +156,7 @@ export function ReviewsEditor({ initialReviews }: Props) {
         ))}
       </Tabs>
 
-      <div className="flex gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <Button type="button" variant="outline" onClick={addReview}>
           <Plus className="mr-2 size-4" />
           {t('addReview')}
@@ -155,6 +164,7 @@ export function ReviewsEditor({ initialReviews }: Props) {
         <Button onClick={handleSave} disabled={isPending}>
           {isPending ? tc('saving') : tc('save')}
         </Button>
+        <ReviewsTranslateAiButton reviews={reviews} />
       </div>
     </div>
   );
