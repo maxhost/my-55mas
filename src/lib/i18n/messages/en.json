@@ -216,6 +216,21 @@
     "countries": "Countries",
     "noCountries": "No active countries"
   },
+  "AdminReviews": {
+    "title": "Reseñas",
+    "description": "Testimonials que aparecen en el sitio público. Cada reseña tiene autor, foto, estrellas (paso 0.5) y texto traducible a los 5 idiomas.",
+    "addReview": "Añadir reseña",
+    "noReviews": "Todavía no hay reseñas. Añadí la primera.",
+    "authorName": "Nombre del autor",
+    "stars": "Estrellas",
+    "text": "Texto de la reseña",
+    "isActive": "Activa (visible en el sitio público)",
+    "noPhoto": "Sin foto",
+    "savePhotoHint": "Guardá la reseña primero para poder subir foto",
+    "remove": "Eliminar",
+    "moveUp": "Subir",
+    "moveDown": "Bajar"
+  },
   "AdminTalentTags": {
     "title": "Talent tags",
     "description": "Manage the tags backoffice applies to talents. Deactivating keeps historical assignments.",

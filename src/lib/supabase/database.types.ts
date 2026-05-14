@@ -1264,6 +1264,42 @@ export type Database = {
           },
         ]
       }
+      reviews: {
+        Row: {
+          author_name: string
+          author_photo: string | null
+          created_at: string
+          i18n: Json
+          id: string
+          is_active: boolean
+          sort_order: number
+          stars: number
+          updated_at: string
+        }
+        Insert: {
+          author_name: string
+          author_photo?: string | null
+          created_at?: string
+          i18n?: Json
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          stars: number
+          updated_at?: string
+        }
+        Update: {
+          author_name?: string
+          author_photo?: string | null
+          created_at?: string
+          i18n?: Json
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          stars?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       service_cities: {
         Row: {
           base_price: number
