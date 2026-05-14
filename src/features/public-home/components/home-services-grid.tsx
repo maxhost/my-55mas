@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from '@/lib/i18n/navigation';
+import { useSearchParams } from 'next/navigation';
+import { Link, useRouter } from '@/lib/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { ServiceCard } from '@/shared/components/marketing/service-card';
 import {
@@ -25,21 +26,42 @@ const FILTER_KEYS: CategoryKey[] = [
 type Props = {
   services: HomeServiceCard[];
   initialCategory: CategoryKey;
+  /** Base path for router.replace on filter click. Default '/' (home). */
+  basePath?: string;
+  /** Show the "View all services" CTA below the grid. Default true
+   *  (home). The /servicios page passes false because it already
+   *  shows the full catalog. */
+  showViewAll?: boolean;
 };
 
-// Owns the filter state for the home services section. Filtering happens
-// fully client-side over the pre-fetched list, so clicking a filter is
-// instant and never reloads the page. The URL is kept in sync via
-// `router.replace(..., { scroll: false })` so links are still shareable.
-export function HomeServicesGrid({ services, initialCategory }: Props) {
+// Owns the filter state for the public services catalog. Filtering
+// happens fully client-side over the pre-fetched list, so clicking a
+// filter is instant and never reloads the page. The URL is kept in
+// sync via `router.replace(..., { scroll: false })` so links are
+// still shareable; other searchParams (utm_*, ref, etc.) are
+// preserved untouched.
+export function HomeServicesGrid({
+  services,
+  initialCategory,
+  basePath = '/',
+  showViewAll = true,
+}: Props) {
   const t = useTranslations('home.services');
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [active, setActive] = useState<CategoryKey>(initialCategory);
 
   const handleSelect = (key: string) => {
     const next = key as CategoryKey;
     setActive(next);
-    const url = next === 'all' ? '/' : `/?cat=${next}`;
+    const params = new URLSearchParams(searchParams?.toString() ?? '');
+    if (next === 'all') {
+      params.delete('cat');
+    } else {
+      params.set('cat', next);
+    }
+    const qs = params.toString();
+    const url = qs ? `${basePath}?${qs}` : basePath;
     router.replace(url, { scroll: false });
   };
 
@@ -82,9 +104,9 @@ export function HomeServicesGrid({ services, initialCategory }: Props) {
         </ServicesCarousel>
       )}
 
-      {visible.length > 0 && (
+      {visible.length > 0 && showViewAll && (
         <div className="mt-7 text-center">
-          <a
+          <Link
             href="/servicios"
             className="
               inline-flex items-center justify-center
@@ -94,7 +116,7 @@ export function HomeServicesGrid({ services, initialCategory }: Props) {
             "
           >
             {t('viewAll')}
-          </a>
+          </Link>
         </div>
       )}
     </>

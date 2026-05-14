@@ -1382,6 +1382,17 @@
     "about": "Sobre 55+",
     "menuCloseAria": "Tancar menú"
   },
+  "services": {
+    "title": "Descobreix els nostres serveis",
+    "meta": {
+      "title": "Serveis | 55+",
+      "description": "Explora tots els serveis professionals que ofereixen els nostres talents 55+. Acompanyament, classes, reparacions i més, a prop teu."
+    },
+    "cta": {
+      "title": "Tens talent per compartir? Uneix-te a 55+ com a talent",
+      "button": "Vull oferir un servei"
+    }
+  },
   "legal": {
     "nav": {
       "faq": "Preguntes Freqüents",

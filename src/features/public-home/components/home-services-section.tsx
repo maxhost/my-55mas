@@ -41,6 +41,8 @@ export async function HomeServicesSection({
         <HomeServicesGrid
           services={services}
           initialCategory={activeCategory}
+          basePath="/"
+          showViewAll
         />
       </div>
     </section>

@@ -1382,6 +1382,17 @@
     "about": "Sobre 55+",
     "menuCloseAria": "Cerrar menú"
   },
+  "services": {
+    "title": "Descubre nuestros servicios",
+    "meta": {
+      "title": "Servicios | 55+",
+      "description": "Explorá todos los servicios profesionales que ofrecen nuestros talentos 55+. Acompañamiento, clases, reparaciones y más, cerca de ti."
+    },
+    "cta": {
+      "title": "¿Tenés talento para compartir? Sumate como talento 55+",
+      "button": "Quiero ofrecer un servicio"
+    }
+  },
   "legal": {
     "nav": {
       "faq": "Preguntas Frecuentes",
