@@ -1,17 +1,13 @@
 import { getTranslations } from 'next-intl/server';
-import { ServiceCard } from '@/shared/components/marketing/service-card';
-import {
-  ServicesCarousel,
-  ServicesFilter,
-  type ServicesFilterOption,
-} from '@/shared/components/marketing/services-grid';
 import type { ServiceCategory } from '@/shared/lib/services/types';
 import { loadHomeServices } from '../lib/load-home-services';
+import { HomeServicesGrid } from './home-services-grid';
 
 type CategoryKey = 'all' | ServiceCategory;
 
 type Props = {
-  /** Active filter from ?cat=... searchParam. Default 'all'. */
+  /** Active filter from ?cat=... searchParam. Default 'all'. Only used
+   *  for the FIRST render — subsequent filter clicks are client-only. */
   activeCategory: CategoryKey;
   /** Label of the currently selected city (from cookie). */
   cityLabel: string;
@@ -19,30 +15,15 @@ type Props = {
   locale: string;
 };
 
-const FILTER_KEYS: CategoryKey[] = [
-  'all',
-  'accompaniment',
-  'classes',
-  'repairs',
-  'home',
-];
-
 export async function HomeServicesSection({
   activeCategory,
   cityLabel,
   locale,
 }: Props) {
   const t = await getTranslations('home.services');
-  const services = await loadHomeServices(locale, activeCategory);
-
-  const filterOptions: ServicesFilterOption[] = FILTER_KEYS.map((key) => ({
-    key,
-    label: t(`tabs.${key}`),
-    href: key === 'all' ? '/' : `/?cat=${key}`,
-  }));
-
-  const emptyKey =
-    activeCategory === 'all' ? 'emptyAll' : 'emptyCategory';
+  // Fetch all categorized published services once; client-side filtering
+  // takes over from there so tab clicks never round-trip to the server.
+  const services = await loadHomeServices(locale, 'all');
 
   return (
     <section id="services" className="bg-white px-4 py-12 md:px-6 md:py-16">
@@ -57,45 +38,10 @@ export async function HomeServicesSection({
           <span className="font-bold">{cityLabel}</span>
         </div>
 
-        <ServicesFilter
-          options={filterOptions}
-          activeKey={activeCategory}
-          ariaLabel={t('tabsAria')}
+        <HomeServicesGrid
+          services={services}
+          initialCategory={activeCategory}
         />
-
-        {services.length === 0 ? (
-          <p className="my-10 text-center text-brand-text/70">{t(emptyKey)}</p>
-        ) : (
-          <ServicesCarousel ariaLabel={t('carouselAria')}>
-            {services.map((s) => (
-              <ServiceCard
-                key={s.id}
-                href={`/servicios/${s.slug}`}
-                imageSrc={s.imageSrc}
-                imageAlt={s.imageAlt}
-                category={{ label: t(`tabs.${s.category}`), tone: s.tone }}
-                title={s.title}
-                bullets={s.bullets}
-              />
-            ))}
-          </ServicesCarousel>
-        )}
-
-        {services.length > 0 && (
-          <div className="mt-7 text-center">
-            <a
-              href="/servicios"
-              className="
-                inline-flex items-center justify-center
-                rounded-full bg-brand-mustard px-7 py-3.5
-                text-base font-semibold text-brand-text
-                hover:bg-brand-mustard-deep transition-colors
-              "
-            >
-              {t('viewAll')}
-            </a>
-          </div>
-        )}
       </div>
     </section>
   );

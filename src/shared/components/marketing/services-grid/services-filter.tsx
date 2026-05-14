@@ -1,21 +1,26 @@
-import Link from 'next/link';
+'use client';
 
 export type ServicesFilterOption = {
   key: string;
   label: string;
-  href: string;
 };
 
 type Props = {
   options: ServicesFilterOption[];
   activeKey: string;
+  onSelect: (key: string) => void;
   ariaLabel?: string;
 };
 
-// Tab filter rendered as RSC links. Each option points to a URL with the
-// category in searchParams (?cat=...). RSC re-renders on navigation so we
-// ship zero JS for the filter itself.
-export function ServicesFilter({ options, activeKey, ariaLabel }: Props) {
+// Tab filter rendered as buttons. Selecting an option fires `onSelect`
+// (no navigation, no scroll jump). Callers own the URL sync (e.g. via
+// `router.replace(..., { scroll: false })`).
+export function ServicesFilter({
+  options,
+  activeKey,
+  onSelect,
+  ariaLabel,
+}: Props) {
   return (
     <nav
       aria-label={ariaLabel}
@@ -27,19 +32,20 @@ export function ServicesFilter({ options, activeKey, ariaLabel }: Props) {
           ? 'bg-brand-coral text-white border-brand-coral'
           : 'bg-white text-brand-text border-black/10 hover:border-brand-coral';
         return (
-          <Link
+          <button
             key={opt.key}
-            href={opt.href}
+            type="button"
             aria-current={isActive ? 'page' : undefined}
+            onClick={() => onSelect(opt.key)}
             className={`
               inline-flex h-[40.4px] items-center rounded-[10px] border-[1.5px]
               px-[18px] text-[0.95rem] font-semibold leading-none
-              transition-colors
+              transition-colors cursor-pointer
               ${classes}
             `}
           >
             {opt.label}
-          </Link>
+          </button>
         );
       })}
     </nav>
