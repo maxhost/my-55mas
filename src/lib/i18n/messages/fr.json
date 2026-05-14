@@ -50,7 +50,14 @@
     "groupStaff": "Staff",
     "groupCatalog": "Catalogue",
     "groupStats": "Statistiques",
-    "groupSystem": "Système"
+    "groupSystem": "Système",
+    "groupPublic": "Público",
+    "reviews": "Reseñas",
+    "faq": "FAQ",
+    "terms": "Términos y Condiciones",
+    "privacy": "Política de Privacidad",
+    "termsOfUse": "Términos de Uso del Servicio",
+    "transparency": "Transparencia"
   },
   "AdminServices": {
     "title": "Services",

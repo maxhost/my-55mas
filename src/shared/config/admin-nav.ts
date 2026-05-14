@@ -54,6 +54,19 @@ export const adminNavGroups: NavGroup[] = [
     ],
   },
   {
+    labelKey: 'groupPublic',
+    collapsible: true,
+    defaultOpen: false,
+    items: [
+      { labelKey: 'reviews', href: '/admin/reviews', icon: 'star' },
+      { labelKey: 'faq', href: '/admin/faq', icon: 'help-circle' },
+      { labelKey: 'terms', href: '/admin/terms', icon: 'scroll' },
+      { labelKey: 'privacy', href: '/admin/privacy', icon: 'lock' },
+      { labelKey: 'termsOfUse', href: '/admin/terms-of-use', icon: 'file-check' },
+      { labelKey: 'transparency', href: '/admin/transparency', icon: 'shield-check' },
+    ],
+  },
+  {
     labelKey: 'groupSystem',
     collapsible: true,
     defaultOpen: false,

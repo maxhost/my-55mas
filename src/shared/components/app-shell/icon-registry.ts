@@ -20,6 +20,12 @@ import {
   Globe,
   Database,
   IdCard,
+  Star,
+  HelpCircle,
+  Scroll,
+  Lock,
+  FileCheck,
+  ShieldCheck,
 } from 'lucide-react';
 
 const icons: Record<string, LucideIcon> = {
@@ -40,6 +46,12 @@ const icons: Record<string, LucideIcon> = {
   globe: Globe,
   database: Database,
   'id-card': IdCard,
+  star: Star,
+  'help-circle': HelpCircle,
+  scroll: Scroll,
+  lock: Lock,
+  'file-check': FileCheck,
+  'shield-check': ShieldCheck,
 };
 
 export function getNavIcon(name: string): LucideIcon {
