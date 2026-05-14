@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState, useTransition } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,7 @@ import type {
   LegalDocumentSlug,
   LegalDocumentTranslation,
 } from '../types';
+import { LegalDocTranslateAiButton } from './legal-doc-translate-ai-button';
 
 type Props = {
   doc: LegalDocument;
@@ -51,6 +52,15 @@ export function LegalDocumentEditor({ doc }: Props) {
   const [activeLocale, setActiveLocale] = useState<string>(locales[0]);
   const [expectedUpdatedAt, setExpectedUpdatedAt] = useState(doc.updated_at);
   const [isPending, startTransition] = useTransition();
+
+  // Sync local state when the page re-fetches (e.g. after AI translate
+  // → router.refresh() → fresh `doc` prop). Without this the editor
+  // keeps stale translations and a stale expectedUpdatedAt, breaking
+  // the next manual save.
+  useEffect(() => {
+    setTranslations(buildInitialTranslations(doc));
+    setExpectedUpdatedAt(doc.updated_at);
+  }, [doc]);
 
   const toolbarLabels = {
     bold: t('toolbar.bold'),
@@ -133,6 +143,7 @@ export function LegalDocumentEditor({ doc }: Props) {
               <LexicalEditor
                 key={locale}
                 initialState={current?.lexicalState ?? null}
+                initialHtml={current?.richHtml ?? null}
                 onChange={handleEditorChange}
                 handleRef={editorRef}
                 placeholder={t('placeholder')}
@@ -144,10 +155,22 @@ export function LegalDocumentEditor({ doc }: Props) {
         ))}
       </Tabs>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <Button onClick={handleSave} disabled={isPending}>
           {isPending ? tc('saving') : tc('save')}
         </Button>
+        <LegalDocTranslateAiButton
+          slug={doc.slug as LegalDocumentSlug}
+          expectedUpdatedAt={expectedUpdatedAt}
+          esTranslation={translations.es ?? { lexicalState: null, richHtml: '' }}
+          onBeforeTranslate={() => {
+            // Force the active editor's debounced onChange to commit so
+            // the ES slot holds the most recent edits before the action
+            // reads them.
+            editorRef.current?.flushOnChange();
+          }}
+          onSaved={setExpectedUpdatedAt}
+        />
       </div>
     </div>
   );

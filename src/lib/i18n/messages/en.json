@@ -239,7 +239,16 @@
       "numberedList": "Lista numerada",
       "link": "Insertar enlace",
       "linkPrompt": "URL del enlace (https:// o mailto:)"
-    }
+    },
+    "aiTranslateButtonLabel": "IA",
+    "aiTranslate": "Traducir con IA",
+    "aiTranslating": "Traduciendo…",
+    "aiTranslateConfirmTitle": "Traducir documento con IA",
+    "aiTranslateConfirmDescription": "Esto traducirá el contenido en español a inglés, portugués, francés y catalán usando IA, preservando el formato (negritas, listas, enlaces, etc.). Las traducciones existentes en esos 4 idiomas se sobrescribirán. El contenido en español NO se modifica salvo por una pasada de sanitización HTML.",
+    "aiTranslateSuccess": "Documento traducido a EN/PT/FR/CA",
+    "aiTranslateError": "No se pudo traducir el documento",
+    "aiTranslateErrorTooLarge": "Documento demasiado largo para traducir en un solo click (más de 100KB). Reducí el contenido o dividilo.",
+    "aiTranslateDisabledHint": "Escribí contenido en español primero para usar la IA"
   },
   "AdminFaqs": {
     "title": "FAQ",

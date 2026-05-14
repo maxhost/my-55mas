@@ -13,7 +13,8 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { LinkNode } from '@lexical/link';
-import { $generateHtmlFromNodes } from '@lexical/html';
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
+import { $getRoot } from 'lexical';
 import type { EditorState, LexicalEditor as LexicalEditorInstance } from 'lexical';
 import { LexicalEditorToolbar } from './lexical-editor-toolbar';
 
@@ -30,8 +31,14 @@ export type LexicalEditorHandle = {
 };
 
 export type LexicalEditorProps = {
-  /** Initial editor state. `null` renders an empty document. */
+  /** Initial editor state. `null` falls through to `initialHtml`; if
+   *  both are absent, renders an empty document. */
   initialState: Record<string, unknown> | null;
+  /** HTML used as the fallback source when `initialState` is null or
+   *  corrupt. Useful after AI translation, which writes the translated
+   *  richHtml but no Lexical state. The editor parses the HTML into
+   *  nodes on mount; the next onChange emits a fresh state. */
+  initialHtml?: string | null;
   onChange: (payload: LexicalChangePayload) => void;
   /** Imperative handle to flush onChange before unmount/state swap. */
   handleRef?: React.RefObject<LexicalEditorHandle | null>;
@@ -130,35 +137,50 @@ function ChangePlugin({
 }
 
 // Plugin that loads initial state into the editor on mount and when
-// `initialState` reference changes (used by tab-swap pattern).
+// `state` or `html` reference changes (used by tab-swap pattern).
+// Preference order: state > html > empty.
 function InitialStatePlugin({
   state,
+  html,
 }: {
   state: Record<string, unknown> | null;
+  html: string | null;
 }) {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
-    if (!state) {
+    if (state) {
+      try {
+        const parsed = editor.parseEditorState(JSON.stringify(state));
+        editor.setEditorState(parsed);
+        return;
+      } catch {
+        // Fall through to HTML path.
+      }
+    }
+    if (html && html.trim()) {
       editor.update(() => {
-        // Reset to empty paragraph.
+        const dom = new DOMParser().parseFromString(html, 'text/html');
+        const nodes = $generateNodesFromDOM(editor, dom);
+        const root = $getRoot();
+        root.clear();
+        root.append(...nodes);
       });
       return;
     }
-    try {
-      const parsed = editor.parseEditorState(JSON.stringify(state));
-      editor.setEditorState(parsed);
-    } catch {
-      // Corrupt or incompatible state: keep editor empty, parent should
-      // surface a banner if it cares.
-    }
-  }, [editor, state]);
+    // No state and no html: explicit reset so re-mounts don't carry
+    // over stale content from a previous tab.
+    editor.update(() => {
+      $getRoot().clear();
+    });
+  }, [editor, state, html]);
 
   return null;
 }
 
 export function LexicalEditor({
   initialState,
+  initialHtml,
   onChange,
   handleRef,
   placeholder,
@@ -204,7 +226,7 @@ export function LexicalEditor({
         <HistoryPlugin />
         <ListPlugin />
         <LinkPlugin />
-        <InitialStatePlugin state={initialState} />
+        <InitialStatePlugin state={initialState} html={initialHtml ?? null} />
         <ChangePlugin onChange={onChange} handleRef={handleRef} />
       </LexicalComposer>
     </div>
