@@ -53,7 +53,7 @@ export default async function PublicHomePage({ params: { locale }, searchParams 
       <HomeHowtoTalents />
       <HomeHowtoClients />
       <HomeProject />
-      <HomeTestimonials />
+      <HomeTestimonials locale={locale} />
       <HomeJoinCta />
       <HomeCollaborators />
     </>

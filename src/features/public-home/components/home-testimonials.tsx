@@ -1,33 +1,19 @@
 import { getTranslations } from 'next-intl/server';
+import { loadHomeReviews } from '@/features/public-home/lib/load-home-reviews';
 import {
   TestimonialCard,
   TestimonialsCarousel,
 } from '@/shared/components/marketing/testimonial';
 
-// Hardcoded for now (extracted verbatim from 55mas.es rendered DOM).
-// Replaced by a Supabase query in fase 4 once we land the testimonials
-// table.
-const SAMPLE_TESTIMONIALS = [
-  {
-    id: 'andrea',
-    author: 'Andrea',
-    quote:
-      '"Fue la primera vez que utilicé 55+ y sin duda es una experiencia para repetir. Pasó poco más de una semana desde que pedí el servicio hasta que se realizó. El proceso fue simple, eficiente y, lo más importante: João hizo un excelente trabajo en nuestro jardín. Si pudiera dar más estrellas, las daría :) ¡Felicidades por este proyecto!"',
-  },
-  {
-    id: 'monica',
-    author: 'Monica',
-    quote: '"¡Un servicio maravilloso! El talento me mantuvo siempre informada con fotos y mensajes."',
-  },
-  {
-    id: 'sofia',
-    author: 'Sofia',
-    quote: '"A mi madre le gustó mucho el servicio de Maria Paula. Gracias."',
-  },
-];
+type Props = { locale: string };
 
-export async function HomeTestimonials() {
-  const t = await getTranslations('home.testimonials');
+export async function HomeTestimonials({ locale }: Props) {
+  const [t, reviews] = await Promise.all([
+    getTranslations('home.testimonials'),
+    loadHomeReviews(locale),
+  ]);
+
+  if (reviews.length === 0) return null;
 
   return (
     <section className="bg-white px-4 py-16 md:px-6 md:py-20">
@@ -39,13 +25,14 @@ export async function HomeTestimonials() {
           {t('subtitle')}
         </p>
         <TestimonialsCarousel ariaLabel={t('carouselAria')}>
-          {SAMPLE_TESTIMONIALS.map((it) => (
+          {reviews.map((r) => (
             <TestimonialCard
-              key={it.id}
+              key={r.id}
               roleLabel={t('roleLabel')}
-              rating={5}
-              quote={it.quote}
-              author={{ name: it.author }}
+              rating={r.rating}
+              quote={r.quote}
+              author={{ name: r.authorName }}
+              photoUrl={r.photoUrl}
             />
           ))}
         </TestimonialsCarousel>

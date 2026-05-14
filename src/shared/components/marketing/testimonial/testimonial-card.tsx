@@ -1,11 +1,21 @@
+import Image from 'next/image';
+
 export type TestimonialCardProps = {
   roleLabel: string;          // e.g. "Cliente"
   rating: number;             // 0-5; rendered as N filled stars
   quote: string;
   author: { name: string; initial?: string };
+  /** Public URL of the author avatar. If absent, falls back to initial. */
+  photoUrl?: string | null;
 };
 
-export function TestimonialCard({ roleLabel, rating, quote, author }: TestimonialCardProps) {
+export function TestimonialCard({
+  roleLabel,
+  rating,
+  quote,
+  author,
+  photoUrl,
+}: TestimonialCardProps) {
   const clamped = Math.max(0, Math.min(5, Math.round(rating)));
   const initial = author.initial ?? author.name.charAt(0).toUpperCase();
   return (
@@ -31,12 +41,22 @@ export function TestimonialCard({ roleLabel, rating, quote, author }: Testimonia
         <span
           aria-hidden="true"
           className="
-            inline-flex h-9 w-9 items-center justify-center
+            inline-flex h-9 w-9 items-center justify-center overflow-hidden
             rounded-full bg-brand-blue text-brand-text
             text-[0.95rem] font-bold
           "
         >
-          {initial}
+          {photoUrl ? (
+            <Image
+              src={photoUrl}
+              alt=""
+              width={36}
+              height={36}
+              className="h-9 w-9 rounded-full object-cover"
+            />
+          ) : (
+            initial
+          )}
         </span>
         <span className="text-[0.95rem] font-bold text-brand-text">{author.name}</span>
       </footer>
