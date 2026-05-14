@@ -10,6 +10,7 @@ import { saveConfig } from '../actions/update-service';
 import { canPublish } from '../actions/config-helpers';
 import type { ServiceDetail, CountryOption, CityOption, ServiceStatus, ServiceCountryDetail, ServiceCityDetail } from '../types';
 import { SERVICE_STATUSES } from '../types';
+import { SERVICE_CATEGORIES, type ServiceCategory } from '@/shared/lib/services/types';
 import { useConfigState } from '../hooks/use-config-state';
 import { CountryConfigCard } from './country-config-card';
 
@@ -27,6 +28,9 @@ export function ServiceConfig({ service, countries, allCities, onCountriesChange
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<ServiceStatus>(service.status as ServiceStatus);
   const [allowsRecurrence, setAllowsRecurrence] = useState(service.allows_recurrence);
+  const [category, setCategory] = useState<ServiceCategory | null>(
+    (service.category as ServiceCategory | null) ?? null,
+  );
   const [selectedCountry, setSelectedCountry] = useState('');
 
   const state = useConfigState(service);
@@ -49,6 +53,7 @@ export function ServiceConfig({ service, countries, allCities, onCountriesChange
         service_id: service.id,
         status,
         allows_recurrence: allowsRecurrence,
+        category,
         countries: countryRows,
         cities: cityRows,
       });
@@ -166,6 +171,27 @@ export function ServiceConfig({ service, countries, allCities, onCountriesChange
             {t('noCities')}
           </p>
         )}
+      </div>
+
+      {/* Category */}
+      <div className="max-w-md space-y-2">
+        <Label>{t('category')}</Label>
+        <select
+          value={category ?? ''}
+          onChange={(e) =>
+            setCategory(
+              e.target.value === '' ? null : (e.target.value as ServiceCategory),
+            )
+          }
+          className="border-border bg-background flex h-9 w-full rounded-md border px-3 py-1 text-sm"
+        >
+          <option value="">{t('categoryNone')}</option>
+          {SERVICE_CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {t(`category${c[0].toUpperCase()}${c.slice(1)}`)}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Recurrence */}

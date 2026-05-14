@@ -86,7 +86,7 @@ export async function saveConfig(input: SaveConfigInput) {
     return { error: parsed.error.flatten().fieldErrors };
   }
 
-  const { service_id, status, allows_recurrence, countries, cities } = parsed.data;
+  const { service_id, status, allows_recurrence, category, countries, cities } = parsed.data;
 
   // Validate publish requirements
   if (status === 'published' && !canPublish(cities)) {
@@ -95,11 +95,14 @@ export async function saveConfig(input: SaveConfigInput) {
 
   const supabase = createClient();
 
-  // Atomic save via RPC (transactional: countries + cities together)
+  // Atomic save via RPC (transactional: countries + cities together).
+  // `p_category` is DIRECT SET on the RPC side — passing `undefined`
+  // clears it. Caller (this action) always forwards the form state.
   const { error } = await supabase.rpc('save_service_config', {
     p_service_id: service_id,
     p_status: status ?? undefined,
     p_allows_recurrence: allows_recurrence ?? undefined,
+    p_category: category ?? undefined,
     p_countries: countries as unknown as Json,
     p_cities: cities.map((c) => ({
       city_id: c.city_id,

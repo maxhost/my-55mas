@@ -1,5 +1,19 @@
 import type { AssignedSubtypeGroup, Question } from '@/shared/lib/questions/types';
 
+// ── Service category ─────────────────────────────────────
+// Bucket fijo del home (Acompañamiento / Clases / Reparaciones / Casa).
+// Matchea el enum `service_category` definido en
+// `supabase/migrations/20260514_services_category_column.sql`.
+
+export const SERVICE_CATEGORIES = [
+  'accompaniment',
+  'classes',
+  'repairs',
+  'home',
+] as const;
+
+export type ServiceCategory = (typeof SERVICE_CATEGORIES)[number];
+
 /**
  * A service published in a country, ready to be presented to a talent for hire.
  * Includes the suggested price (city-specific override → country fallback) and

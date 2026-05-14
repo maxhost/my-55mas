@@ -89,6 +89,12 @@
     "currency": "Moneda",
     "active": "Actiu",
     "allowsRecurrence": "Permet recurrència",
+    "category": "Categoría",
+    "categoryNone": "Sin categoría (no aparece en home)",
+    "categoryAccompaniment": "Acompañamiento",
+    "categoryClasses": "Clases",
+    "categoryRepairs": "Reparaciones",
+    "categoryHome": "Casa",
     "confirmArchive": "Arxivar aquest servei?",
     "addCountry": "Afegir",
     "removeCountry": "Treure país",
@@ -1176,7 +1182,9 @@
       },
       "viewAll": "Veure tots els serveis",
       "tabsAria": "Filtres de serveis",
-      "carouselAria": "Serveis disponibles"
+      "carouselAria": "Serveis disponibles",
+      "emptyAll": "Todavía no hay servicios disponibles.",
+      "emptyCategory": "No hay servicios disponibles en esta categoría."
     },
     "howtoTalents": {
       "sectionTitle": "Guanyes tu. Guanyen ells. Guanyem tots.",

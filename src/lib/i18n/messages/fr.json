@@ -89,6 +89,12 @@
     "currency": "Devise",
     "active": "Actif",
     "allowsRecurrence": "Permet la récurrence",
+    "category": "Categoría",
+    "categoryNone": "Sin categoría (no aparece en home)",
+    "categoryAccompaniment": "Acompañamiento",
+    "categoryClasses": "Clases",
+    "categoryRepairs": "Reparaciones",
+    "categoryHome": "Casa",
     "confirmArchive": "Archiver ce service ?",
     "addCountry": "Ajouter",
     "removeCountry": "Retirer le pays",
@@ -1176,7 +1182,9 @@
       },
       "viewAll": "Voir tous les services",
       "tabsAria": "Filtres de services",
-      "carouselAria": "Services disponibles"
+      "carouselAria": "Services disponibles",
+      "emptyAll": "Todavía no hay servicios disponibles.",
+      "emptyCategory": "No hay servicios disponibles en esta categoría."
     },
     "howtoTalents": {
       "sectionTitle": "Vous gagnez. Ils gagnent. Nous gagnons tous.",

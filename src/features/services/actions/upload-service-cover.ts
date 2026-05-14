@@ -11,7 +11,7 @@ import {
   coverBasePath,
   coverStoragePath,
   type CoverSize,
-} from '../lib/cover-image-storage';
+} from '@/shared/lib/services/cover-image-storage';
 
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024; // 8 MB raw upload limit
 const ACCEPTED_INPUT_MIME = new Set([

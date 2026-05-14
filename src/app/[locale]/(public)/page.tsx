@@ -45,7 +45,11 @@ export default async function PublicHomePage({ params: { locale }, searchParams 
     <>
       <JsonLdScript id="ld-home-services" data={servicesJsonLd} />
       <HomeHero />
-      <HomeServicesSection activeCategory={activeCategory} cityLabel={city.label} />
+      <HomeServicesSection
+        activeCategory={activeCategory}
+        cityLabel={city.label}
+        locale={locale}
+      />
       <HomeHowtoTalents />
       <HomeHowtoClients />
       <HomeProject />

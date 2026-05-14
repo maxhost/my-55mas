@@ -7,7 +7,7 @@ import {
   COVER_SIZES,
   SERVICE_IMAGES_BUCKET,
   coverStoragePath,
-} from '../lib/cover-image-storage';
+} from '@/shared/lib/services/cover-image-storage';
 
 const inputSchema = z.object({ serviceId: z.string().uuid() });
 

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { SERVICE_CATEGORIES } from '@/shared/lib/services/types';
 
 // ── FAQ Item ──────────────────────────────────────────
 
@@ -89,6 +90,7 @@ export const saveConfigSchema = z.object({
   service_id: z.string().uuid(),
   status: z.enum(['draft', 'published', 'archived']).optional(),
   allows_recurrence: z.boolean().optional(),
+  category: z.enum(SERVICE_CATEGORIES).nullable().optional(),
   countries: z.array(countryPriceSchema),
   cities: z.array(cityPriceSchema).default([]),
 });

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-label="Servicio 55+">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F3E9E1"/>
+      <stop offset="100%" stop-color="#FEC35A" stop-opacity="0.35"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="400" fill="url(#bg)"/>
+  <circle cx="190" cy="170" r="64" fill="#F0513A" opacity="0.18"/>
+  <circle cx="190" cy="170" r="42" fill="#F0513A" opacity="0.55"/>
+  <rect x="240" y="138" width="160" height="14" rx="7" fill="#171F46" opacity="0.22"/>
+  <rect x="240" y="166" width="220" height="14" rx="7" fill="#171F46" opacity="0.14"/>
+  <rect x="240" y="194" width="180" height="14" rx="7" fill="#171F46" opacity="0.14"/>
+  <path d="M120 290 Q300 240 480 290 L480 320 Q300 270 120 320 Z" fill="#5CB5E6" opacity="0.20"/>
+  <text x="300" y="362" text-anchor="middle" font-family="Mulish, system-ui, sans-serif" font-size="34" font-weight="700" fill="#171F46" opacity="0.55">55+</text>
+</svg>

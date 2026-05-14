@@ -89,6 +89,12 @@
     "currency": "Moeda",
     "active": "Ativo",
     "allowsRecurrence": "Permite recorrência",
+    "category": "Categoría",
+    "categoryNone": "Sin categoría (no aparece en home)",
+    "categoryAccompaniment": "Acompañamiento",
+    "categoryClasses": "Clases",
+    "categoryRepairs": "Reparaciones",
+    "categoryHome": "Casa",
     "confirmArchive": "Arquivar este serviço?",
     "addCountry": "Adicionar",
     "removeCountry": "Remover país",
@@ -1176,7 +1182,9 @@
       },
       "viewAll": "Ver todos os serviços",
       "tabsAria": "Filtros de serviços",
-      "carouselAria": "Serviços disponíveis"
+      "carouselAria": "Serviços disponíveis",
+      "emptyAll": "Todavía no hay servicios disponibles.",
+      "emptyCategory": "No hay servicios disponibles en esta categoría."
     },
     "howtoTalents": {
       "sectionTitle": "Ganhas tu. Ganham eles. Ganhamos todos.",

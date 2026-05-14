@@ -1452,6 +1452,7 @@ export type Database = {
       services: {
         Row: {
           allows_recurrence: boolean
+          category: Database["public"]["Enums"]["service_category"] | null
           cover_image_url: string | null
           created_at: string | null
           i18n: Json
@@ -1464,6 +1465,7 @@ export type Database = {
         }
         Insert: {
           allows_recurrence?: boolean
+          category?: Database["public"]["Enums"]["service_category"] | null
           cover_image_url?: string | null
           created_at?: string | null
           i18n?: Json
@@ -1476,6 +1478,7 @@ export type Database = {
         }
         Update: {
           allows_recurrence?: boolean
+          category?: Database["public"]["Enums"]["service_category"] | null
           cover_image_url?: string | null
           created_at?: string | null
           i18n?: Json
@@ -2437,19 +2440,31 @@ export type Database = {
       }
       delete_service: { Args: { p_service_id: string }; Returns: undefined }
       is_email_registered: { Args: { p_email: string }; Returns: boolean }
-      save_service_config: {
-        Args: {
-          p_allows_recurrence?: boolean
-          p_cities?: Json
-          p_countries?: Json
-          p_service_id: string
-          p_status?: string
-        }
-        Returns: undefined
-      }
+      save_service_config:
+        | {
+            Args: {
+              p_allows_recurrence?: boolean
+              p_cities?: Json
+              p_countries?: Json
+              p_service_id: string
+              p_status?: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_allows_recurrence?: boolean
+              p_category?: Database["public"]["Enums"]["service_category"]
+              p_cities?: Json
+              p_countries?: Json
+              p_service_id: string
+              p_status?: string
+            }
+            Returns: undefined
+          }
     }
     Enums: {
-      [_ in never]: never
+      service_category: "accompaniment" | "classes" | "repairs" | "home"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2576,7 +2591,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      service_category: ["accompaniment", "classes", "repairs", "home"],
+    },
   },
 } as const
-

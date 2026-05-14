@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import {
   buildCoverPublicUrl,
   type CoverSize,
-} from '../lib/cover-image-storage';
+} from '@/shared/lib/services/cover-image-storage';
 import { uploadServiceCover } from '../actions/upload-service-cover';
 import { removeServiceCover } from '../actions/remove-service-cover';
 
