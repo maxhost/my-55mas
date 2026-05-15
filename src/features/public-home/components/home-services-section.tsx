@@ -1,5 +1,8 @@
 import { getTranslations } from 'next-intl/server';
 import type { ServiceCategory } from '@/shared/lib/services/types';
+import { LocatorSelect } from '@/shared/components/marketing/locator-select';
+import { LOCATOR_CITIES } from '@/shared/lib/country';
+import { getSelectedCity } from '@/shared/lib/country/cookie-server';
 import { loadHomeServices } from '../lib/load-home-services';
 import { HomeServicesGrid } from './home-services-grid';
 
@@ -9,21 +12,17 @@ type Props = {
   /** Active filter from ?cat=... searchParam. Default 'all'. Only used
    *  for the FIRST render — subsequent filter clicks are client-only. */
   activeCategory: CategoryKey;
-  /** Label of the currently selected city (from cookie). */
-  cityLabel: string;
   /** Current request locale — used to pick localized name/benefits. */
   locale: string;
 };
 
-export async function HomeServicesSection({
-  activeCategory,
-  cityLabel,
-  locale,
-}: Props) {
-  const t = await getTranslations('home.services');
-  // Fetch all categorized published services once; client-side filtering
-  // takes over from there so tab clicks never round-trip to the server.
-  const services = await loadHomeServices(locale, 'all');
+export async function HomeServicesSection({ activeCategory, locale }: Props) {
+  const [t, tNav, services] = await Promise.all([
+    getTranslations('home.services'),
+    getTranslations('nav'),
+    loadHomeServices(locale, 'all'),
+  ]);
+  const city = getSelectedCity();
 
   return (
     <section id="services" className="bg-white px-4 py-12 md:px-6 md:py-16">
@@ -32,10 +31,16 @@ export async function HomeServicesSection({
           {t('sectionTitle')}
         </h2>
 
-        <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-brand-cream px-3.5 py-2 text-[0.92rem]">
-          <span aria-hidden="true">📍</span>
-          <span>{t('locatorLabel')}</span>
-          <span className="font-bold">{cityLabel}</span>
+        <div className="mb-5 flex max-w-[460px] flex-col gap-1">
+          <p className="text-sm font-medium text-brand-text">
+            {tNav('chooseLocation')}
+          </p>
+          <LocatorSelect
+            cities={LOCATOR_CITIES}
+            currentSlug={city.slug}
+            searchLabel={tNav('search')}
+            searchAriaLabel={tNav('searchAria')}
+          />
         </div>
 
         <HomeServicesGrid

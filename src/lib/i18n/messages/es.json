@@ -1258,7 +1258,6 @@
     },
     "services": {
       "sectionTitle": "El servicio que necesitas, cerca de ti",
-      "locatorLabel": "Elige tu ubicación",
       "tabs": {
         "all": "Todos",
         "accompaniment": "Acompañamiento",

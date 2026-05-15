@@ -1258,7 +1258,6 @@
     },
     "services": {
       "sectionTitle": "El servei que necessites, prop teu",
-      "locatorLabel": "Tria la teva ubicació",
       "tabs": {
         "all": "Tots",
         "accompaniment": "Acompanyament",

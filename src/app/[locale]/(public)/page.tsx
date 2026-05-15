@@ -1,5 +1,4 @@
 import { unstable_setRequestLocale } from 'next-intl/server';
-import { getSelectedCity } from '@/shared/lib/country/cookie-server';
 import { buildPublicMetadata, JsonLdScript, serviceItemListJsonLd } from '@/shared/lib/seo';
 import { HomeHero } from '@/features/public-home/components/home-hero';
 import { HomeServicesSection } from '@/features/public-home/components/home-services-section';
@@ -30,7 +29,6 @@ export async function generateMetadata({ params: { locale } }: { params: { local
 export default async function PublicHomePage({ params: { locale }, searchParams }: Props) {
   unstable_setRequestLocale(locale);
   const activeCategory = normalizeCategory(searchParams.cat);
-  const city = getSelectedCity();
 
   const servicesJsonLd = serviceItemListJsonLd([
     { name: 'Experiencia Gastronómica', url: '/servicios/gastronomy' },
@@ -47,7 +45,6 @@ export default async function PublicHomePage({ params: { locale }, searchParams 
       <HomeHero />
       <HomeServicesSection
         activeCategory={activeCategory}
-        cityLabel={city.label}
         locale={locale}
       />
       <HomeHowtoTalents />

@@ -5,7 +5,7 @@ import { LOCATOR_CITIES, type LocatorCity } from '@/shared/lib/country';
 import { MobileMenu } from '../mobile-menu';
 import { LangSwitcher } from '../lang-switcher';
 import { SocialsRow } from './socials-row';
-import { LocatorSelect } from './locator-select';
+import { LocatorSelect } from '@/shared/components/marketing/locator-select';
 
 type Props = {
   currentCity: LocatorCity;
