@@ -16,7 +16,7 @@ type CategoryKey = 'all' | ServiceCategory;
 
 type Props = {
   params: { locale: string };
-  searchParams: { cat?: string };
+  searchParams: { cat?: string; q?: string };
 };
 
 function normalizeCategory(raw: string | string[] | undefined): CategoryKey {
@@ -29,6 +29,10 @@ function normalizeCategory(raw: string | string[] | undefined): CategoryKey {
   ];
   if (typeof raw !== 'string') return 'all';
   return (allowed as string[]).includes(raw) ? (raw as CategoryKey) : 'all';
+}
+
+function normalizeQuery(raw: string | string[] | undefined): string {
+  return typeof raw === 'string' ? raw.slice(0, 100) : '';
 }
 
 export async function generateMetadata({ params: { locale } }: Props) {
@@ -45,6 +49,7 @@ export default async function ServicesPage({
 }: Props) {
   unstable_setRequestLocale(locale);
   const activeCategory = normalizeCategory(searchParams.cat);
+  const initialQuery = normalizeQuery(searchParams.q);
   const city = getSelectedCity();
 
   const [t, tNav, services] = await Promise.all([
@@ -103,6 +108,8 @@ export default async function ServicesPage({
             basePath="/servicios"
             showViewAll={false}
             layout="grid"
+            showSearch
+            initialQuery={initialQuery}
           />
         </div>
       </div>

@@ -1269,7 +1269,11 @@
       "tabsAria": "Filtres de serveis",
       "carouselAria": "Serveis disponibles",
       "emptyAll": "Todavía no hay servicios disponibles.",
-      "emptyCategory": "No hay servicios disponibles en esta categoría."
+      "emptyCategory": "No hay servicios disponibles en esta categoría.",
+      "searchPlaceholder": "Cerca un servei…",
+      "searchAria": "Cerca serveis per nom",
+      "emptyQuery": "No hem trobat serveis per «{query}».",
+      "searchResultsStatus": "{count, plural, =0 {Sense resultats} one {# servei} other {# serveis}}"
     },
     "howtoTalents": {
       "sectionTitle": "Guanyes tu. Guanyen ells. Guanyem tots.",
