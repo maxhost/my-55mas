@@ -2527,6 +2527,23 @@ export type Database = {
       }
       delete_service: { Args: { p_service_id: string }; Returns: undefined }
       is_email_registered: { Args: { p_email: string }; Returns: boolean }
+      register_talent_profile: {
+        Args: {
+          p_user_id: string
+          p_phone: string
+          p_address: Json
+          p_country_id: string
+          p_city_id: string
+          p_fiscal_id_type_id: string
+          p_fiscal_id: string
+          p_additional_info: string
+          p_terms_accepted: boolean
+          p_marketing_consent: boolean
+          p_preferred_locale: string
+          p_service_ids: string[]
+        }
+        Returns: Json
+      }
       save_service_config:
         | {
             Args: {

@@ -1,136 +1,189 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import type { SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
-import type { Database, Json } from '@/lib/supabase/database.types';
-import { INITIAL_TALENT_STATUS } from '@/shared/lib/domain-defaults';
+import { createAdminClient } from '@/lib/supabase/admin';
+import type { Json } from '@/lib/supabase/database.types';
 import { TalentRegistrationSchema, type TalentRegistrationSchemaOutput } from '../schemas';
+import { getServicesByLocation } from './get-services-by-location';
 
-type RegisterError = { error: Record<string, string[]> };
-type RegisterOk = { ok: true };
+export type RegisterErrorCode =
+  | 'invalid'
+  | 'invalid_location'
+  | 'invalid_fiscal_type'
+  | 'invalid_services'
+  | 'invalid_locale'
+  | 'duplicate_email'
+  | 'weak_password'
+  | 'try_later'
+  | 'unexpected';
 
-type Client = SupabaseClient<Database>;
+export type RegisterResult =
+  | {
+      error: {
+        code: RegisterErrorCode;
+        fieldErrors?: Record<string, string[]>;
+      };
+    }
+  | void;
 
 export async function registerTalent(
   input: unknown,
   locale: string,
-): Promise<RegisterError | void> {
+): Promise<RegisterResult> {
   const parsed = TalentRegistrationSchema.safeParse(input);
   if (!parsed.success) {
-    return { error: parsed.error.flatten().fieldErrors };
+    return {
+      error: {
+        code: 'invalid',
+        fieldErrors: parsed.error.flatten().fieldErrors as Record<
+          string,
+          string[]
+        >,
+      },
+    };
   }
-
-  const supabase = createClient();
   const data = parsed.data;
 
-  const userResult = await createAuthUser(supabase, data);
-  if ('error' in userResult) return userResult;
-  const userId = userResult.userId;
+  // Referential validation BEFORE signUp (anon client; public
+  // catalogs, RLS off) so an invalid payload never creates an orphan
+  // auth user. The RPC re-validates as the authoritative source.
+  const refError = await validateReferences(data, locale);
+  if (refError) return { error: { code: refError } };
 
-  const profileError = await populateProfile(supabase, userId, data, locale);
-  if (profileError) return profileError;
-
-  const talentResult = await createTalentProfile(supabase, userId, data);
-  if ('error' in talentResult) return talentResult;
-  const talentProfileId = talentResult.talentProfileId;
-
-  const servicesError = await createTalentServices(
-    supabase,
-    talentProfileId,
-    data.services,
-    data.country_id,
-  );
-  if (servicesError) return servicesError;
-
-  await sendConfirmationEmail(supabase, data.email);
-
-  redirect(`/${locale}/portal/onboarding`);
-}
-
-async function createAuthUser(
-  supabase: Client,
-  data: TalentRegistrationSchemaOutput,
-): Promise<{ userId: string } | RegisterError> {
-  const { data: result, error } = await supabase.auth.signUp({
+  // signUp (anon + SSR cookies). Keep the session to decide the
+  // post-success navigation (autoconfirm → session; confirm-on →
+  // null). No `role` in metadata (handle_new_user is hardened to
+  // always seed 'client'; talent is granted only by the RPC).
+  const supabase = createClient();
+  const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
     email: data.email,
     password: data.password,
     options: { data: { full_name: data.full_name } },
   });
-  if (error) {
-    if (/already/i.test(error.message)) {
-      return { error: { email: ['duplicateEmail'] } };
-    }
-    return { error: { _auth: [error.message] } };
+  if (signUpError) {
+    return { error: { code: mapSignUpError(signUpError.message) } };
   }
-  if (!result.user) return { error: { _auth: ['no_user'] } };
-  return { userId: result.user.id };
+  const userId = signUpData.user?.id;
+  if (!userId) return { error: { code: 'unexpected' } };
+
+  // Atomic post-signUp work via the service-role-only RPC. The
+  // try/catch wraps ONLY the RPC (never the redirect).
+  const admin = createAdminClient();
+  let rpcOk = false;
+  let rpcCode: RegisterErrorCode | null = null;
+  try {
+    const { data: rpcData, error: rpcError } = await admin.rpc(
+      'register_talent_profile',
+      {
+        p_user_id: userId,
+        p_phone: data.phone,
+        p_address: data.address as unknown as Json,
+        p_country_id: data.country_id,
+        p_city_id: data.city_id,
+        p_fiscal_id_type_id: data.fiscal_id_type_id,
+        p_fiscal_id: data.fiscal_id,
+        p_additional_info: data.additional_info ?? '',
+        p_terms_accepted: data.terms_accepted,
+        p_marketing_consent: data.marketing_consent,
+        p_preferred_locale: locale,
+        p_service_ids: data.services,
+      },
+    );
+    if (rpcError) throw rpcError;
+    const res = rpcData as { ok: boolean; code?: string };
+    rpcOk = res?.ok === true;
+    if (!rpcOk) rpcCode = (res?.code as RegisterErrorCode) ?? 'unexpected';
+  } catch (e) {
+    console.error('[registerTalent] rpc failed', e);
+    rpcCode = 'unexpected';
+  }
+
+  if (!rpcOk) {
+    // Saga compensation, idempotent: only delete the just-created
+    // auth user if the talent profile truly does not exist (a lost
+    // response could mean the RPC actually committed).
+    const { data: existing } = await admin
+      .from('talent_profiles')
+      .select('id')
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (existing) {
+      rpcOk = true; // it had completed; treat as success
+    } else {
+      await admin.auth.admin
+        .deleteUser(userId)
+        .catch((e) => console.error('[registerTalent] compensate failed', e));
+      return { error: { code: rpcCode ?? 'unexpected' } };
+    }
+  }
+
+  // Best-effort confirmation email (only relevant when confirm-on).
+  await supabase.auth
+    .resend({ type: 'signup', email: data.email })
+    .catch(() => undefined);
+
+  // Post-success navigation (deterministic, session-aware).
+  // redirect() throws NEXT_REDIRECT — intentionally OUTSIDE any
+  // try/catch.
+  if (signUpData.session) {
+    redirect(`/${locale}/portal/onboarding`);
+  }
+  redirect(`/${locale}/login?registered=talent`);
 }
 
-async function populateProfile(
-  supabase: Client,
-  userId: string,
+async function validateReferences(
   data: TalentRegistrationSchemaOutput,
   locale: string,
-): Promise<RegisterError | null> {
-  const { error } = await supabase
-    .from('profiles')
-    .update({
-      full_name: data.full_name,
-      phone: data.phone,
-      address: data.address as unknown as Json,
-      preferred_country: data.country_id,
-      preferred_city: data.city_id,
-      preferred_locale: locale,
-      active_role: 'talent',
-    })
-    .eq('id', userId);
-  if (error) return { error: { _profile: [error.message] } };
+): Promise<Exclude<RegisterErrorCode, 'invalid' | 'duplicate_email' | 'weak_password' | 'try_later' | 'unexpected'> | null> {
+  const supabase = createClient();
+
+  const [{ data: country }, { data: city }, { data: fiscal }, { data: lang }] =
+    await Promise.all([
+      supabase
+        .from('countries')
+        .select('id')
+        .eq('id', data.country_id)
+        .eq('is_active', true)
+        .maybeSingle(),
+      supabase
+        .from('cities')
+        .select('id')
+        .eq('id', data.city_id)
+        .eq('country_id', data.country_id)
+        .eq('is_active', true)
+        .maybeSingle(),
+      supabase
+        .from('fiscal_id_types')
+        .select('id')
+        .eq('id', data.fiscal_id_type_id)
+        .maybeSingle(),
+      supabase
+        .from('languages')
+        .select('code')
+        .eq('code', locale)
+        .maybeSingle(),
+    ]);
+
+  if (!country || !city) return 'invalid_location';
+  if (!fiscal) return 'invalid_fiscal_type';
+  if (!lang) return 'invalid_locale';
+
+  const allowed = await getServicesByLocation(
+    data.country_id,
+    data.city_id,
+    locale,
+  );
+  const allowedIds = new Set(allowed.map((s) => s.id));
+  if (!data.services.every((id) => allowedIds.has(id))) {
+    return 'invalid_services';
+  }
   return null;
 }
 
-async function createTalentProfile(
-  supabase: Client,
-  userId: string,
-  data: TalentRegistrationSchemaOutput,
-): Promise<{ talentProfileId: string } | RegisterError> {
-  const { data: row, error } = await supabase
-    .from('talent_profiles')
-    .insert({
-      user_id: userId,
-      status: INITIAL_TALENT_STATUS,
-      country_id: data.country_id,
-      city_id: data.city_id,
-      fiscal_id_type_id: data.fiscal_id_type_id,
-      fiscal_id: data.fiscal_id,
-      terms_accepted: data.terms_accepted,
-      marketing_consent: data.marketing_consent,
-      additional_info: data.additional_info ?? null,
-    })
-    .select('id')
-    .single();
-  if (error || !row) return { error: { _talent: [error?.message ?? 'failed'] } };
-  return { talentProfileId: row.id };
-}
-
-async function createTalentServices(
-  supabase: Client,
-  talentProfileId: string,
-  serviceIds: string[],
-  countryId: string,
-): Promise<RegisterError | null> {
-  const rows = serviceIds.map((service_id) => ({
-    talent_id: talentProfileId,
-    service_id,
-    country_id: countryId,
-    is_verified: false,
-  }));
-  const { error } = await supabase.from('talent_services').insert(rows);
-  if (error) return { error: { _services: [error.message] } };
-  return null;
-}
-
-async function sendConfirmationEmail(supabase: Client, email: string): Promise<void> {
-  // Best-effort. If it fails, registration still succeeds.
-  await supabase.auth.resend({ type: 'signup', email }).catch(() => undefined);
+function mapSignUpError(message: string): RegisterErrorCode {
+  if (/already|registered/i.test(message)) return 'duplicate_email';
+  if (/password/i.test(message)) return 'weak_password';
+  if (/rate|429|too many/i.test(message)) return 'try_later';
+  return 'unexpected';
 }

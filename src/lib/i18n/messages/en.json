@@ -820,7 +820,18 @@
     "onboardingPlaceholderHeading": "Onboarding under construction",
     "onboardingPlaceholderBody": "Soon you will be able to complete the information for each service you offer.",
     "locationNotDetected": "Start by typing your address above to detect country and city automatically.",
-    "cityManualHint": "We could not auto-detect your city. Please select it from the list."
+    "cityManualHint": "We could not auto-detect your city. Please select it from the list.",
+    "errors": {
+      "invalid": "Please review the highlighted fields.",
+      "invalid_location": "Please check the selected country and city.",
+      "invalid_fiscal_type": "The tax ID type is not valid.",
+      "invalid_services": "One of the selected services is not available in your location.",
+      "invalid_locale": "Unsupported language.",
+      "duplicate_email": "That email already has an account. Please log in.",
+      "weak_password": "The password does not meet the minimum requirements.",
+      "try_later": "Too many attempts. Please try again in a few minutes.",
+      "unexpected": "We could not complete the registration. Please try again later."
+    }
   },
   "AdminTestServiceHire": {
     "title": "Service hire test",

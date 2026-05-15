@@ -820,7 +820,18 @@
     "onboardingPlaceholderHeading": "Onboarding en construcció",
     "onboardingPlaceholderBody": "Aviat podràs completar la informació de cada servei que ofereixes.",
     "locationNotDetected": "Comença escrivint la teva adreça a dalt per detectar país i ciutat automàticament.",
-    "cityManualHint": "No hem reconegut la teva ciutat automàticament. Selecciona-la de la llista."
+    "cityManualHint": "No hem reconegut la teva ciutat automàticament. Selecciona-la de la llista.",
+    "errors": {
+      "invalid": "Revisa els camps marcats.",
+      "invalid_location": "Revisa el país i la ciutat seleccionats.",
+      "invalid_fiscal_type": "El tipus d'identificació fiscal no és vàlid.",
+      "invalid_services": "Algun dels serveis triats no està disponible a la teva ubicació.",
+      "invalid_locale": "Idioma no compatible.",
+      "duplicate_email": "Aquest email ja té un compte. Inicia sessió.",
+      "weak_password": "La contrasenya no compleix els requisits mínims.",
+      "try_later": "Massa intents. Torna-ho a provar d'aquí a uns minuts.",
+      "unexpected": "No hem pogut completar el registre. Torna-ho a provar més tard."
+    }
   },
   "AdminTestServiceHire": {
     "title": "Test de contractació de servei",

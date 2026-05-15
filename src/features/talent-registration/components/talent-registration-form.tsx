@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { CountryCode } from 'libphonenumber-js';
@@ -26,7 +27,15 @@ type Props = {
   /** Hints from page-level i18n (TalentRegistration namespace). */
   hints: { locationNotDetected: string; cityManualHint: string };
   loadServices: (countryId: string, cityId?: string) => Promise<ServiceOption[]>;
-  onSubmit: (data: TalentRegistrationSchemaInput) => Promise<{ error?: Record<string, string[]> } | void>;
+  onSubmit: (data: TalentRegistrationSchemaInput) => Promise<
+    | {
+        error?: {
+          code: string;
+          fieldErrors?: Record<string, string[]>;
+        };
+      }
+    | void
+  >;
 };
 
 const DEFAULT_VALUES: TalentRegistrationSchemaInput = {
@@ -56,6 +65,7 @@ function normalize(s: string): string {
 
 export function TalentRegistrationForm({ context, cities, hints, loadServices, onSubmit }: Props) {
   const fieldsI18n = context.i18n.fields;
+  const tErrors = useTranslations('TalentRegistration.errors');
   const [services, setServices] = useState<ServiceOption[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -123,15 +133,24 @@ export function TalentRegistrationForm({ context, cities, hints, loadServices, o
     setSubmitError(null);
     startTransition(async () => {
       const result = await onSubmit(data);
-      if (result?.error) {
-        const first = Object.entries(result.error)[0];
-        if (first) {
-          form.setError(first[0] as keyof TalentRegistrationSchemaInput, {
-            message: first[1].join(', '),
+      if (!result?.error) return; // success → the action redirects
+      const { code, fieldErrors } = result.error;
+
+      if (code === 'invalid' && fieldErrors) {
+        // Zod field errors → mapped to their real form fields.
+        for (const [field, msgs] of Object.entries(fieldErrors)) {
+          form.setError(field as keyof TalentRegistrationSchemaInput, {
+            message: msgs.join(', '),
           });
         }
-        setSubmitError('submit_failed');
+        setSubmitError(tErrors('invalid'));
+        return;
       }
+      if (code === 'duplicate_email') {
+        form.setError('email', { message: tErrors('duplicate_email') });
+      }
+      // Always surface a visible, localized form-level message.
+      setSubmitError(tErrors(code));
     });
   };
 

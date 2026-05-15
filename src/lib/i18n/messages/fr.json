@@ -820,7 +820,18 @@
     "onboardingPlaceholderHeading": "Onboarding en construction",
     "onboardingPlaceholderBody": "Vous pourrez bientôt compléter les informations de chaque service que vous offrez.",
     "locationNotDetected": "Commence par écrire ton adresse ci-dessus pour détecter le pays et la ville automatiquement.",
-    "cityManualHint": "Nous n'avons pas pu détecter ta ville automatiquement. Sélectionne-la dans la liste."
+    "cityManualHint": "Nous n'avons pas pu détecter ta ville automatiquement. Sélectionne-la dans la liste.",
+    "errors": {
+      "invalid": "Vérifiez les champs en surbrillance.",
+      "invalid_location": "Vérifiez le pays et la ville sélectionnés.",
+      "invalid_fiscal_type": "Le type d'identifiant fiscal n'est pas valide.",
+      "invalid_services": "L'un des services choisis n'est pas disponible dans votre localisation.",
+      "invalid_locale": "Langue non prise en charge.",
+      "duplicate_email": "Cet e-mail a déjà un compte. Connectez-vous.",
+      "weak_password": "Le mot de passe ne respecte pas les exigences minimales.",
+      "try_later": "Trop de tentatives. Réessayez dans quelques minutes.",
+      "unexpected": "Nous n'avons pas pu finaliser l'inscription. Réessayez plus tard."
+    }
   },
   "AdminTestServiceHire": {
     "title": "Test d'embauche de service",
