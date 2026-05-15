@@ -14,9 +14,10 @@ export type ServiceCardProps = {
   bullets: string[];
 };
 
-// Agnostic service card. Used in the home carousel + future listing pages.
-// 327×535 on desktop matches the original 55mas.es spec; fluid on smaller
-// viewports.
+// Agnostic service card. The outer footprint (width/shrink) is owned by
+// the layout container (ServicesCarousel or ServicesGrid) — the card only
+// describes its content + internal styling. 535px desktop height matches
+// the original 55mas.es spec and keeps rows uniform in both layouts.
 export function ServiceCard({ href, imageSrc, imageAlt, category, title, bullets }: ServiceCardProps) {
   const badgeColor =
     category.tone === 'salmon' ? 'bg-brand-salmon' : 'bg-brand-coral';
@@ -29,7 +30,7 @@ export function ServiceCard({ href, imageSrc, imageAlt, category, title, bullets
         border border-black/10 shadow-[0_2px_8px_rgba(23,31,70,0.06)]
         transition-[transform,box-shadow] duration-200
         hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(23,31,70,0.12)]
-        shrink-0 w-[84vw] sm:w-[calc(50%-12px)] md:w-[327px] md:h-[535px]
+        h-full md:h-[535px]
       "
     >
       <div className="relative h-60 w-full flex-shrink-0 md:h-[280px]">
@@ -37,7 +38,7 @@ export function ServiceCard({ href, imageSrc, imageAlt, category, title, bullets
           src={imageSrc}
           alt={imageAlt}
           fill
-          sizes="(max-width: 640px) 84vw, (max-width: 1024px) 50vw, 327px"
+          sizes="(max-width: 640px) 90vw, (max-width: 1024px) 50vw, 400px"
           className="object-cover"
         />
       </div>

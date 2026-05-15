@@ -48,6 +48,7 @@ export async function HomeServicesSection({ activeCategory, locale }: Props) {
           initialCategory={activeCategory}
           basePath="/"
           showViewAll
+          layout="carousel"
         />
       </div>
     </section>

@@ -102,6 +102,7 @@ export default async function ServicesPage({
             initialCategory={activeCategory}
             basePath="/servicios"
             showViewAll={false}
+            layout="grid"
           />
         </div>
       </div>

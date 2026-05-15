@@ -5,8 +5,9 @@ type Props = {
   ariaLabel?: string;
 };
 
-// Pure-CSS horizontal carousel. Children (cards) own their own widths.
-// Hidden scrollbar via Tailwind utilities — JS-free.
+// Pure-CSS horizontal carousel. The container owns child sizing (fixed
+// widths + no-shrink) so cards stay agnostic. Hidden scrollbar via
+// Tailwind utilities — JS-free.
 export function ServicesCarousel({ children, ariaLabel }: Props) {
   return (
     <div
@@ -17,7 +18,8 @@ export function ServicesCarousel({ children, ariaLabel }: Props) {
         snap-x snap-mandatory
         [scrollbar-width:none] [-ms-overflow-style:none]
         [&::-webkit-scrollbar]:hidden
-        [&>*]:snap-start
+        [&>*]:snap-start [&>*]:shrink-0
+        [&>*]:w-[84vw] sm:[&>*]:w-[calc(50%-12px)] md:[&>*]:w-[327px]
       "
     >
       {children}

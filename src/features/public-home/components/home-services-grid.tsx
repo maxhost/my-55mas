@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { ServiceCard } from '@/shared/components/marketing/service-card';
 import {
   ServicesCarousel,
+  ServicesGrid,
   ServicesFilter,
   type ServicesFilterOption,
 } from '@/shared/components/marketing/services-grid';
@@ -32,6 +33,9 @@ type Props = {
    *  (home). The /servicios page passes false because it already
    *  shows the full catalog. */
   showViewAll?: boolean;
+  /** 'carousel' (home, horizontal scroll) | 'grid' (/servicios,
+   *  3-col full listing). Default 'carousel' — backward-compat. */
+  layout?: 'carousel' | 'grid';
 };
 
 // Owns the filter state for the public services catalog. Filtering
@@ -45,6 +49,7 @@ export function HomeServicesGrid({
   initialCategory,
   basePath = '/',
   showViewAll = true,
+  layout = 'carousel',
 }: Props) {
   const t = useTranslations('home.services');
   const router = useRouter();
@@ -75,6 +80,8 @@ export function HomeServicesGrid({
       ? services
       : services.filter((s) => s.category === active);
 
+  const Wrapper = layout === 'grid' ? ServicesGrid : ServicesCarousel;
+
   return (
     <>
       <ServicesFilter
@@ -89,7 +96,7 @@ export function HomeServicesGrid({
           {t(active === 'all' ? 'emptyAll' : 'emptyCategory')}
         </p>
       ) : (
-        <ServicesCarousel ariaLabel={t('carouselAria')}>
+        <Wrapper ariaLabel={t('carouselAria')}>
           {visible.map((s) => (
             <ServiceCard
               key={s.id}
@@ -101,7 +108,7 @@ export function HomeServicesGrid({
               bullets={s.bullets}
             />
           ))}
-        </ServicesCarousel>
+        </Wrapper>
       )}
 
       {visible.length > 0 && showViewAll && (
