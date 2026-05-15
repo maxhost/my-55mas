@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useRouter } from '@/lib/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { ServiceCard } from '@/shared/components/marketing/service-card';
@@ -55,6 +55,10 @@ type Props = {
   showSearch?: boolean;
   /** Seed for the search box from the ?q= searchParam (deep-link). */
   initialQuery?: string;
+  /** Optional node rendered on the same row as the search input
+   *  (desktop) — used by /servicios to put the city locator inline
+   *  with the search box. Stacks above the input on mobile. */
+  controlsSlot?: ReactNode;
 };
 
 // Owns the filter state for the public services catalog. Filtering
@@ -71,6 +75,7 @@ export function HomeServicesGrid({
   layout = 'carousel',
   showSearch = false,
   initialQuery = '',
+  controlsSlot,
 }: Props) {
   const t = useTranslations('home.services');
   const router = useRouter();
@@ -114,7 +119,8 @@ export function HomeServicesGrid({
   return (
     <>
       {showSearch && (
-        <div className="mb-5">
+        <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-end">
+          {controlsSlot}
           <input
             type="search"
             value={query}

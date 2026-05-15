@@ -90,18 +90,6 @@ export default async function ServicesPage({
             </svg>
           </div>
 
-          <div className="mb-5 flex max-w-[460px] flex-col gap-1">
-            <p className="text-sm font-medium text-brand-text">
-              {tNav('chooseLocation')}
-            </p>
-            <LocatorSelect
-              cities={LOCATOR_CITIES}
-              currentSlug={city.slug}
-              searchLabel={tNav('search')}
-              searchAriaLabel={tNav('searchAria')}
-            />
-          </div>
-
           <HomeServicesGrid
             services={services}
             initialCategory={activeCategory}
@@ -110,6 +98,19 @@ export default async function ServicesPage({
             layout="grid"
             showSearch
             initialQuery={initialQuery}
+            controlsSlot={
+              <div className="flex max-w-[460px] flex-col gap-1">
+                <p className="text-sm font-medium text-brand-text">
+                  {tNav('chooseLocation')}
+                </p>
+                <LocatorSelect
+                  cities={LOCATOR_CITIES}
+                  currentSlug={city.slug}
+                  searchLabel={tNav('search')}
+                  searchAriaLabel={tNav('searchAria')}
+                />
+              </div>
+            }
           />
         </div>
       </div>
