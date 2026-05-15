@@ -16,7 +16,7 @@ const SECURITY_HEADERS = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data: https://fonts.gstatic.com",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.bubble.io",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.bubble.io https://api.mapbox.com",
       "frame-src 'self' https://player.vimeo.com https://www.youtube.com",
       "media-src 'self' https://player.vimeo.com",
       "object-src 'none'",
