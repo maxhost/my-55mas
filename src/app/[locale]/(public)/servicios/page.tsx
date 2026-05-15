@@ -3,8 +3,11 @@ import { loadHomeServices } from '@/features/public-home/lib/load-home-services'
 import { HomeServicesGrid } from '@/features/public-home/components/home-services-grid';
 import { JoinCta } from '@/shared/components/marketing/join-cta';
 import { LocatorSelect } from '@/shared/components/marketing/locator-select';
+import { SuggestionCtaCard } from '@/features/service-suggestions';
 import { LOCATOR_CITIES } from '@/shared/lib/country';
 import { getSelectedCity } from '@/shared/lib/country/cookie-server';
+import { listActiveCountries } from '@/shared/lib/countries/list-active-countries';
+import { listActiveCities } from '@/shared/lib/countries/list-active-cities';
 import {
   buildPublicMetadata,
   JsonLdScript,
@@ -52,10 +55,12 @@ export default async function ServicesPage({
   const initialQuery = normalizeQuery(searchParams.q);
   const city = getSelectedCity();
 
-  const [t, tNav, services] = await Promise.all([
+  const [t, tNav, services, countries, cities] = await Promise.all([
     getTranslations('services'),
     getTranslations('nav'),
     loadHomeServices(locale, 'all'),
+    listActiveCountries(locale),
+    listActiveCities(locale),
   ]);
 
   const servicesJsonLd = serviceItemListJsonLd(
@@ -110,6 +115,15 @@ export default async function ServicesPage({
                   searchAriaLabel={tNav('searchAria')}
                 />
               </div>
+            }
+            gridCtaSlot={
+              <SuggestionCtaCard
+                title={t('suggestionCard.title')}
+                body={t('suggestionCard.body')}
+                buttonLabel={t('suggestionCard.button')}
+                countries={countries}
+                cities={cities}
+              />
             }
           />
         </div>

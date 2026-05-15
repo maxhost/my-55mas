@@ -1394,6 +1394,42 @@
     "cta": {
       "title": "Got talent to share? Join 55+ as a talent",
       "button": "I want to offer a service"
+    },
+    "suggestionCard": {
+      "title": "Can't find the service you need?",
+      "body": "Tell us what you're looking for. Your suggestion helps us improve and keep connecting the talent and experience of our community with those who need it most. Let's talk!",
+      "button": "Send us a suggestion"
+    }
+  },
+  "ServiceSuggestion": {
+    "modalTitle": "Send us a suggestion",
+    "modalDescription": "Tell us what service you need and we'll let you know when it's available.",
+    "fullNameLabel": "Full name",
+    "fullNamePlaceholder": "Your first and last name",
+    "serviceNeededLabel": "What service do you need?",
+    "serviceNeededPlaceholder": "Describe the service you're looking for",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@email.com",
+    "countryLabel": "Country",
+    "countryPlaceholder": "Select a country",
+    "cityLabel": "City",
+    "cityPlaceholder": "Select a city",
+    "cityDisabledHint": "Choose a country first",
+    "commentsLabel": "Comments",
+    "commentsPlaceholder": "Tell us more (optional)",
+    "submit": "Send suggestion",
+    "cancel": "Cancel",
+    "successToast": "Thanks! We received your suggestion.",
+    "errorGeneric": "Could not send. Please try again.",
+    "errorLocation": "Please check the selected country and city.",
+    "errorNotConfigured": "Sending is unavailable right now. Please try later.",
+    "errorSend": "Could not send the suggestion. Please try later.",
+    "validation": {
+      "fullName": "Enter your full name.",
+      "serviceNeeded": "Tell us what service you need.",
+      "email": "Enter a valid email.",
+      "countryId": "Select a country.",
+      "cityId": "Select a city."
     }
   },
   "legal": {

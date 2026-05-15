@@ -1394,6 +1394,42 @@
     "cta": {
       "title": "¿Tenés talento para compartir? Sumate como talento 55+",
       "button": "Quiero ofrecer un servicio"
+    },
+    "suggestionCard": {
+      "title": "¿No encuentras el servicio que necesitas?",
+      "body": "Cuéntanos qué buscas. Tu sugerencia nos ayuda a mejorar y a seguir conectando el talento y experiencia de nuestra comunidad con quienes más lo necesitan. ¡Hablemos!",
+      "button": "Haznos una sugerencia"
+    }
+  },
+  "ServiceSuggestion": {
+    "modalTitle": "Haznos una sugerencia",
+    "modalDescription": "Cuéntanos qué servicio necesitas y te avisaremos cuando esté disponible.",
+    "fullNameLabel": "Nombre completo",
+    "fullNamePlaceholder": "Tu nombre y apellido",
+    "serviceNeededLabel": "¿Qué servicio necesitas?",
+    "serviceNeededPlaceholder": "Describe el servicio que buscas",
+    "emailLabel": "Correo electrónico",
+    "emailPlaceholder": "tu@email.com",
+    "countryLabel": "País",
+    "countryPlaceholder": "Selecciona un país",
+    "cityLabel": "Ciudad",
+    "cityPlaceholder": "Selecciona una ciudad",
+    "cityDisabledHint": "Elige un país primero",
+    "commentsLabel": "Comentarios",
+    "commentsPlaceholder": "Cuéntanos más (opcional)",
+    "submit": "Enviar sugerencia",
+    "cancel": "Cancelar",
+    "successToast": "¡Gracias! Recibimos tu sugerencia.",
+    "errorGeneric": "No se pudo enviar. Intenta de nuevo.",
+    "errorLocation": "Revisa el país y la ciudad seleccionados.",
+    "errorNotConfigured": "El envío no está disponible por ahora. Intenta más tarde.",
+    "errorSend": "No se pudo enviar la sugerencia. Intenta más tarde.",
+    "validation": {
+      "fullName": "Ingresa tu nombre completo.",
+      "serviceNeeded": "Indica qué servicio necesitas.",
+      "email": "Ingresa un email válido.",
+      "countryId": "Selecciona un país.",
+      "cityId": "Selecciona una ciudad."
     }
   },
   "legal": {

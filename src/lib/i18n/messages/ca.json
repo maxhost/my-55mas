@@ -1394,6 +1394,42 @@
     "cta": {
       "title": "Tens talent per compartir? Uneix-te a 55+ com a talent",
       "button": "Vull oferir un servei"
+    },
+    "suggestionCard": {
+      "title": "No trobes el servei que necessites?",
+      "body": "Explica'ns què busques. El teu suggeriment ens ajuda a millorar i a seguir connectant el talent i l'experiència de la nostra comunitat amb qui més ho necessita. Parlem-ne!",
+      "button": "Fes-nos un suggeriment"
+    }
+  },
+  "ServiceSuggestion": {
+    "modalTitle": "Fes-nos un suggeriment",
+    "modalDescription": "Explica'ns quin servei necessites i t'avisarem quan estigui disponible.",
+    "fullNameLabel": "Nom complet",
+    "fullNamePlaceholder": "El teu nom i cognom",
+    "serviceNeededLabel": "Quin servei necessites?",
+    "serviceNeededPlaceholder": "Descriu el servei que busques",
+    "emailLabel": "Correu electrònic",
+    "emailPlaceholder": "tu@email.com",
+    "countryLabel": "País",
+    "countryPlaceholder": "Selecciona un país",
+    "cityLabel": "Ciutat",
+    "cityPlaceholder": "Selecciona una ciutat",
+    "cityDisabledHint": "Tria un país primer",
+    "commentsLabel": "Comentaris",
+    "commentsPlaceholder": "Explica'ns més (opcional)",
+    "submit": "Envia el suggeriment",
+    "cancel": "Cancel·la",
+    "successToast": "Gràcies! Hem rebut el teu suggeriment.",
+    "errorGeneric": "No s'ha pogut enviar. Torna-ho a provar.",
+    "errorLocation": "Revisa el país i la ciutat seleccionats.",
+    "errorNotConfigured": "L'enviament no està disponible ara mateix. Prova-ho més tard.",
+    "errorSend": "No s'ha pogut enviar el suggeriment. Prova-ho més tard.",
+    "validation": {
+      "fullName": "Introdueix el teu nom complet.",
+      "serviceNeeded": "Indica quin servei necessites.",
+      "email": "Introdueix un email vàlid.",
+      "countryId": "Selecciona un país.",
+      "cityId": "Selecciona una ciutat."
     }
   },
   "legal": {

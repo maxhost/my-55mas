@@ -59,6 +59,11 @@ type Props = {
    *  (desktop) — used by /servicios to put the city locator inline
    *  with the search box. Stacks above the input on mobile. */
   controlsSlot?: ReactNode;
+  /** Optional node appended as the LAST grid item (grid layout only) —
+   *  used by /servicios for the "suggest a service" CTA card. When
+   *  present, an empty result set still renders the grid (just the
+   *  CTA) instead of the empty-text paragraph. */
+  gridCtaSlot?: ReactNode;
 };
 
 // Owns the filter state for the public services catalog. Filtering
@@ -76,6 +81,7 @@ export function HomeServicesGrid({
   showSearch = false,
   initialQuery = '',
   controlsSlot,
+  gridCtaSlot,
 }: Props) {
   const t = useTranslations('home.services');
   const router = useRouter();
@@ -115,6 +121,11 @@ export function HomeServicesGrid({
   const visible = filterServices(services, active, query);
   const Wrapper = layout === 'grid' ? ServicesGrid : ServicesCarousel;
   const trimmedQuery = query.trim();
+  const hasGridCta = layout === 'grid' && Boolean(gridCtaSlot);
+  const showEmptyText = visible.length === 0 && !hasGridCta;
+  const emptyMsg = trimmedQuery
+    ? t('emptyQuery', { query: trimmedQuery })
+    : t(active === 'all' ? 'emptyAll' : 'emptyCategory');
 
   return (
     <>
@@ -153,12 +164,8 @@ export function HomeServicesGrid({
         </p>
       )}
 
-      {visible.length === 0 ? (
-        <p className="my-10 text-center text-brand-text/70">
-          {trimmedQuery
-            ? t('emptyQuery', { query: trimmedQuery })
-            : t(active === 'all' ? 'emptyAll' : 'emptyCategory')}
-        </p>
+      {showEmptyText ? (
+        <p className="my-10 text-center text-brand-text/70">{emptyMsg}</p>
       ) : (
         <Wrapper ariaLabel={t('carouselAria')}>
           {visible.map((s) => (
@@ -172,7 +179,14 @@ export function HomeServicesGrid({
               bullets={s.bullets}
             />
           ))}
+          {hasGridCta ? gridCtaSlot : null}
         </Wrapper>
+      )}
+
+      {hasGridCta && visible.length === 0 && (
+        <p role="status" aria-live="polite" className="sr-only">
+          {emptyMsg}
+        </p>
       )}
 
       {visible.length > 0 && showViewAll && (

@@ -1394,6 +1394,42 @@
     "cta": {
       "title": "Tem talento para compartilhar? Junte-se à 55+ como talento",
       "button": "Quero oferecer um serviço"
+    },
+    "suggestionCard": {
+      "title": "Não encontras o serviço que precisas?",
+      "body": "Conta-nos o que procuras. A tua sugestão ajuda-nos a melhorar e a continuar a ligar o talento e a experiência da nossa comunidade a quem mais precisa. Vamos conversar!",
+      "button": "Envia-nos uma sugestão"
+    }
+  },
+  "ServiceSuggestion": {
+    "modalTitle": "Envia-nos uma sugestão",
+    "modalDescription": "Conta-nos que serviço precisas e avisamos-te quando estiver disponível.",
+    "fullNameLabel": "Nome completo",
+    "fullNamePlaceholder": "O teu nome e apelido",
+    "serviceNeededLabel": "Que serviço precisas?",
+    "serviceNeededPlaceholder": "Descreve o serviço que procuras",
+    "emailLabel": "Email",
+    "emailPlaceholder": "tu@email.com",
+    "countryLabel": "País",
+    "countryPlaceholder": "Seleciona um país",
+    "cityLabel": "Cidade",
+    "cityPlaceholder": "Seleciona uma cidade",
+    "cityDisabledHint": "Escolhe um país primeiro",
+    "commentsLabel": "Comentários",
+    "commentsPlaceholder": "Conta-nos mais (opcional)",
+    "submit": "Enviar sugestão",
+    "cancel": "Cancelar",
+    "successToast": "Obrigado! Recebemos a tua sugestão.",
+    "errorGeneric": "Não foi possível enviar. Tenta novamente.",
+    "errorLocation": "Verifica o país e a cidade selecionados.",
+    "errorNotConfigured": "O envio não está disponível agora. Tenta mais tarde.",
+    "errorSend": "Não foi possível enviar a sugestão. Tenta mais tarde.",
+    "validation": {
+      "fullName": "Indica o teu nome completo.",
+      "serviceNeeded": "Indica que serviço precisas.",
+      "email": "Indica um email válido.",
+      "countryId": "Seleciona um país.",
+      "cityId": "Seleciona uma cidade."
     }
   },
   "legal": {

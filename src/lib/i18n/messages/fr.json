@@ -1394,6 +1394,42 @@
     "cta": {
       "title": "Vous avez du talent à partager ? Rejoignez 55+ en tant que talent",
       "button": "Je veux offrir un service"
+    },
+    "suggestionCard": {
+      "title": "Vous ne trouvez pas le service dont vous avez besoin ?",
+      "body": "Dites-nous ce que vous cherchez. Votre suggestion nous aide à nous améliorer et à continuer de connecter le talent et l'expérience de notre communauté avec ceux qui en ont le plus besoin. Parlons-en !",
+      "button": "Envoyez-nous une suggestion"
+    }
+  },
+  "ServiceSuggestion": {
+    "modalTitle": "Envoyez-nous une suggestion",
+    "modalDescription": "Dites-nous quel service vous avez besoin et nous vous préviendrons dès qu'il sera disponible.",
+    "fullNameLabel": "Nom complet",
+    "fullNamePlaceholder": "Votre prénom et nom",
+    "serviceNeededLabel": "De quel service avez-vous besoin ?",
+    "serviceNeededPlaceholder": "Décrivez le service que vous cherchez",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "vous@email.com",
+    "countryLabel": "Pays",
+    "countryPlaceholder": "Sélectionnez un pays",
+    "cityLabel": "Ville",
+    "cityPlaceholder": "Sélectionnez une ville",
+    "cityDisabledHint": "Choisissez d'abord un pays",
+    "commentsLabel": "Commentaires",
+    "commentsPlaceholder": "Dites-nous en plus (facultatif)",
+    "submit": "Envoyer la suggestion",
+    "cancel": "Annuler",
+    "successToast": "Merci ! Nous avons reçu votre suggestion.",
+    "errorGeneric": "Échec de l'envoi. Veuillez réessayer.",
+    "errorLocation": "Vérifiez le pays et la ville sélectionnés.",
+    "errorNotConfigured": "L'envoi n'est pas disponible pour le moment. Réessayez plus tard.",
+    "errorSend": "Impossible d'envoyer la suggestion. Réessayez plus tard.",
+    "validation": {
+      "fullName": "Saisissez votre nom complet.",
+      "serviceNeeded": "Indiquez le service dont vous avez besoin.",
+      "email": "Saisissez un e-mail valide.",
+      "countryId": "Sélectionnez un pays.",
+      "cityId": "Sélectionnez une ville."
     }
   },
   "legal": {
